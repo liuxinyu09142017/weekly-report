@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>工作周报系统 - 增强版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1f2937;
+            --secondary: #374151;
+            --accent: #2563eb;
+            --border: #e5e7eb;
+            --bg-light: #f9fafb;
+            --text-dark: #111827;
+            --text-light: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --pre-sales: #8b5cf6;
+            --after-sales: #06b6d4;
+            --signed: #10b981;
+            --pipeline: #f59e0b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans CJK SC', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 24px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .main {
+            padding: 24px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-light);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .filters {
+            background: var(--bg-light);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-dark);
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .analysis-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .analysis-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .analysis-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 8px;
+        }
+
+        .analysis-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .analysis-item:last-child {
+            border-bottom: none;
+        }
+
+        .analysis-label {
+            color: var(--text-light);
+        }
+
+        .analysis-value {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: white;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-presales {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--pre-sales);
+        }
+
+        .badge-aftersales {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--after-sales);
+        }
+
+        .badge-signed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--signed);
+        }
+
+        .badge-pipeline {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--pipeline);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 11px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-light);
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .analysis-cards {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 工作周报系统 - 增强版</h1>
+            <p>智能工作时间追踪、多维度统计分析与工作量管理</p>
+        </div>
+
+        <div class="main">
+            <!-- 日期范围过滤 -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label>开始日期</label>
+                    <input type="date" id="filterStartDate">
+                </div>
+                <div class="filter-group">
+                    <label>结束日期</label>
+                    <input type="date" id="filterEndDate">
+                </div>
+                <div class="filter-group">
+                    <label>项目类型</label>
+                    <select id="filterProjectType">
+                        <option value="">全部</option>
+                        <option value="presales">售前</option>
+                        <option value="aftersales">售后</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>签单状态</label>
+                    <select id="filterSignedStatus">
+                        <option value="">全部</option>
+                        <option value="signed">已签单</option>
+                        <option value="pipeline">Pipeline</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>行业</label>
+                    <input type="text" id="filterIndustry" placeholder="输入行业">
+                </div>
+                <div class="filter-group">
+                    <label>客户</label>
+                    <input type="text" id="filterClient" placeholder="输入客户名">
+                </div>
+                <div class="filter-group">
+                    <label>销售人员</label>
+                    <input type="text" id="filterSalesperson" placeholder="输入销售名">
+                </div>
+                <div class="filter-group" style="align-self: flex-end;">
+                    <button class="btn btn-primary" onclick="applyFilters()">应用筛选</button>
+                </div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">总项目金额</div>
+                    <div class="stat-value" id="totalAmount">£0K</div>
+                    <div class="stat-sub" id="totalCount">共0个项目</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">售前项目金额</div>
+                    <div class="stat-value" id="preSalesAmount">£0K</div>
+                    <div class="stat-sub" id="preSalesCount">共0个项目</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">售前已签单</div>
+                    <div class="stat-value" id="signedAmount" style="color: var(--signed);">£0K</div>
+                    <div class="stat-sub" id="signedCount">共0个项目</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">售前Pipeline</div>
+                    <div class="stat-value" id="pipelineAmount" style="color: var(--pipeline);">£0K</div>
+                    <div class="stat-sub" id="pipelineCount">共0个项目</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">售后项目金额</div>
+                    <div class="stat-value" id="afterSalesAmount">£0K</div>
+                    <div class="stat-sub" id="afterSalesCount">共0个项目</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">工作时长</div>
+                    <div class="stat-value" id="workHours">0h</div>
+                    <div class="stat-sub" id="workDays">0天</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">加班时长</div>
+                    <div class="stat-value" id="overtimeHours" style="color: var(--danger);">0h</div>
+                    <div class="stat-sub" id="overtimeDays">0天</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">客户数 / 销售人员数</div>
+                    <div class="stat-value" id="clientCount">0 / 0</div>
+                    <div class="stat-sub">不重复计算</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">本周加班时长</div>
+                    <div class="stat-value" id="weekOvertimeHours" style="color: var(--danger);">0h</div>
+                    <div class="stat-sub" id="weekOvertimeInfo">本周：0天加班</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">本周支持项目数</div>
+                    <div class="stat-value" id="weekProjectCount">0</div>
+                    <div class="stat-sub" id="weekProjectInfo">个项目</div>
+                </div>
+            </div>
+
+            <!-- 多维度分析 -->
+            <div class="analysis-cards">
+                <div class="analysis-card">
+                    <h3>按行业统计金额</h3>
+                    <div id="industryAnalysis"></div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>按客户统计金额</h3>
+                    <div id="clientAnalysis"></div>
+                </div>
+
+                <div class="analysis-card">
+                    <h3>按销售人员统计金额</h3>
+                    <div id="salespersonAnalysis"></div>
+                </div>
+            </div>
+
+            <!-- 控制按钮 -->
+            <div class="controls">
+                <button class="btn btn-primary" onclick="openAddModal()">➕ 添加新项目</button>
+                <button class="btn btn-secondary" onclick="exportData()">💾 导出数据</button>
+                <button class="btn btn-secondary" onclick="openImportModal()">📥 导入数据</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">🔄 重置筛选</button>
+                <button class="btn btn-primary" onclick="generateWeeklyReport()">📋 生成周报</button>
+                <button class="btn btn-primary" onclick="sendEmailReport()">📧 发送邮件</button>
+            </div>
+
+            <!-- 数据表格 -->
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>客户</th>
+                            <th>项目</th>
+                            <th>行业</th>
+                            <th>类型</th>
+                            <th>签单</th>
+                            <th>规模(K£)</th>
+                            <th>销售</th>
+                            <th>工程师</th>
+                            <th>工作时长</th>
+                            <th>加班时长</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">最后更新：<span id="lastUpdate">-</span></div>
+    </div>
+
+    <!-- 添加项目模态框 -->
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">添加新项目</div>
+            <form onsubmit="saveData(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>周起始日期 *</label>
+                        <input type="date" id="weekStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>客户名称 *</label>
+                        <input type="text" id="clientName" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>项目名称 *</label>
+                        <input type="text" id="projectName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>行业 *</label>
+                        <input type="text" id="industry" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>国家 *</label>
+                        <input type="text" id="country" required>
+                    </div>
+                    <div class="form-group">
+                        <label>项目规模 (K£) *</label>
+                        <input type="number" id="projectScale" step="0.1" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>项目类型 *</label>
+                        <select id="projectType" onchange="updateProjectStages()" required>
+                            <option value="">-- 请选择 --</option>
+                            <option value="presales">售前</option>
+                            <option value="aftersales">售后</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>销售人员 *</label>
+                        <input type="text" id="salesperson" required>
+                    </div>
+                </div>
+
+                <div id="presalesSection" style="display:none;">
+                    <div class="form-group">
+                        <label>签单状态</label>
+                        <select id="signedStatus">
+                            <option value="pipeline">Pipeline</option>
+                            <option value="signed">已签单</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>进度阶段</label>
+                    <input type="text" id="projectStage" placeholder="如：技术方案、现场保障">
+                </div>
+
+                <div class="form-group">
+                    <label>工作时长 (h)</label>
+                    <input type="number" id="workHours" step="0.5" min="0" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label>加班时长 (h)</label>
+                    <input type="number" id="overtimeHours" step="0.5" min="0" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label>主工程师</label>
+                    <input type="text" id="engineerName">
+                </div>
+
+                <div class="form-group">
+                    <label>合作工程师</label>
+                    <input type="text" id="collaboratorNames" placeholder="多个工程师用逗号分隔">
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeFormModal()" style="flex:1;">取消</button>
+                    <button type="submit" class="btn btn-primary" style="flex:1;">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 导入模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">导入数据</div>
+            <div class="form-group">
+                <label>选择CSV或Excel文件</label>
+                <input type="file" id="fileInput" accept=".csv,.xls,.xlsx">
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary" onclick="closeImportModal()" style="flex:1;">取消</button>
+                <button class="btn btn-primary" onclick="importData()" style="flex:1;">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 周报预览模态框 -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">工作周报 - 文字版</div>
+            <div id="reportContent" style="background: white; padding: 16px; border-radius: 8px; max-height: 600px; overflow-y: auto; white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; color: var(--text-dark);"></div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-secondary" onclick="closeReportModal()" style="flex:1;">关闭</button>
+                <button class="btn btn-primary" onclick="copyReportToClipboard()" style="flex:1;">📋 复制到剪贴板</button>
+                <button class="btn btn-primary" onclick="generateAISummary()" style="flex:1;">✨ AI生成摘要</button>
+                <button class="btn btn-primary" onclick="sendEmailReport()" style="flex:1;">📧 发送邮件</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 发送邮件模态框 -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">发送周报邮件</div>
+            <div class="form-group">
+                <label>收件人邮箱 *</label>
+                <input type="email" id="emailRecipient" placeholder="example@company.com" required>
+            </div>
+            <div class="form-group">
+                <label>抄送（可选）</label>
+                <input type="text" id="emailCC" placeholder="多个邮箱用逗号分隔">
+            </div>
+            <div class="form-group">
+                <label>邮件主题 *</label>
+                <input type="text" id="emailSubject" placeholder="工作周报" required>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary" onclick="closeEmailModal()" style="flex:1;">取消</button>
+                <button class="btn btn-primary" onclick="sendEmail()" style="flex:1;">📧 发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI摘要模态框 -->
+    <div id="aiSummaryModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">✨ AI生成摘要</div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-size: 13px; color: var(--text-light);">
+                    <input type="checkbox" id="useAISummary" checked> 使用AI生成的摘要（使用Claude API）
+                </label>
+            </div>
+            <div id="aiSummaryContent" style="background: white; padding: 16px; border-radius: 8px; max-height: 600px; overflow-y: auto; white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; color: var(--text-dark); border: 1px solid var(--border);"></div>
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-light);">
+                <p>注：AI摘要使用Claude API生成，需要联网。如无网络或API不可用，请使用原始周报。</p>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 16px;">
+                <button class="btn btn-secondary" onclick="closeAISummaryModal()" style="flex:1;">关闭</button>
+                <button class="btn btn-primary" onclick="copyAISummaryToClipboard()" style="flex:1;">📋 复制摘要</button>
+                <button class="btn btn-primary" onclick="useAISummaryForEmail()" style="flex:1;">📧 用此摘要发送邮件</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+        let filteredData = [];
+        const STORAGE_KEY = 'weeklyReportData_enhanced';
+
+        const stageOptions = {
+            presales: ['需求调研', '技术研讨', '工勘', '技术方案', '预算审批', '招标中', '投标材料准备', '提交报价', '待公布结果', '已公布结果', '已下单', '已到货'],
+            aftersales: ['编写售后实施方案', '编写实施计划', '整理验收文档', '现场交付', '割接', '现场保障', '用户培训', '现场验收', '运维支持', '故障排查']
+        };
+
+        function init() {
+            loadData();
+            setDefaultDate();
+            updateStats();
+        }
+
+        function loadData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            allData = stored ? JSON.parse(stored) : [];
+            filteredData = JSON.parse(JSON.stringify(allData));
+            renderTable();
+        }
+
+        function setDefaultDate() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+            const monday = new Date(today.setDate(diff));
+            document.getElementById('weekStartDate').value = monday.toISOString().split('T')[0];
+        }
+
+        function updateProjectStages() {
+            const type = document.getElementById('projectType').value;
+            const presalesSection = document.getElementById('presalesSection');
+            if (type === 'presales') {
+                presalesSection.style.display = 'block';
+            } else {
+                presalesSection.style.display = 'none';
+            }
+        }
+
+        function applyFilters() {
+            const startDate = document.getElementById('filterStartDate').value;
+            const endDate = document.getElementById('filterEndDate').value;
+            const projectType = document.getElementById('filterProjectType').value;
+            const signedStatus = document.getElementById('filterSignedStatus').value;
+            const industry = document.getElementById('filterIndustry').value.toLowerCase();
+            const client = document.getElementById('filterClient').value.toLowerCase();
+            const salesperson = document.getElementById('filterSalesperson').value.toLowerCase();
+
+            filteredData = allData.filter(item => {
+                if (startDate && item.weekStartDate < startDate) return false;
+                if (endDate && item.weekStartDate > endDate) return false;
+                if (projectType && item.projectType !== projectType) return false;
+                if (signedStatus && item.signedStatus !== signedStatus) return false;
+                if (industry && !item.industry.toLowerCase().includes(industry)) return false;
+                if (client && !item.clientName.toLowerCase().includes(client)) return false;
+                if (salesperson && !item.salesperson.toLowerCase().includes(salesperson)) return false;
+                return true;
+            });
+
+            renderTable();
+            updateStats();
+        }
+
+        function resetFilters() {
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            document.getElementById('filterProjectType').value = '';
+            document.getElementById('filterSignedStatus').value = '';
+            document.getElementById('filterIndustry').value = '';
+            document.getElementById('filterClient').value = '';
+            document.getElementById('filterSalesperson').value = '';
+            filteredData = JSON.parse(JSON.stringify(allData));
+            renderTable();
+            updateStats();
+        }
+
+        function getWeekStartDate() {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+            const monday = new Date(today.setDate(diff));
+            return monday.toISOString().split('T')[0];
+        }
+
+        function updateStats() {
+            // 基础统计
+            const totalAmount = filteredData.reduce((sum, item) => sum + item.projectScale, 0);
+            const preSalesData = filteredData.filter(item => item.projectType === 'presales');
+            const preSalesAmount = preSalesData.reduce((sum, item) => sum + item.projectScale, 0);
+            const signedData = preSalesData.filter(item => item.signedStatus === 'signed');
+            const signedAmount = signedData.reduce((sum, item) => sum + item.projectScale, 0);
+            const pipelineData = preSalesData.filter(item => item.signedStatus === 'pipeline');
+            const pipelineAmount = pipelineData.reduce((sum, item) => sum + item.projectScale, 0);
+            const afterSalesAmount = filteredData.filter(item => item.projectType === 'aftersales').reduce((sum, item) => sum + item.projectScale, 0);
+
+            const totalWorkHours = filteredData.reduce((sum, item) => sum + (item.workHours || 0), 0);
+            const totalOvertimeHours = filteredData.reduce((sum, item) => sum + (item.overtimeHours || 0), 0);
+
+            // 统计客户和销售人员
+            const uniqueClients = new Set(filteredData.map(item => item.clientName));
+            const uniqueSalespeople = new Set(filteredData.map(item => item.salesperson));
+
+            // 本周统计
+            const weekStartDate = getWeekStartDate();
+            const weekEndDate = new Date(new Date(weekStartDate).getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            const weekData = allData.filter(item => item.weekStartDate === weekStartDate);
+            const weekOvertimeHours = weekData.reduce((sum, item) => sum + (item.overtimeHours || 0), 0);
+            const weekProjectCount = new Set(weekData.map(item => item.projectName)).size;
+
+            // 更新卡片
+            document.getElementById('totalAmount').textContent = '£' + totalAmount.toFixed(1) + 'K';
+            document.getElementById('totalCount').textContent = '共' + filteredData.length + '个项目';
+
+            document.getElementById('preSalesAmount').textContent = '£' + preSalesAmount.toFixed(1) + 'K';
+            document.getElementById('preSalesCount').textContent = '共' + preSalesData.length + '个项目';
+
+            document.getElementById('signedAmount').textContent = '£' + signedAmount.toFixed(1) + 'K';
+            document.getElementById('signedCount').textContent = '共' + signedData.length + '个项目';
+
+            document.getElementById('pipelineAmount').textContent = '£' + pipelineAmount.toFixed(1) + 'K';
+            document.getElementById('pipelineCount').textContent = '共' + pipelineData.length + '个项目';
+
+            document.getElementById('afterSalesAmount').textContent = '£' + afterSalesAmount.toFixed(1) + 'K';
+            document.getElementById('afterSalesCount').textContent = '共' + filteredData.filter(item => item.projectType === 'aftersales').length + '个项目';
+
+            document.getElementById('workHours').textContent = totalWorkHours.toFixed(1) + 'h';
+            document.getElementById('workDays').textContent = '约' + Math.ceil(totalWorkHours / 8.5) + '天';
+
+            document.getElementById('overtimeHours').textContent = totalOvertimeHours.toFixed(1) + 'h';
+            document.getElementById('overtimeDays').textContent = '约' + Math.ceil(totalOvertimeHours / 8.5) + '天';
+
+            document.getElementById('clientCount').textContent = uniqueClients.size + ' / ' + uniqueSalespeople.size;
+
+            // 本周统计
+            document.getElementById('weekOvertimeHours').textContent = weekOvertimeHours.toFixed(1) + 'h';
+            const weekDays = Math.ceil(weekOvertimeHours / 8.5);
+            document.getElementById('weekOvertimeInfo').textContent = `周期：${weekStartDate} 到 ${weekEndDate}`;
+
+            document.getElementById('weekProjectCount').textContent = weekProjectCount;
+            document.getElementById('weekProjectInfo').textContent = `本周支持 ${weekProjectCount} 个项目`;
+
+            // 多维度分析
+            updateAnalysis();
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('zh-CN');
+        }
+
+        function updateAnalysis() {
+            // 按行业统计
+            const industryMap = {};
+            filteredData.forEach(item => {
+                industryMap[item.industry] = (industryMap[item.industry] || 0) + item.projectScale;
+            });
+
+            const industryHTML = Object.entries(industryMap)
+                .sort((a, b) => b[1] - a[1])
+                .map(([industry, amount]) => `
+                    <div class="analysis-item">
+                        <span class="analysis-label">${industry}</span>
+                        <span class="analysis-value">£${amount.toFixed(1)}K</span>
+                    </div>
+                `).join('');
+            document.getElementById('industryAnalysis').innerHTML = industryHTML || '<div class="analysis-item"><span>无数据</span></div>';
+
+            // 按客户统计
+            const clientMap = {};
+            filteredData.forEach(item => {
+                clientMap[item.clientName] = (clientMap[item.clientName] || 0) + item.projectScale;
+            });
+
+            const clientHTML = Object.entries(clientMap)
+                .sort((a, b) => b[1] - a[1])
+                .map(([client, amount]) => `
+                    <div class="analysis-item">
+                        <span class="analysis-label">${client}</span>
+                        <span class="analysis-value">£${amount.toFixed(1)}K</span>
+                    </div>
+                `).join('');
+            document.getElementById('clientAnalysis').innerHTML = clientHTML || '<div class="analysis-item"><span>无数据</span></div>';
+
+            // 按销售人员统计
+            const salespersonMap = {};
+            filteredData.forEach(item => {
+                salespersonMap[item.salesperson] = (salespersonMap[item.salesperson] || 0) + item.projectScale;
+            });
+
+            const salespersonHTML = Object.entries(salespersonMap)
+                .sort((a, b) => b[1] - a[1])
+                .map(([salesperson, amount]) => `
+                    <div class="analysis-item">
+                        <span class="analysis-label">${salesperson}</span>
+                        <span class="analysis-value">£${amount.toFixed(1)}K</span>
+                    </div>
+                `).join('');
+            document.getElementById('salespersonAnalysis').innerHTML = salespersonHTML || '<div class="analysis-item"><span>无数据</span></div>';
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;">暂无数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filteredData.map((item, index) => {
+                const typeBadge = item.projectType === 'presales' 
+                    ? '<span class="badge badge-presales">售前</span>'
+                    : '<span class="badge badge-aftersales">售后</span>';
+
+                const signedBadge = item.projectType === 'presales'
+                    ? (item.signedStatus === 'signed' 
+                        ? '<span class="badge badge-signed">已签单</span>'
+                        : '<span class="badge badge-pipeline">Pipeline</span>')
+                    : '-';
+
+                return `
+                    <tr>
+                        <td>${item.clientName}</td>
+                        <td>${item.projectName}</td>
+                        <td>${item.industry}</td>
+                        <td>${typeBadge}</td>
+                        <td>${signedBadge}</td>
+                        <td>£${item.projectScale}</td>
+                        <td>${item.salesperson}</td>
+                        <td>${item.engineerName}</td>
+                        <td>${item.workHours}h</td>
+                        <td>${item.overtimeHours}h</td>
+                        <td>
+                            <button class="btn btn-small btn-primary" onclick="editData(${index})">编辑</button>
+                            <button class="btn btn-small btn-secondary" onclick="deleteData(${index})">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function saveData(event) {
+            event.preventDefault();
+
+            const newData = {
+                weekStartDate: document.getElementById('weekStartDate').value,
+                clientName: document.getElementById('clientName').value,
+                projectName: document.getElementById('projectName').value,
+                industry: document.getElementById('industry').value,
+                country: document.getElementById('country').value,
+                projectScale: parseFloat(document.getElementById('projectScale').value),
+                projectType: document.getElementById('projectType').value,
+                signedStatus: document.getElementById('projectType').value === 'presales' ? document.getElementById('signedStatus').value : '',
+                projectStage: document.getElementById('projectStage').value,
+                salesperson: document.getElementById('salesperson').value,
+                workHours: parseFloat(document.getElementById('workHours').value) || 0,
+                overtimeHours: parseFloat(document.getElementById('overtimeHours').value) || 0,
+                engineerName: document.getElementById('engineerName').value,
+                collaboratorNames: document.getElementById('collaboratorNames').value,
+                date: new Date().toISOString()
+            };
+
+            allData.push(newData);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+            filteredData = JSON.parse(JSON.stringify(allData));
+            renderTable();
+            updateStats();
+            closeFormModal();
+        }
+
+        function deleteData(index) {
+            if (confirm('确定删除?')) {
+                const dataIndex = allData.findIndex(item => JSON.stringify(item) === JSON.stringify(filteredData[index]));
+                if (dataIndex >= 0) {
+                    allData.splice(dataIndex, 1);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+                    filteredData.splice(index, 1);
+                    renderTable();
+                    updateStats();
+                }
+            }
+        }
+
+        function editData(index) {
+            alert('编辑功能开发中...');
+        }
+
+        function exportData() {
+            const headers = ['周起始日期', '客户名称', '项目名称', '行业', '国家', '项目规模(K£)', '项目类型', '签单状态', '进度阶段', '销售人员', '主工程师', '合作工程师', '工作时长', '加班时长'];
+            const rows = filteredData.map(item => [
+                item.weekStartDate, item.clientName, item.projectName, item.industry, item.country,
+                item.projectScale, item.projectType, item.signedStatus, item.projectStage,
+                item.salesperson, item.engineerName, item.collaboratorNames, item.workHours, item.overtimeHours
+            ]);
+
+            const csv = [headers, ...rows].map(row => 
+                row.map(cell => `"${cell.toString().replace(/"/g, '""')}"`).join(',')
+            ).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'weekly-report.csv';
+            link.click();
+        }
+
+        function importData() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) {
+                alert('请选择文件');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const lines = content.split('\n').filter(line => line.trim());
+                    
+                    if (lines.length < 2) {
+                        alert('文件格式错误');
+                        return;
+                    }
+
+                    // 简单的CSV解析
+                    const parseCSVLine = (line) => {
+                        const result = [];
+                        let current = '';
+                        let insideQuotes = false;
+                        
+                        for (let i = 0; i < line.length; i++) {
+                            const char = line[i];
+                            if (char === '"') {
+                                if (insideQuotes && line[i + 1] === '"') {
+                                    current += '"';
+                                    i++;
+                                } else {
+                                    insideQuotes = !insideQuotes;
+                                }
+                            } else if (char === ',' && !insideQuotes) {
+                                result.push(current);
+                                current = '';
+                            } else {
+                                current += char;
+                            }
+                        }
+                        result.push(current);
+                        return result;
+                    };
+
+                    const headers = parseCSVLine(lines[0]);
+                    let importCount = 0;
+
+                    for (let i = 1; i < lines.length; i++) {
+                        const values = parseCSVLine(lines[i]);
+                        if (values.length < headers.length) continue;
+
+                        const row = {};
+                        headers.forEach((h, idx) => {
+                            row[h.trim()] = values[idx] || '';
+                        });
+
+                        allData.push({
+                            weekStartDate: row['周起始日期'],
+                            clientName: row['客户名称'],
+                            projectName: row['项目名称'],
+                            industry: row['行业'],
+                            country: row['国家'],
+                            projectScale: parseFloat(row['项目规模(K£)']) || 0,
+                            projectType: row['项目类型'],
+                            signedStatus: row['签单状态'],
+                            projectStage: row['进度阶段'],
+                            salesperson: row['销售人员'],
+                            workHours: parseFloat(row['工作时长']) || 0,
+                            overtimeHours: parseFloat(row['加班时长']) || 0,
+                            engineerName: row['主工程师'],
+                            collaboratorNames: row['合作工程师'],
+                            date: new Date().toISOString()
+                        });
+                        importCount++;
+                    }
+
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+                    filteredData = JSON.parse(JSON.stringify(allData));
+                    renderTable();
+                    updateStats();
+                    closeImportModal();
+                    alert(`成功导入 ${importCount} 条记录`);
+                } catch (error) {
+                    alert('导入失败: ' + error.message);
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function openAddModal() {
+            document.getElementById('formModal').classList.add('active');
+        }
+
+        function closeFormModal() {
+            document.getElementById('formModal').classList.remove('active');
+            document.getElementById('dataForm').reset();
+            setDefaultDate();
+        }
+
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+            document.getElementById('fileInput').value = '';
+        }
+
+        function generateWeeklyReport() {
+            const weekStartDate = getWeekStartDate();
+            const weekData = allData.filter(item => item.weekStartDate === weekStartDate);
+
+            if (weekData.length === 0) {
+                alert('本周暂无项目数据，无法生成周报');
+                return;
+            }
+
+            let report = generateReportContent(weekData, weekStartDate);
+            document.getElementById('reportContent').textContent = report;
+            document.getElementById('reportModal').classList.add('active');
+        }
+
+        function generateReportContent(weekData, weekStartDate) {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('zh-CN');
+            const weekEndDate = new Date(new Date(weekStartDate).getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+            // 简单统计
+            const totalAmount = weekData.reduce((sum, item) => sum + item.projectScale, 0);
+            const totalWorkHours = weekData.reduce((sum, item) => sum + (item.workHours || 0), 0);
+            const totalOvertimeHours = weekData.reduce((sum, item) => sum + (item.overtimeHours || 0), 0);
+
+            let report = `周报 - ${weekStartDate}\n\n`;
+
+            // 按客户分组显示项目
+            const groupedByClient = {};
+            weekData.forEach(item => {
+                if (!groupedByClient[item.clientName]) {
+                    groupedByClient[item.clientName] = [];
+                }
+                groupedByClient[item.clientName].push(item);
+            });
+
+            let projectIndex = 1;
+            Object.entries(groupedByClient).forEach(([client, projects]) => {
+                const clientTotal = projects.reduce((sum, p) => sum + p.projectScale, 0);
+
+                report += `${projectIndex}. ${client}\n`;
+                report += `内容：${projects.map(p => p.projectName).join('、')}\n`;
+                report += `规模：${clientTotal.toFixed(1)}K EURO\n`;
+                report += `下一步工作计划：完成${projects[0].projectStage || '项目交付'}，相关细节需要双方沟通确认\n`;
+                report += `\n`;
+
+                projectIndex++;
+            });
+
+            // 添加统计信息
+            report += `工作总结：\n`;
+            report += `本周共支持 ${Object.keys(groupedByClient).length} 个客户，${weekData.length} 个项目\n`;
+            report += `项目总金额：${totalAmount.toFixed(1)}K EURO\n`;
+            report += `工作时长：${totalWorkHours.toFixed(1)}h\n`;
+            report += `加班时长：${totalOvertimeHours.toFixed(1)}h\n`;
+
+            return report;
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('active');
+        }
+
+        function copyReportToClipboard() {
+            const reportContent = document.getElementById('reportContent').textContent;
+            navigator.clipboard.writeText(reportContent).then(() => {
+                alert('周报已复制到剪贴板！');
+            }).catch(err => {
+                alert('复制失败，请重试');
+            });
+        }
+
+        function downloadReportAsText() {
+            const reportContent = document.getElementById('reportContent').textContent;
+            const weekStartDate = getWeekStartDate();
+            const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `周报_${weekStartDate}.txt`;
+            link.click();
+        }
+
+        function openEmailModal() {
+            document.getElementById('emailModal').classList.add('active');
+            const weekStartDate = getWeekStartDate();
+            document.getElementById('emailSubject').value = `${weekStartDate} 周工作周报`;
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.remove('active');
+        }
+
+        function sendEmailReport() {
+            openEmailModal();
+        }
+
+        async function generateAISummary() {
+            const reportContent = document.getElementById('reportContent').textContent;
+            
+            document.getElementById('aiSummaryContent').textContent = '正在生成摘要，请稍候...';
+            document.getElementById('aiSummaryModal').classList.add('active');
+
+            try {
+                // 调用Claude API来生成摘要
+                const apiKey = prompt('请输入你的Claude API Key（用于生成AI摘要）：\n\n如果没有，可以到 https://console.anthropic.com 获取\n\n留空将使用原始周报');
+                
+                if (apiKey === null) {
+                    // 用户取消
+                    document.getElementById('aiSummaryContent').textContent = reportContent;
+                    return;
+                }
+
+                if (!apiKey) {
+                    // 用户没有输入API Key，使用原始周报
+                    document.getElementById('aiSummaryContent').textContent = reportContent;
+                    alert('已使用原始周报。如需AI摘要，请提供API Key。');
+                    return;
+                }
+
+                // 发送请求到Claude API
+                const response = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-opus-4-20250805',
+                        max_tokens: 1000,
+                        messages: [
+                            {
+                                role: 'user',
+                                content: `请根据以下工作周报，生成一份简洁的邮件摘要。要求：
+1. 格式简洁，按照"客户名称 - 项目内容 - 下一步计划"的格式
+2. 突出重点，包含金额和关键交付内容
+3. 适合直接发送给部门领导
+4. 中文回复，保持专业语气
+
+原始周报：
+${reportContent}
+
+请生成邮件摘要：`
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error?.message || '生成摘要失败');
+                }
+
+                const data = await response.json();
+                const summary = data.content[0].text;
+                document.getElementById('aiSummaryContent').textContent = summary;
+            } catch (error) {
+                document.getElementById('aiSummaryContent').textContent = `生成摘要失败：${error.message}\n\n已回退到原始周报：\n\n${reportContent}`;
+            }
+        }
+
+        function closeAISummaryModal() {
+            document.getElementById('aiSummaryModal').classList.remove('active');
+        }
+
+        function copyAISummaryToClipboard() {
+            const summaryContent = document.getElementById('aiSummaryContent').textContent;
+            navigator.clipboard.writeText(summaryContent).then(() => {
+                alert('摘要已复制到剪贴板！');
+            }).catch(err => {
+                alert('复制失败，请重试');
+            });
+        }
+
+        function useAISummaryForEmail() {
+            const summaryContent = document.getElementById('aiSummaryContent').textContent;
+            
+            // 保存摘要内容到临时变量
+            window.currentEmailContent = summaryContent;
+            
+            closeAISummaryModal();
+            openEmailModal();
+        }
+
+        function sendEmail() {
+            const recipient = document.getElementById('emailRecipient').value;
+            const cc = document.getElementById('emailCC').value;
+            const subject = document.getElementById('emailSubject').value;
+            
+            // 优先使用AI摘要，其次使用原始周报
+            let emailContent = window.currentEmailContent || document.getElementById('reportContent').textContent;
+
+            if (!recipient) {
+                alert('请输入收件人邮箱');
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(recipient)) {
+                alert('请输入有效的邮箱地址');
+                return;
+            }
+
+            const mailtoBody = encodeURIComponent(emailContent).substring(0, 32000);
+            const mailtoCC = cc ? `&cc=${encodeURIComponent(cc)}` : '';
+            const mailtoUrl = `mailto:${recipient}?subject=${encodeURIComponent(subject)}${mailtoCC}&body=${mailtoBody}`;
+
+            alert(`即将打开邮件客户端...`);
+            window.open(mailtoUrl);
+            closeEmailModal();
+            
+            // 清除临时保存的AI摘要
+            window.currentEmailContent = null;
+        }
+
+        window.onclick = function(event) {
+            if (event.target.id === 'formModal') closeFormModal();
+            if (event.target.id === 'importModal') closeImportModal();
+            if (event.target.id === 'reportModal') closeReportModal();
+            if (event.target.id === 'emailModal') closeEmailModal();
+            if (event.target.id === 'aiSummaryModal') closeAISummaryModal();
+        }
+
+        init();
+    </script>
+</body>
+</html>
