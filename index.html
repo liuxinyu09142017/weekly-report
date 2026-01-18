@@ -10,70 +10,188 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
     
     <style>
-        /* 保留你原有的 CSS 样式，此处省略以节省空间，建议直接粘贴原代码样式 */
-        :root { --primary: #1f2937; --accent: #2563eb; --bg-light: #f9fafb; --text-dark: #111827; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg-light); margin: 0; padding: 16px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        :root {
+            --primary: #1f2937;
+            --secondary: #374151;
+            --accent: #2563eb;
+            --border: #e5e7eb;
+            --bg-light: #f9fafb;
+            --text-dark: #111827;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            min-height: 80vh;
+        }
+
+        /* 登录页样式 */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .user-pill {
+            background: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .role-badge {
+            background: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* 表格样式 */
+        .main-content { padding: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); color: #6b7280; font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+        
+        /* 按钮样式 */
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .btn-primary { background: var(--accent); color: white; }
-        .main { padding: 20px; }
-        /* ... 其他样式保持不变 ... */
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-outline { border: 1px solid var(--border); background: white; }
+        .btn-danger { color: var(--danger); background: none; }
+
+        /* 模态框 */
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; }
+        .modal.active { display: flex; }
+        .modal-content { background:white; padding:24px; border-radius:12px; width:400px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display:block; margin-bottom:5px; font-size:12px; font-weight:600; }
+        .form-group input, .form-group select { width:100%; padding:8px; border:1px solid var(--border); border-radius:4px; box-sizing: border-box; }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <div id="loginPage" class="login-page" style="padding: 100px 20px; text-align: center;">
-            <h1 style="margin-bottom: 20px;">📊 工作周报系统</h1>
-            <button class="btn btn-primary" onclick="signInWithGoogle()" style="font-size: 16px; padding: 12px 24px;">
-                使用 Google 账号登录
+        <div id="authCheck" style="text-align: center; padding: 50px;">正在初始化系统...</div>
+
+        <div id="loginPage" class="login-container" style="display: none;">
+            <h1 style="font-size: 40px; margin-bottom: 10px;">📊</h1>
+            <h2>企业周报管理系统</h2>
+            <p style="color: #6b7280; margin-bottom: 30px;">请使用 Google 账号登录以同步云端数据</p>
+            <button class="btn btn-primary" onclick="signIn()" style="padding: 12px 30px; font-size: 16px;">
+                Google 账号一键登录
             </button>
-            <p id="loginStatus" style="margin-top: 20px; color: #666;"></p>
         </div>
 
         <div id="mainPage" style="display: none;">
             <div class="header">
                 <div>
-                    <h2 id="headerTitle">工作周报系统</h2>
-                    <p id="userEmailDisplay" style="font-size: 12px; opacity: 0.8;"></p>
+                    <h2 style="margin: 0; font-size: 18px;">周报概览</h2>
                 </div>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <span id="roleBadge" style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px; font-size: 12px;">工程师</span>
-                    <button class="btn" style="background: #4b5563; color: white;" onclick="logout()">登出</button>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <div class="user-pill">
+                        <span id="userEmail">---</span>
+                        <span id="roleLabel" class="role-badge">工程师</span>
+                    </div>
+                    <button class="btn btn-outline" style="font-size: 12px;" onclick="signOut()">登出</button>
                 </div>
             </div>
 
-            <div class="main">
-                <div style="margin-bottom: 20px;">
-                    <button class="btn btn-primary" onclick="openModal()">+ 新增周报条目</button>
+            <div class="main-content">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <button class="btn btn-primary" onclick="toggleModal(true)">+ 新增项目条目</button>
+                    <div id="statsInfo" style="font-size: 14px; color: #6b7280;"></div>
                 </div>
-                
-                <div id="contentSection">
-                    <table style="width: 100%; border-collapse: collapse;" id="projectTable">
-                        <thead>
-                            <tr style="background: #f3f4f6; text-align: left;">
-                                <th style="padding: 12px;">客户</th>
-                                <th>项目</th>
-                                <th>金额</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="projectsTableBody"></tbody>
-                    </table>
-                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>客户名称</th>
+                            <th>项目名称</th>
+                            <th>规模 (K£)</th>
+                            <th>工程师</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        <tr><td colspan="5" style="text-align: center; color: #9ca3af; padding: 40px;">暂无周报条目，请点击新增</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top: 0;">新增周报项</h3>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label>客户名称 *</label>
+                    <input type="text" id="clientName" required placeholder="例如：某大型银行">
+                </div>
+                <div class="form-group">
+                    <label>项目名称 *</label>
+                    <input type="text" id="projectName" required placeholder="例如：核心网络升级">
+                </div>
+                <div class="form-group">
+                    <label>项目规模 (K£) *</label>
+                    <input type="number" id="projectScale" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label>专业方向</label>
+                    <select id="specialty">
+                        <option value="网络">网络</option>
+                        <option value="系统">系统</option>
+                        <option value="基础设施">基础设施</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn btn-outline" style="flex: 1;" onclick="toggleModal(false)">取消</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">保存条目</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // --- 请将此处替换为你自己的 Firebase 配置 ---
+        // --- 1. 初始化 Firebase (配置来自你提供的图片) ---
         const firebaseConfig = {
-            apiKey: "你的API_KEY",
-            authDomain: "你的项目ID.firebaseapp.com",
-            projectId: "你的项目ID",
-            storageBucket: "你的项目ID.appspot.com",
-            messagingSenderId: "你的发送者ID",
-            appId: "你的APP_ID"
+            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qLK_TAy9U",
+            authDomain: "weekly-report-d55e9.firebaseapp.com",
+            projectId: "weekly-report-d55e9",
+            storageBucket: "weekly-report-d55e9.firebasestorage.app",
+            messagingSenderId: "315332641675",
+            appId: "1:315332641675:web:1f8ab523df0b86a47c258e",
+            measurementId: "G-ZBYL1WTJNK"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -81,99 +199,113 @@
         const auth = firebase.auth();
 
         let currentUser = null;
-        let userRole = 'engineer';
+        let isAdmin = false;
 
-        // 登录逻辑
-        async function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                const result = await auth.signInWithPopup(provider);
-                console.log("登录成功");
-            } catch (error) {
-                alert("登录失败: " + error.message);
-            }
-        }
-
-        // 获取角色逻辑 (优化版)
-        async function checkUserRole(email) {
-            try {
-                // 预设管理员邮箱 (你可以直接在这里硬编码，也可以读数据库)
-                const adminList = ['liuxinyu0914@gmail.com']; 
-                if (adminList.includes(email)) {
-                    return 'admin';
-                }
-                
-                // 尝试从 Firestore 获取更多配置
-                const doc = await db.collection('config').doc('settings').get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.adminEmails && data.adminEmails.includes(email)) return 'admin';
-                    if (data.leaderEmails && data.leaderEmails.includes(email)) return 'leader';
-                }
-                return 'engineer';
-            } catch (e) {
-                console.warn("角色检查受限，默认为工程师");
-                return 'engineer';
-            }
-        }
-
-        // 监听登录状态
+        // --- 2. 身份验证逻辑 ---
         auth.onAuthStateChanged(async (user) => {
+            document.getElementById('authCheck').style.display = 'none';
             if (user) {
                 currentUser = user;
-                userRole = await checkUserRole(user.email);
+                // 判断是否为管理员 (在此处硬编码你的邮箱，或之后在 Firestore 建立 admin 集合)
+                isAdmin = (user.email === "liuxinyu0914@gmail.com"); 
                 
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('mainPage').style.display = 'block';
-                document.getElementById('userEmailDisplay').textContent = user.email;
-                document.getElementById('roleBadge').textContent = userRole === 'admin' ? '管理员' : '工程师';
-                
+                showUI('mainPage');
+                document.getElementById('userEmail').innerText = user.email;
+                document.getElementById('roleLabel').innerText = isAdmin ? "管理员" : "工程师";
                 loadData();
             } else {
-                document.getElementById('loginPage').style.display = 'block';
-                document.getElementById('mainPage').style.display = 'none';
+                showUI('loginPage');
             }
         });
 
+        async function signIn() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try { await auth.signInWithPopup(provider); } 
+            catch (e) { alert("登录失败: " + e.message); }
+        }
+
+        function signOut() { auth.signOut(); }
+
+        // --- 3. 数据读写逻辑 ---
         async function loadData() {
-            const tbody = document.getElementById('projectsTableBody');
-            tbody.innerHTML = '<tr><td colspan="4">加载中...</td></tr>';
-            
+            const tbody = document.getElementById('dataTableBody');
             try {
                 let query = db.collection('projects');
-                // 如果不是管理员，只看自己的数据
-                if (userRole !== 'admin') {
-                    query = query.where('userId', '==', currentUser.uid);
-                }
                 
+                // 逻辑限制：非管理员只能看到自己提交的周报
+                if (!isAdmin) {
+                    query = query.where('uid', '==', currentUser.uid);
+                }
+
                 const snapshot = await query.orderBy('createdAt', 'desc').get();
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #9ca3af; padding: 40px;">暂无条目</td></tr>';
+                    return;
+                }
+
                 let html = '';
+                let totalAmount = 0;
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    totalAmount += parseFloat(data.projectScale || 0);
                     html += `
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 12px;">${data.clientName}</td>
+                        <tr>
+                            <td>${data.clientName}</td>
                             <td>${data.projectName}</td>
                             <td>£${data.projectScale}K</td>
-                            <td><button onclick="deleteDoc('${doc.id}')" style="color:red; background:none; border:none; cursor:pointer;">删除</button></td>
+                            <td>${data.userName || '未知'}</td>
+                            <td>
+                                <button class="btn btn-danger" style="font-size: 12px;" onclick="deleteItem('${doc.id}')">删除</button>
+                            </td>
                         </tr>
                     `;
                 });
-                tbody.innerHTML = html || '<tr><td colspan="4">暂无数据</td></tr>';
+                tbody.innerHTML = html;
+                document.getElementById('statsInfo').innerText = `当前统计：${snapshot.size} 个项目 | 总金额：£${totalAmount.toFixed(1)}K`;
             } catch (e) {
-                tbody.innerHTML = `<tr><td colspan="4">加载失败: ${e.message}</td></tr>`;
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">数据加载失败，请检查 Firestore 安全规则。</td></tr>`;
             }
         }
 
-        async function deleteDoc(id) {
-            if(confirm('确定删除吗？')) {
+        document.getElementById('projectForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const newItem = {
+                clientName: document.getElementById('clientName').value,
+                projectName: document.getElementById('projectName').value,
+                projectScale: parseFloat(document.getElementById('projectScale').value),
+                specialty: document.getElementById('specialty').value,
+                uid: currentUser.uid,
+                userName: currentUser.displayName || currentUser.email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                await db.collection('projects').add(newItem);
+                toggleModal(false);
+                document.getElementById('projectForm').reset();
+                loadData();
+            } catch (e) {
+                alert("保存失败，请确认 Firestore 写入权限已开启。");
+            }
+        };
+
+        async function deleteItem(id) {
+            if (confirm("确定删除该条目吗？")) {
                 await db.collection('projects').doc(id).delete();
                 loadData();
             }
         }
 
-        function logout() {
-            auth.signOut();
+        // --- 4. 辅助函数 ---
+        function showUI(id) {
+            document.getElementById('loginPage').style.display = (id === 'loginPage' ? 'flex' : 'none');
+            document.getElementById('mainPage').style.display = (id === 'mainPage' ? 'block' : 'none');
+        }
+
+        function toggleModal(show) {
+            document.getElementById('addModal').classList.toggle('active', show);
         }
     </script>
 </body>
