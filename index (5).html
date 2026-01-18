@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业级工作周报系统 V11</title>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9fafb; padding: 16px; }
+        .container { max-width: 1600px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .header { background: #1f2937; color: white; padding: 24px; }
+        .header h1 { font-size: 28px; margin-bottom: 5px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .content { padding: 40px; }
+        .login-center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; gap: 20px; }
+        .login-title { font-size: 32px; text-align: center; margin-bottom: 20px; }
+        .login-desc { font-size: 16px; color: #6b7280; text-align: center; margin-bottom: 30px; }
+        .google-btn { padding: 14px 28px; background: white; border: 1px solid #dadce0; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 10px; }
+        .google-btn:hover { background: #f8f9fa; border-color: #d0d0d0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .status { margin-top: 20px; padding: 12px 20px; background: #e0e7ff; border-radius: 6px; color: #667eea; font-size: 14px; text-align: center; }
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
+        .user-details h3 { margin: 0; font-size: 14px; font-weight: 600; }
+        .user-details p { margin: 3px 0 0 0; font-size: 12px; color: #6b7280; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .btn-logout { background: #ef4444; color: white; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: #f9fafb; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb; text-align: center; }
+        .stat-label { font-size: 12px; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
+        .stat-value { font-size: 24px; font-weight: 700; color: #2563eb; }
+        .info-box { background: #f0f4ff; border-left: 4px solid #2563eb; padding: 20px; border-radius: 8px; }
+        .info-box h3 { margin-bottom: 12px; color: #2563eb; }
+        .info-box p { margin: 6px 0; font-size: 13px; color: #374151; }
+        .login-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 企业级工作周报系统 V11</h1>
+            <p>多用户云端版 - Firestore数据库</p>
+        </div>
+
+        <!-- 登录页 -->
+        <div id="loginPage" class="content">
+            <div class="login-center">
+                <h2 class="login-title">欢迎登录</h2>
+                <p class="login-desc">
+                    使用Google账户登录<br>
+                    享受云端数据同步服务
+                </p>
+                <button class="google-btn" onclick="signInWithGoogle()">
+                    🔐 使用Google账户登录
+                </button>
+                <div class="status" id="statusMsg">系统已就绪</div>
+            </div>
+        </div>
+
+        <!-- 仪表板 -->
+        <div id="dashboard" class="content dashboard">
+            <div class="dash-header">
+                <h2>仪表板</h2>
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">用</div>
+                    <div class="user-details">
+                        <h3 id="userName">用户名</h3>
+                        <p id="userEmail">邮箱</p>
+                    </div>
+                    <button class="btn btn-logout" onclick="logout()">登出</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">系统状态</div>
+                    <div class="stat-value">✅</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">数据库</div>
+                    <div class="stat-value">☁️</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">认证方式</div>
+                    <div class="stat-value">🔒</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">版本</div>
+                    <div class="stat-value">V11</div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>🎉 系统已就绪！</h3>
+                <p><strong>当前用户：</strong> <span id="currentUser">-</span></p>
+                <p><strong>项目ID：</strong> weekly-report-d55e9</p>
+                <p><strong>数据库：</strong> Google Firestore</p>
+                <p><strong>认证：</strong> Firebase Google OAuth</p>
+                <p><strong>状态：</strong> ✅ 正常运行</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Sign-In库 -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+        let currentUser = null;
+
+        // 初始化Google Sign-In
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: '1018033981926-cg6bl58ehp3kpm0rlcr7vlgeg8iore3g.apps.googleusercontent.com',
+                callback: handleCredentialResponse
+            });
+        };
+
+        // 处理Google登录响应
+        function handleCredentialResponse(response) {
+            console.log('Google登录成功:', response);
+            
+            // 解码JWT token获取用户信息
+            const base64Url = response.credential.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+                atob(base64).split('').map(c => {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join('')
+            );
+            
+            currentUser = JSON.parse(jsonPayload);
+            console.log('用户信息:', currentUser);
+            showDashboard();
+        }
+
+        // Google登录
+        function signInWithGoogle() {
+            document.getElementById('statusMsg').textContent = '正在连接Google...';
+            google.accounts.id.renderButton(
+                document.createElement('div'),
+                { theme: 'outline', size: 'large' }
+            );
+            // 触发Google登录流程
+            const btn = document.querySelector('[data-login-uri]');
+            if (btn) btn.click();
+        }
+
+        // 显示仪表板
+        function showDashboard() {
+            if (!currentUser) return;
+
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('currentUser').textContent = currentUser.name + ' (' + currentUser.email + ')';
+
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboard').classList.add('active');
+        }
+
+        // 登出
+        function logout() {
+            currentUser = null;
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('loginPage').style.display = 'block';
+            document.getElementById('statusMsg').textContent = '系统已就绪';
+        }
+    </script>
+</body>
+</html>
