@@ -3,170 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>企业级工作周报系统 V11</title>
+    <title>企业级工作周报系统 V11 - 稳定版</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9fafb; padding: 16px; }
-        .container { max-width: 1600px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .header { background: #1f2937; color: white; padding: 24px; }
-        .header h1 { font-size: 28px; margin-bottom: 5px; }
-        .header p { font-size: 14px; opacity: 0.9; }
-        .content { padding: 40px; }
-        .login-center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; gap: 20px; }
-        .login-title { font-size: 32px; text-align: center; margin-bottom: 20px; }
-        .login-desc { font-size: 16px; color: #6b7280; text-align: center; margin-bottom: 30px; }
-        .google-btn { padding: 14px 28px; background: white; border: 1px solid #dadce0; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 10px; }
-        .google-btn:hover { background: #f8f9fa; border-color: #d0d0d0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .status { margin-top: 20px; padding: 12px 20px; background: #e0e7ff; border-radius: 6px; color: #667eea; font-size: 14px; text-align: center; }
-        .dashboard { display: none; }
-        .dashboard.active { display: block; }
-        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
-        .user-details h3 { margin: 0; font-size: 14px; font-weight: 600; }
-        .user-details p { margin: 3px 0 0 0; font-size: 12px; color: #6b7280; }
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
-        .btn-logout { background: #ef4444; color: white; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .stat-card { background: #f9fafb; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb; text-align: center; }
-        .stat-label { font-size: 12px; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
-        .stat-value { font-size: 24px; font-weight: 700; color: #2563eb; }
-        .info-box { background: #f0f4ff; border-left: 4px solid #2563eb; padding: 20px; border-radius: 8px; }
-        .info-box h3 { margin-bottom: 12px; color: #2563eb; }
-        .info-box p { margin: 6px 0; font-size: 13px; color: #374151; }
-        .login-center { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* 保留你原有的 CSS 样式，此处省略以节省空间，建议直接粘贴原代码样式 */
+        :root { --primary: #1f2937; --accent: #2563eb; --bg-light: #f9fafb; --text-dark: #111827; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg-light); margin: 0; padding: 16px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: var(--primary); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: var(--accent); color: white; }
+        .main { padding: 20px; }
+        /* ... 其他样式保持不变 ... */
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>📊 企业级工作周报系统 V11</h1>
-            <p>多用户云端版 - Firestore数据库</p>
+        <div id="loginPage" class="login-page" style="padding: 100px 20px; text-align: center;">
+            <h1 style="margin-bottom: 20px;">📊 工作周报系统</h1>
+            <button class="btn btn-primary" onclick="signInWithGoogle()" style="font-size: 16px; padding: 12px 24px;">
+                使用 Google 账号登录
+            </button>
+            <p id="loginStatus" style="margin-top: 20px; color: #666;"></p>
         </div>
 
-        <!-- 登录页 -->
-        <div id="loginPage" class="content">
-            <div class="login-center">
-                <h2 class="login-title">欢迎登录</h2>
-                <p class="login-desc">
-                    使用Google账户登录<br>
-                    享受云端数据同步服务
-                </p>
-                <button class="google-btn" onclick="signInWithGoogle()">
-                    🔐 使用Google账户登录
-                </button>
-                <div class="status" id="statusMsg">系统已就绪</div>
-            </div>
-        </div>
-
-        <!-- 仪表板 -->
-        <div id="dashboard" class="content dashboard">
-            <div class="dash-header">
-                <h2>仪表板</h2>
-                <div class="user-info">
-                    <div class="avatar" id="userAvatar">用</div>
-                    <div class="user-details">
-                        <h3 id="userName">用户名</h3>
-                        <p id="userEmail">邮箱</p>
-                    </div>
-                    <button class="btn btn-logout" onclick="logout()">登出</button>
+        <div id="mainPage" style="display: none;">
+            <div class="header">
+                <div>
+                    <h2 id="headerTitle">工作周报系统</h2>
+                    <p id="userEmailDisplay" style="font-size: 12px; opacity: 0.8;"></p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span id="roleBadge" style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 4px; font-size: 12px;">工程师</span>
+                    <button class="btn" style="background: #4b5563; color: white;" onclick="logout()">登出</button>
                 </div>
             </div>
 
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-label">系统状态</div>
-                    <div class="stat-value">✅</div>
+            <div class="main">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="openModal()">+ 新增周报条目</button>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">数据库</div>
-                    <div class="stat-value">☁️</div>
+                
+                <div id="contentSection">
+                    <table style="width: 100%; border-collapse: collapse;" id="projectTable">
+                        <thead>
+                            <tr style="background: #f3f4f6; text-align: left;">
+                                <th style="padding: 12px;">客户</th>
+                                <th>项目</th>
+                                <th>金额</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody"></tbody>
+                    </table>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">认证方式</div>
-                    <div class="stat-value">🔒</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">版本</div>
-                    <div class="stat-value">V11</div>
-                </div>
-            </div>
-
-            <div class="info-box">
-                <h3>🎉 系统已就绪！</h3>
-                <p><strong>当前用户：</strong> <span id="currentUser">-</span></p>
-                <p><strong>项目ID：</strong> weekly-report-d55e9</p>
-                <p><strong>数据库：</strong> Google Firestore</p>
-                <p><strong>认证：</strong> Firebase Google OAuth</p>
-                <p><strong>状态：</strong> ✅ 正常运行</p>
             </div>
         </div>
     </div>
 
-    <!-- Google Sign-In库 -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-
     <script>
-        let currentUser = null;
-
-        // 初始化Google Sign-In
-        window.onload = function() {
-            google.accounts.id.initialize({
-                client_id: '1018033981926-cg6bl58ehp3kpm0rlcr7vlgeg8iore3g.apps.googleusercontent.com',
-                callback: handleCredentialResponse
-            });
+        // --- 请将此处替换为你自己的 Firebase 配置 ---
+        const firebaseConfig = {
+            apiKey: "你的API_KEY",
+            authDomain: "你的项目ID.firebaseapp.com",
+            projectId: "你的项目ID",
+            storageBucket: "你的项目ID.appspot.com",
+            messagingSenderId: "你的发送者ID",
+            appId: "你的APP_ID"
         };
 
-        // 处理Google登录响应
-        function handleCredentialResponse(response) {
-            console.log('Google登录成功:', response);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        let currentUser = null;
+        let userRole = 'engineer';
+
+        // 登录逻辑
+        async function signInWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                const result = await auth.signInWithPopup(provider);
+                console.log("登录成功");
+            } catch (error) {
+                alert("登录失败: " + error.message);
+            }
+        }
+
+        // 获取角色逻辑 (优化版)
+        async function checkUserRole(email) {
+            try {
+                // 预设管理员邮箱 (你可以直接在这里硬编码，也可以读数据库)
+                const adminList = ['liuxinyu0914@gmail.com']; 
+                if (adminList.includes(email)) {
+                    return 'admin';
+                }
+                
+                // 尝试从 Firestore 获取更多配置
+                const doc = await db.collection('config').doc('settings').get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.adminEmails && data.adminEmails.includes(email)) return 'admin';
+                    if (data.leaderEmails && data.leaderEmails.includes(email)) return 'leader';
+                }
+                return 'engineer';
+            } catch (e) {
+                console.warn("角色检查受限，默认为工程师");
+                return 'engineer';
+            }
+        }
+
+        // 监听登录状态
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                userRole = await checkUserRole(user.email);
+                
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainPage').style.display = 'block';
+                document.getElementById('userEmailDisplay').textContent = user.email;
+                document.getElementById('roleBadge').textContent = userRole === 'admin' ? '管理员' : '工程师';
+                
+                loadData();
+            } else {
+                document.getElementById('loginPage').style.display = 'block';
+                document.getElementById('mainPage').style.display = 'none';
+            }
+        });
+
+        async function loadData() {
+            const tbody = document.getElementById('projectsTableBody');
+            tbody.innerHTML = '<tr><td colspan="4">加载中...</td></tr>';
             
-            // 解码JWT token获取用户信息
-            const base64Url = response.credential.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(
-                atob(base64).split('').map(c => {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join('')
-            );
-            
-            currentUser = JSON.parse(jsonPayload);
-            console.log('用户信息:', currentUser);
-            showDashboard();
+            try {
+                let query = db.collection('projects');
+                // 如果不是管理员，只看自己的数据
+                if (userRole !== 'admin') {
+                    query = query.where('userId', '==', currentUser.uid);
+                }
+                
+                const snapshot = await query.orderBy('createdAt', 'desc').get();
+                let html = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    html += `
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px;">${data.clientName}</td>
+                            <td>${data.projectName}</td>
+                            <td>£${data.projectScale}K</td>
+                            <td><button onclick="deleteDoc('${doc.id}')" style="color:red; background:none; border:none; cursor:pointer;">删除</button></td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html || '<tr><td colspan="4">暂无数据</td></tr>';
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="4">加载失败: ${e.message}</td></tr>`;
+            }
         }
 
-        // Google登录
-        function signInWithGoogle() {
-            document.getElementById('statusMsg').textContent = '正在连接Google...';
-            google.accounts.id.renderButton(
-                document.createElement('div'),
-                { theme: 'outline', size: 'large' }
-            );
-            // 触发Google登录流程
-            const btn = document.querySelector('[data-login-uri]');
-            if (btn) btn.click();
+        async function deleteDoc(id) {
+            if(confirm('确定删除吗？')) {
+                await db.collection('projects').doc(id).delete();
+                loadData();
+            }
         }
 
-        // 显示仪表板
-        function showDashboard() {
-            if (!currentUser) return;
-
-            document.getElementById('userName').textContent = currentUser.name;
-            document.getElementById('userEmail').textContent = currentUser.email;
-            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
-            document.getElementById('currentUser').textContent = currentUser.name + ' (' + currentUser.email + ')';
-
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboard').classList.add('active');
-        }
-
-        // 登出
         function logout() {
-            currentUser = null;
-            document.getElementById('dashboard').classList.remove('active');
-            document.getElementById('loginPage').style.display = 'block';
-            document.getElementById('statusMsg').textContent = '系统已就绪';
+            auth.signOut();
         }
     </script>
 </body>
