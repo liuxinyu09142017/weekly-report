@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业级工作周报系统 V11</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9fafb; }
+        .container { max-width: 1600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; }
+        .header { background: #1f2937; color: white; padding: 24px; }
+        .header h1 { font-size: 28px; margin-bottom: 5px; }
+        .login-page { padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 500px; }
+        .login-center { gap: 20px; max-width: 500px; }
+        .login-title { font-size: 32px; text-align: center; margin-bottom: 20px; }
+        .google-login-btn { padding: 12px 24px; background: white; border: 1px solid #dadce0; border-radius: 4px; font-size: 16px; font-weight: 500; cursor: pointer; width: 100%; }
+        .status-box { margin-top: 20px; padding: 15px; background: #f0f4ff; border-radius: 6px; border-left: 4px solid #2563eb; }
+        .status-box p { margin: 5px 0; font-size: 13px; color: #374151; }
+        .main-page { padding: 24px; display: none; }
+        .user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        .btn-logout { background: #ef4444; color: white; }
+        .info-box { background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-top: 20px; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 企业级工作周报系统 V11</h1>
+            <p style="font-size: 14px; opacity: 0.9;">Firebase + Google OAuth 诊断版</p>
+        </div>
+
+        <!-- 登录页 -->
+        <div id="loginPage" class="login-page">
+            <div class="login-center">
+                <h2 class="login-title">欢迎登录</h2>
+                <p style="text-align: center; color: #6b7280; margin-bottom: 20px;">
+                    使用Google账户登录<br>享受云端数据同步
+                </p>
+                <button class="google-login-btn" onclick="signInWithGoogle()">
+                    🔐 使用Google账户登录
+                </button>
+                
+                <div class="status-box">
+                    <p><strong>系统状态：</strong></p>
+                    <p id="firebaseStatus">Firebase初始化中...</p>
+                    <p id="authStatus">认证模块加载中...</p>
+                    <p id="loginLog">就绪</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主页 -->
+        <div id="mainPage" class="main-page">
+            <div class="user-header">
+                <h2>仪表板</h2>
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">用</div>
+                    <div>
+                        <h3 id="userName" style="margin: 0; font-size: 14px;">用户名</h3>
+                        <p id="userEmail" style="margin: 2px 0 0 0; font-size: 12px; color: #6b7280;">邮箱</p>
+                    </div>
+                    <button class="btn btn-logout" onclick="logout()">登出</button>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3 style="margin-bottom: 15px;">✅ 登录成功！</h3>
+                <p><strong>当前用户：</strong> <span id="displayUser">-</span></p>
+                <p style="margin-top: 10px;"><strong>项目ID：</strong> weekly-report-d55e9</p>
+                <p style="margin-top: 10px;"><strong>数据库：</strong> Google Firestore</p>
+                <p style="margin-top: 10px;"><strong>认证方式：</strong> Firebase Google OAuth</p>
+                <p style="margin-top: 10px;"><strong>状态：</strong> ✅ 正常运行</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qLK_TAy9U",
+            authDomain: "weekly-report-d55e9.firebaseapp.com",
+            projectId: "weekly-report-d55e9",
+            storageBucket: "weekly-report-d55e9.firebasestorage.app",
+            messagingSenderId: "315332641675",
+            appId: "1:315332641675:web:1f8ab523df0b86a47c258e"
+        };
+
+        let auth, db, currentUser;
+
+        function log(msg) {
+            console.log('[诊断]', msg);
+            document.getElementById('loginLog').textContent = msg;
+        }
+
+        // 第1步：等待Firebase库加载
+        function waitForFirebase() {
+            if (typeof firebase === 'undefined') {
+                log('等待Firebase库加载...');
+                setTimeout(waitForFirebase, 100);
+                return;
+            }
+
+            log('✅ Firebase库已加载');
+            document.getElementById('firebaseStatus').textContent = '✅ Firebase库已加载';
+            initializeFirebase();
+        }
+
+        // 第2步：初始化Firebase
+        function initializeFirebase() {
+            try {
+                log('初始化Firebase配置...');
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                    log('✅ Firebase已初始化');
+                } else {
+                    log('✅ Firebase已初始化（重复检测）');
+                }
+
+                auth = firebase.auth();
+                db = firebase.firestore();
+
+                document.getElementById('firebaseStatus').textContent = '✅ Firebase初始化完成';
+                
+                // 第3步：监听认证状态
+                log('设置认证状态监听...');
+                setupAuthListener();
+
+            } catch(error) {
+                log('❌ 初始化失败: ' + error.message);
+                document.getElementById('firebaseStatus').textContent = '❌ ' + error.message;
+            }
+        }
+
+        // 第3步：设置认证监听
+        function setupAuthListener() {
+            auth.onAuthStateChanged(user => {
+                log('认证状态变化事件触发');
+                console.log('当前用户:', user);
+
+                if (user) {
+                    log('✅ 用户已认证: ' + user.email);
+                    document.getElementById('authStatus').textContent = '✅ 用户已认证: ' + user.email;
+                    currentUser = user;
+                    showMainPage();
+                } else {
+                    log('用户未认证，显示登录页');
+                    document.getElementById('authStatus').textContent = '用户未认证';
+                }
+            });
+
+            document.getElementById('authStatus').textContent = '✅ 监听已设置';
+            log('✅ 认证监听已设置');
+        }
+
+        // Google登录
+        async function signInWithGoogle() {
+            try {
+                if (!auth) {
+                    log('❌ Firebase未初始化');
+                    alert('系统未初始化，请刷新页面');
+                    return;
+                }
+
+                log('开始Google登录流程...');
+                document.getElementById('loginLog').textContent = '正在打开Google登录窗口...';
+
+                const provider = new firebase.auth.GoogleAuthProvider();
+                log('创建GoogleAuthProvider');
+
+                const result = await auth.signInWithPopup(provider);
+                log('✅ Google登录成功，返回用户信息');
+                console.log('登录结果:', result);
+
+                currentUser = result.user;
+                log('✅ currentUser已设置');
+
+                // 主动调用显示主页
+                showMainPage();
+
+            } catch(error) {
+                log('❌ 登录失败: ' + error.message);
+                console.error('详细错误:', error);
+                document.getElementById('loginLog').textContent = '❌ 登录失败: ' + error.message;
+            }
+        }
+
+        // 显示主页
+        function showMainPage() {
+            log('执行showMainPage()');
+
+            if (!currentUser) {
+                log('❌ currentUser为空');
+                return;
+            }
+
+            const name = currentUser.displayName || currentUser.email.split('@')[0];
+            
+            log('设置UI元素...');
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+            document.getElementById('displayUser').textContent = name + ' (' + currentUser.email + ')';
+
+            log('隐藏登录页，显示主页');
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+
+            log('✅ 页面切换完成！');
+        }
+
+        // 登出
+        function logout() {
+            if (auth) {
+                log('执行登出...');
+                auth.signOut();
+                currentUser = null;
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('mainPage').classList.add('hidden');
+                log('✅ 已登出');
+            }
+        }
+
+        // 页面加载时开始初始化
+        window.addEventListener('load', function() {
+            log('页面已加载，开始初始化Firebase');
+            setTimeout(waitForFirebase, 500);
+        });
+    </script>
+</body>
+</html>
