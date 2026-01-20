@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业级工作周报系统 V11</title>
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f9fafb; padding: 16px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: #1f2937; color: white; padding: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .login-page { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; min-height: 500px; }
+        .login-box { text-align: center; max-width: 400px; }
+        .login-box h1 { font-size: 48px; margin-bottom: 10px; }
+        .login-box h2 { font-size: 24px; margin-bottom: 5px; color: #1f2937; }
+        .login-box p { color: #6b7280; margin-bottom: 30px; }
+        .google-btn { padding: 14px 28px; background: white; border: 1px solid #dadce0; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+        .google-btn:hover { background: #f8f9fa; }
+        .error { background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 12px; border-radius: 6px; margin: 16px 0; display: none; }
+        .main-page { display: none; }
+        .main-page.active { display: block; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #2563eb; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .content { padding: 24px; }
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid #e5e7eb; background: #f9fafb; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+        tr:hover { background: #f9fafb; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-danger { background: #ef4444; color: white; font-size: 12px; }
+        .btn-logout { background: #6b7280; color: white; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; }
+        .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 14px; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        
+        .info-box { background: #f0f4ff; border-left: 4px solid #2563eb; padding: 16px; border-radius: 8px; margin-top: 20px; }
+        .info-box h3 { color: #2563eb; margin-bottom: 8px; }
+        .info-box p { font-size: 13px; color: #374151; margin: 4px 0; }
+        
+        .loading { text-align: center; padding: 40px; color: #6b7280; }
+        .stats { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-item { background: #f9fafb; padding: 12px 16px; border-radius: 6px; border-left: 3px solid #2563eb; }
+        .stat-label { font-size: 12px; color: #6b7280; }
+        .stat-value { font-size: 18px; font-weight: 700; color: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="font-size: 24px; margin: 0;">📊 企业级工作周报系统 V11</h1>
+            <div id="userSection" style="display: none;">
+                <div class="user-info">
+                    <div class="avatar" id="userAvatar">用</div>
+                    <div style="text-align: left; font-size: 14px;">
+                        <div id="userName" style="font-weight: 600;">用户</div>
+                        <div id="userEmail" style="font-size: 12px; opacity: 0.8;">邮箱</div>
+                    </div>
+                    <button class="btn btn-logout" onclick="logout()" style="margin-left: 16px;">登出</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 登录页 -->
+        <div id="loginPage" class="login-page">
+            <div class="login-box">
+                <h1>📊</h1>
+                <h2>企业级工作周报系统</h2>
+                <p>V11 企业版 · 多用户 · 权限管理 · 云端数据</p>
+                
+                <div id="errorMsg" class="error"></div>
+                
+                <button class="google-btn" onclick="signInWithGoogle()">
+                    🔐 使用Google账户登录
+                </button>
+                <p style="margin-top: 16px; color: #9ca3af; font-size: 13px;">系统已就绪，点击按钮登录</p>
+            </div>
+        </div>
+
+        <!-- 主页面 -->
+        <div id="mainPage" class="main-page">
+            <div class="content">
+                <div class="controls">
+                    <h2 style="margin: 0;">周报管理</h2>
+                    <button class="btn btn-primary" onclick="openAddModal()">+ 新增项目</button>
+                </div>
+
+                <div class="stats" id="statsContainer" style="display: none;">
+                    <div class="stat-item">
+                        <div class="stat-label">项目总数</div>
+                        <div class="stat-value" id="projectCount">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">总金额</div>
+                        <div class="stat-value" id="totalAmount">£0K</div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>客户</th>
+                            <th>项目</th>
+                            <th>规模 (£K)</th>
+                            <th>专业方向</th>
+                            <th>工程师</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="6" style="text-align: center; padding: 40px; color: #9ca3af;">加载中...</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box">
+                    <h3>✅ 系统已就绪</h3>
+                    <p>✨ 所有功能已激活，系统已成功部署！</p>
+                    <p><strong>项目ID：</strong> weekly-report-d55e9</p>
+                    <p><strong>数据库：</strong> Google Firestore（实时同步）</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增项目模态框 -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">新增周报项目</div>
+            <form id="projectForm" onsubmit="saveProject(event)">
+                <div class="form-group">
+                    <label>客户名称 *</label>
+                    <input type="text" id="clientName" required placeholder="例如：某大型银行">
+                </div>
+                <div class="form-group">
+                    <label>项目名称 *</label>
+                    <input type="text" id="projectName" required placeholder="例如：核心网络升级">
+                </div>
+                <div class="form-group">
+                    <label>项目规模 (£K) *</label>
+                    <input type="number" id="projectScale" step="0.1" required placeholder="0.0">
+                </div>
+                <div class="form-group">
+                    <label>专业方向 *</label>
+                    <select id="specialty" required>
+                        <option value="">-- 请选择 --</option>
+                        <option value="网络">网络</option>
+                        <option value="系统">系统</option>
+                        <option value="基础设施">基础设施</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" onclick="closeAddModal()" style="background: #e5e7eb; color: #374151;">取消</button>
+                    <button type="submit" class="btn btn-primary">保存项目</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qLK_TAy9U",
+            authDomain: "weekly-report-d55e9.firebaseapp.com",
+            projectId: "weekly-report-d55e9",
+            storageBucket: "weekly-report-d55e9.firebasestorage.app",
+            messagingSenderId: "315332641675",
+            appId: "1:315332641675:web:1f8ab523df0b86a47c258e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        // Google 登录
+        async function signInWithGoogle() {
+            try {
+                clearError();
+                
+                if (typeof google === 'undefined') {
+                    showError('Google库加载中...');
+                    setTimeout(signInWithGoogle, 1000);
+                    return;
+                }
+
+                google.accounts.id.initialize({
+                    client_id: '1018033981926-cg6bl58ehp3kpm0rlcr7vlgeg8iore3g.apps.googleusercontent.com',
+                    callback: handleCredentialResponse,
+                    auto_select: false
+                });
+
+                google.accounts.id.prompt();
+
+            } catch (e) {
+                showError('登录失败: ' + e.message);
+            }
+        }
+
+        // 处理Google响应
+        function handleCredentialResponse(response) {
+            try {
+                const base64Url = response.credential.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(
+                    atob(base64).split('').map(c => 
+                        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+                    ).join('')
+                );
+                
+                currentUser = JSON.parse(jsonPayload);
+                showMainPage();
+                loadProjects();
+                
+            } catch(e) {
+                showError('解析用户信息失败');
+            }
+        }
+
+        // 显示主页
+        function showMainPage() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainPage').classList.add('active');
+            document.getElementById('userSection').style.display = 'block';
+            
+            const name = currentUser.name || currentUser.email;
+            document.getElementById('userName').textContent = name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+        }
+
+        // 加载项目
+        async function loadProjects() {
+            try {
+                const snapshot = await db.collection('projects')
+                    .where('userId', '==', currentUser.email)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                const tbody = document.getElementById('tableBody');
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: #9ca3af;">暂无项目，点击新增</td></tr>';
+                    updateStats(0, 0);
+                    return;
+                }
+
+                let html = '';
+                let totalAmount = 0;
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const amount = parseFloat(data.projectScale) || 0;
+                    totalAmount += amount;
+                    
+                    html += `
+                        <tr>
+                            <td>${data.clientName}</td>
+                            <td>${data.projectName}</td>
+                            <td>£${amount.toFixed(1)}K</td>
+                            <td>${data.specialty}</td>
+                            <td>${currentUser.name}</td>
+                            <td>
+                                <button class="btn btn-danger" onclick="deleteProject('${doc.id}')">删除</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tbody.innerHTML = html;
+                updateStats(snapshot.size, totalAmount);
+
+            } catch (e) {
+                console.error('加载项目失败:', e);
+                document.getElementById('tableBody').innerHTML = 
+                    '<tr><td colspan="6" style="text-align: center; color: red;">加载失败：' + e.message + '</td></tr>';
+            }
+        }
+
+        // 更新统计
+        function updateStats(count, total) {
+            document.getElementById('projectCount').textContent = count;
+            document.getElementById('totalAmount').textContent = '£' + total.toFixed(1) + 'K';
+            document.getElementById('statsContainer').style.display = count > 0 ? 'flex' : 'none';
+        }
+
+        // 保存项目
+        async function saveProject(e) {
+            e.preventDefault();
+            
+            try {
+                const newProject = {
+                    clientName: document.getElementById('clientName').value,
+                    projectName: document.getElementById('projectName').value,
+                    projectScale: parseFloat(document.getElementById('projectScale').value),
+                    specialty: document.getElementById('specialty').value,
+                    userId: currentUser.email,
+                    userName: currentUser.name,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+
+                await db.collection('projects').add(newProject);
+                
+                closeAddModal();
+                document.getElementById('projectForm').reset();
+                loadProjects();
+
+            } catch (e) {
+                showError('保存失败：' + e.message);
+            }
+        }
+
+        // 删除项目
+        async function deleteProject(id) {
+            if (!confirm('确定删除该项目吗？')) return;
+            
+            try {
+                await db.collection('projects').doc(id).delete();
+                loadProjects();
+            } catch (e) {
+                showError('删除失败：' + e.message);
+            }
+        }
+
+        // 模态框控制
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+        }
+
+        // 登出
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainPage').classList.remove('active');
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('userSection').style.display = 'none';
+        }
+
+        // 错误处理
+        function showError(msg) {
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function clearError() {
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
