@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周报系统 - 主页</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .welcome-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        
+        .welcome-card h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-card p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .action-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .action-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .action-btn.secondary {
+            background: #f5f7fa;
+            color: #667eea;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 100px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">📊 周报系统</div>
+            <div class="user-info">
+                <img id="user-avatar" class="user-avatar" src="" alt="头像" style="display: none;">
+                <span id="user-name">加载中...</span>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 加载中 -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <div>正在加载...</div>
+    </div>
+    
+    <!-- 主内容 -->
+    <div id="main-content" class="container" style="display: none;">
+        <!-- 欢迎卡片 -->
+        <div class="welcome-card">
+            <h1>欢迎回来！👋</h1>
+            <p id="welcome-message">今天是个适合写周报的好日子！</p>
+        </div>
+        
+        <!-- 开发提示 -->
+        <div class="notice">
+            <strong>🚧 开发中</strong><br>
+            这是Dashboard的基础版本，完整功能正在开发中。目前可以测试登录和登出功能。
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div class="stat-number" id="total-reports">0</div>
+                <div class="stat-label">总周报数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-number" id="this-month">0</div>
+                <div class="stat-label">本月周报</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-number" id="completed-tasks">0</div>
+                <div class="stat-label">完成任务</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-number" id="streak-days">0</div>
+                <div class="stat-label">连续天数</div>
+            </div>
+        </div>
+        
+        <!-- 操作按钮 -->
+        <div class="action-card">
+            <h2>快速操作</h2>
+            <button class="action-btn" onclick="alert('创建周报功能开发中...')">
+                ✏️ 创建新周报
+            </button>
+            <button class="action-btn secondary" onclick="alert('查看历史功能开发中...')">
+                📋 查看历史周报
+            </button>
+            <button class="action-btn secondary" onclick="window.open('firestore-test.html', '_blank')">
+                🧪 测试数据库
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
+            authDomain: "weekly-report-d55e9.firebaseapp.com",
+            projectId: "weekly-report-d55e9",
+            storageBucket: "weekly-report-d55e9.appspot.com",
+            messagingSenderId: "315332641675",
+            appId: "1:315332641675:web:e1b52c3d4c5fcc7b8c0de7"
+        };
+
+        // 初始化Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // 检查登录状态
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                console.log('用户已登录:', user.email);
+                
+                // 显示用户信息
+                document.getElementById('user-name').textContent = user.displayName || user.email;
+                
+                if (user.photoURL) {
+                    const avatar = document.getElementById('user-avatar');
+                    avatar.src = user.photoURL;
+                    avatar.style.display = 'block';
+                }
+                
+                // 更新欢迎消息
+                const now = new Date();
+                const hour = now.getHours();
+                let greeting = '你好';
+                if (hour < 12) greeting = '早上好';
+                else if (hour < 18) greeting = '下午好';
+                else greeting = '晚上好';
+                
+                document.getElementById('welcome-message').textContent = 
+                    `${greeting}，${user.displayName || ''}！今天是 ${now.toLocaleDateString('zh-CN')}`;
+                
+                // 加载统计数据
+                await loadStats(user.uid);
+                
+                // 显示主内容
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                
+            } else {
+                console.log('用户未登录，跳转到登录页');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 加载统计数据
+        async function loadStats(userId) {
+            try {
+                // 查询用户的周报
+                const snapshot = await db.collection('reports')
+                    .where('userId', '==', userId)
+                    .get();
+                
+                document.getElementById('total-reports').textContent = snapshot.size;
+                
+                // 计算本月周报
+                const now = new Date();
+                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const thisMonthCount = snapshot.docs.filter(doc => {
+                    const createdAt = doc.data().createdAt?.toDate();
+                    return createdAt && createdAt >= monthStart;
+                }).length;
+                
+                document.getElementById('this-month').textContent = thisMonthCount;
+                
+                // 计算完成任务（示例）
+                let totalTasks = 0;
+                snapshot.docs.forEach(doc => {
+                    const tasks = doc.data().tasks || [];
+                    totalTasks += tasks.filter(t => t.status === '完成').length;
+                });
+                document.getElementById('completed-tasks').textContent = totalTasks;
+                
+                console.log('统计数据加载完成');
+                
+            } catch (error) {
+                console.error('加载统计数据失败:', error);
+                // 即使失败也显示0，不影响用户体验
+            }
+        }
+
+        // 登出
+        function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                auth.signOut().then(() => {
+                    console.log('已退出登录');
+                    window.location.href = 'index.html';
+                }).catch((error) => {
+                    console.error('退出失败:', error);
+                    alert('退出登录失败，请重试');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
