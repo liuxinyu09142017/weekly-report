@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>周报系统 - 登录</title>
+    
+    <!-- Firebase 9.x compat版本 -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- FirebaseUI -->
+    <script src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 450px;
+            width: 90%;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        #firebaseui-auth-container {
+            margin-top: 20px;
+        }
+        
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .debug-info {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .debug-info h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .debug-log {
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>📊 周报系统</h1>
+            <p>使用Google账号登录</p>
+        </div>
+        
+        <div id="error-message" class="error-message"></div>
+        
+        <div id="loader" class="loading">
+            <div class="spinner"></div>
+            <div>正在加载认证系统...</div>
+        </div>
+        
+        <div id="firebaseui-auth-container"></div>
+        
+        <!-- Debug信息 -->
+        <div id="debug-info" class="debug-info">
+            <h3>🔍 调试信息</h3>
+            <div id="debug-log" class="debug-log"></div>
+        </div>
+        
+        <div class="footer">
+            <small>Weekly Report System v1.0</small>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 调试日志 ====================
+        const debugLog = [];
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            debugLog.push(logMessage);
+            console.log(logMessage);
+            
+            const debugPanel = document.getElementById('debug-log');
+            if (debugPanel) {
+                debugPanel.textContent = debugLog.join('\n');
+            }
+        }
+
+        // ==================== Firebase 配置 ====================
+        // 注意：Project ID 是 weekly-report-d55e9 (不是 d5e9)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmSEQFZVNk8DJL5rW0CQzLmPGQ5pXZRak",
+            authDomain: "weekly-report-d55e9.firebaseapp.com",
+            projectId: "weekly-report-d55e9",
+            storageBucket: "weekly-report-d55e9.appspot.com",
+            messagingSenderId: "315332641675",
+            appId: "1:315332641675:web:e1b52c3d4c5fcc7b8c0de7"
+        };
+
+        log('Firebase配置已加载');
+        log(`Project ID: ${firebaseConfig.projectId}`);
+
+        // ==================== 全局变量 ====================
+        let app, auth, ui;
+        
+        // ==================== 工具函数 ====================
+        function showElement(id) {
+            const element = document.getElementById(id);
+            if (element) element.style.display = 'block';
+        }
+        
+        function hideElement(id) {
+            const element = document.getElementById(id);
+            if (element) element.style.display = 'none';
+        }
+
+        function showError(message) {
+            log(message, 'error');
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.innerHTML = `
+                <strong>❌ 错误：</strong><br>
+                ${message}
+                <br><br>
+                <small>请检查浏览器控制台获取详细信息</small>
+            `;
+            showElement('error-message');
+            hideElement('loader');
+            showElement('debug-info');
+        }
+
+        function showSuccess(message) {
+            log(message, 'success');
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.style.background = '#e7f5e7';
+            errorDiv.style.border = '1px solid #a3d9a3';
+            errorDiv.style.color = '#2d662d';
+            errorDiv.innerHTML = `
+                <strong>✅ 成功：</strong><br>
+                ${message}
+            `;
+            showElement('error-message');
+            hideElement('loader');
+        }
+
+        // ==================== 初始化 Firebase ====================
+        function initializeFirebase() {
+            try {
+                log('开始初始化Firebase...');
+                
+                // 检查Firebase SDK
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase SDK未加载，请检查网络连接');
+                }
+                log('✅ Firebase SDK已加载');
+                
+                // 初始化Firebase App
+                if (!firebase.apps.length) {
+                    app = firebase.initializeApp(firebaseConfig);
+                    log('✅ Firebase应用初始化成功');
+                } else {
+                    app = firebase.app();
+                    log('✅ 使用现有Firebase应用实例');
+                }
+                
+                // 初始化Auth
+                auth = firebase.auth();
+                log('✅ Firebase Auth初始化成功');
+                
+                // 设置Auth语言
+                auth.languageCode = 'zh-CN';
+                log('✅ Auth语言设置为中文');
+                
+                // 检查FirebaseUI
+                if (typeof firebaseui === 'undefined') {
+                    throw new Error('FirebaseUI未加载，请检查网络连接');
+                }
+                log('✅ FirebaseUI库已加载');
+                
+                // 初始化FirebaseUI
+                ui = new firebaseui.auth.AuthUI(auth);
+                log('✅ FirebaseUI初始化成功');
+                
+                return true;
+            } catch (error) {
+                log(`Firebase初始化失败: ${error.message}`, 'error');
+                console.error('详细错误:', error);
+                showError(`系统初始化失败: ${error.message}`);
+                return false;
+            }
+        }
+
+        // ==================== FirebaseUI 配置 ====================
+        const uiConfig = {
+            callbacks: {
+                signInSuccessWithAuthResult: function(authResult, redirectUrl) {
+                    const user = authResult.user;
+                    log(`✅ 登录成功: ${user.email}`);
+                    log(`用户ID: ${user.uid}`);
+                    log(`显示名称: ${user.displayName || '未设置'}`);
+                    
+                    // 显示成功消息
+                    showSuccess(`欢迎 ${user.displayName || user.email}！<br>正在跳转...`);
+                    
+                    // 跳转到主页
+                    setTimeout(() => {
+                        log('跳转到dashboard.html...');
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                    
+                    return false;
+                },
+                signInFailure: function(error) {
+                    log(`登录失败: ${error.code} - ${error.message}`, 'error');
+                    
+                    // 友好的错误提示
+                    let friendlyMessage = '登录失败';
+                    switch(error.code) {
+                        case 'auth/popup-closed-by-user':
+                            friendlyMessage = '您取消了登录操作';
+                            break;
+                        case 'auth/popup-blocked':
+                            friendlyMessage = '浏览器阻止了弹窗，请允许弹窗后重试';
+                            break;
+                        case 'auth/network-request-failed':
+                            friendlyMessage = '网络连接失败，请检查网络后重试';
+                            break;
+                        case 'auth/internal-error':
+                            friendlyMessage = '内部错误，请稍后重试';
+                            break;
+                        case 'auth/unauthorized-domain':
+                            friendlyMessage = '当前域名未授权，请联系管理员';
+                            break;
+                        default:
+                            friendlyMessage = `登录失败: ${error.message}`;
+                    }
+                    
+                    showError(friendlyMessage);
+                    return Promise.resolve();
+                },
+                uiShown: function() {
+                    log('✅ 登录界面已显示');
+                    hideElement('loader');
+                }
+            },
+            signInOptions: [
+                {
+                    provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                    customParameters: {
+                        prompt: 'select_account'
+                    }
+                }
+            ],
+            signInFlow: 'popup',
+            tosUrl: '#',
+            privacyPolicyUrl: '#'
+        };
+
+        // ==================== 启动认证UI ====================
+        function startAuthUI() {
+            try {
+                log('启动认证UI...');
+                
+                // 清空容器
+                const container = document.getElementById('firebaseui-auth-container');
+                container.innerHTML = '';
+                
+                // 启动UI
+                ui.start('#firebaseui-auth-container', uiConfig);
+                log('✅ 认证UI已启动');
+                
+            } catch (error) {
+                log(`启动认证UI失败: ${error.message}`, 'error');
+                console.error('详细错误:', error);
+                showError(`启动登录界面失败: ${error.message}`);
+            }
+        }
+
+        // ==================== 检查登录状态 ====================
+        function checkAuthState() {
+            log('检查用户登录状态...');
+            
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    log(`✅ 用户已登录: ${user.email}`);
+                    log(`显示名称: ${user.displayName || '未设置'}`);
+                    log(`UID: ${user.uid}`);
+                    
+                    // 显示欢迎信息
+                    hideElement('loader');
+                    hideElement('firebaseui-auth-container');
+                    showSuccess(`欢迎回来！<br>${user.displayName || user.email}<br><small>正在跳转到主页...</small>`);
+                    
+                    // 跳转
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    log('ℹ️ 用户未登录，显示登录界面');
+                    startAuthUI();
+                }
+            }, (error) => {
+                log(`检查登录状态时出错: ${error.message}`, 'error');
+                showError(`检查登录状态失败: ${error.message}`);
+            });
+        }
+
+        // ==================== 页面加载事件 ====================
+        window.addEventListener('DOMContentLoaded', () => {
+            log('🚀 页面DOM加载完成');
+        });
+
+        window.addEventListener('load', () => {
+            log('🚀 页面完全加载完成');
+            log('等待Firebase脚本加载...');
+            
+            // 延迟初始化，确保所有脚本加载完成
+            setTimeout(() => {
+                if (initializeFirebase()) {
+                    checkAuthState();
+                }
+            }, 500);
+        });
+
+        // ==================== 全局错误处理 ====================
+        window.addEventListener('error', (e) => {
+            log(`全局错误: ${e.message}`, 'error');
+            console.error('错误详情:', e.error);
+            
+            if (e.message.includes('firebase') || e.message.includes('firebaseui')) {
+                showError('Firebase脚本加载失败<br>可能的原因：<br>1. 网络连接问题<br>2. 防火墙限制<br>3. 需要使用VPN');
+            }
+        });
+
+        window.addEventListener('unhandledrejection', (e) => {
+            log(`未处理的Promise错误: ${e.reason}`, 'error');
+            console.error('Promise错误详情:', e.reason);
+        });
+
+        // ==================== 调试面板开关 ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            const logo = document.querySelector('.logo h1');
+            if (logo) {
+                let clickCount = 0;
+                let clickTimer = null;
+                
+                logo.addEventListener('click', () => {
+                    clickCount++;
+                    
+                    if (clickTimer) {
+                        clearTimeout(clickTimer);
+                    }
+                    
+                    clickTimer = setTimeout(() => {
+                        if (clickCount >= 2) {
+                            const debugPanel = document.getElementById('debug-info');
+                            if (debugPanel.style.display === 'none' || !debugPanel.style.display) {
+                                showElement('debug-info');
+                                log('调试面板已打开');
+                            } else {
+                                hideElement('debug-info');
+                                log('调试面板已关闭');
+                            }
+                        }
+                        clickCount = 0;
+                    }, 300);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
