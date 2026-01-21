@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>等待审批 - 工程师工时系统</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .pending-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .status-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .status-title {
+            color: #856404;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .status-text {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .info-grid {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .steps {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        
+        .steps h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .step-number.done {
+            background: #4ec9b0;
+        }
+        
+        .step-number.current {
+            background: #ffc107;
+        }
+        
+        .step-text {
+            flex: 1;
+            padding-top: 4px;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+        
+        .step-desc {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f5f7fa;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #e7eaf0;
+        }
+        
+        .contact-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 13px;
+            color: #1565c0;
+            margin-top: 20px;
+        }
+        
+        .contact-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载中 -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <div>正在加载...</div>
+    </div>
+    
+    <!-- 等待审批页面 -->
+    <div id="pending-content" class="pending-container" style="display: none;">
+        <div class="icon">⏳</div>
+        <h1 class="title">等待管理员审批</h1>
+        <p class="subtitle">
+            您的账号已创建成功！<br>
+            管理员审批后即可开始使用系统。
+        </p>
+        
+        <div class="status-box">
+            <div class="status-title">📋 当前状态</div>
+            <div class="status-text">
+                您的账号正在等待管理员审批和信息补录。<br>
+                通常会在 1-2 个工作日内完成。
+            </div>
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-row">
+                <span class="info-label">Gmail 邮箱</span>
+                <span class="info-value" id="user-email">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">申请时间</span>
+                <span class="info-value" id="apply-time">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">账号状态</span>
+                <span class="info-value" style="color: #f59e0b;">⏳ 待审批</span>
+            </div>
+        </div>
+        
+        <div class="steps">
+            <h3>📝 审批流程</h3>
+            <div class="step">
+                <div class="step-number done">✓</div>
+                <div class="step-text">
+                    <div class="step-title">1. 账号创建</div>
+                    <div class="step-desc">使用 Gmail 登录成功</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number current">2</div>
+                <div class="step-text">
+                    <div class="step-title">2. 等待审批</div>
+                    <div class="step-desc">管理员审核和补录信息</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">
+                    <div class="step-title">3. 账号激活</div>
+                    <div class="step-desc">审批通过后开始使用</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="checkStatus()">
+                🔄 刷新状态
+            </button>
+            <button class="btn btn-secondary" onclick="logout()">
+                👋 退出登录
+            </button>
+        </div>
+        
+        <div class="contact-info">
+            <strong>💡 温馨提示</strong>
+            如有紧急需要，请联系管理员：<br>
+            📧 liuxinyu0914@gmail.com
+        </div>
+    </div>
+
+    <script>
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
+            authDomain: "weekly-report-d55e9.firebaseapp.com",
+            projectId: "weekly-report-d55e9",
+            storageBucket: "weekly-report-d55e9.appspot.com",
+            messagingSenderId: "315332641675",
+            appId: "1:315332641675:web:e1b52c3d4c5fcc7b8c0de7"
+        };
+
+        // 初始化Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        let currentUser = null;
+
+        // 检查登录状态
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                console.log('用户已登录:', user.email);
+                await loadUserStatus();
+            } else {
+                console.log('用户未登录，跳转到登录页');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 加载用户状态
+        async function loadUserStatus() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                
+                if (!userDoc.exists) {
+                    alert('用户数据不存在，请重新登录');
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                
+                // 检查状态
+                if (userData.status === 'approved') {
+                    // 已审批，跳转到Dashboard
+                    window.location.href = 'dashboard.html';
+                    return;
+                } else if (userData.status === 'rejected') {
+                    alert('您的申请已被拒绝，请联系管理员。');
+                    await auth.signOut();
+                    window.location.href = 'index.html';
+                    return;
+                } else if (userData.status === 'disabled') {
+                    alert('您的账号已被禁用，请联系管理员。');
+                    await auth.signOut();
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // 显示用户信息
+                document.getElementById('user-email').textContent = userData.email;
+                document.getElementById('apply-time').textContent = 
+                    userData.createdAt ? formatDate(userData.createdAt) : '刚刚';
+                
+                // 显示页面
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('pending-content').style.display = 'block';
+                
+            } catch (error) {
+                console.error('加载用户状态失败:', error);
+                alert('加载失败: ' + error.message);
+            }
+        }
+
+        // 刷新状态
+        async function checkStatus() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '检查中...';
+            
+            try {
+                await loadUserStatus();
+                
+                // 如果还在这个页面，说明还是pending状态
+                alert('当前仍在等待审批中');
+                
+            } catch (error) {
+                console.error('刷新状态失败:', error);
+                alert('刷新失败: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔄 刷新状态';
+            }
+        }
+
+        // 退出登录
+        async function logout() {
+            if (confirm('确定要退出登录吗？')) {
+                try {
+                    await auth.signOut();
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error('退出登录失败:', error);
+                    alert('退出失败: ' + error.message);
+                }
+            }
+        }
+
+        // 格式化日期
+        function formatDate(timestamp) {
+            if (!timestamp) return '刚刚';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>

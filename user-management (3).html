@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - 工程师工时系统</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .tab .badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f48771;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .user-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e1e8ed;
+        }
+        
+        .user-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .user-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .user-avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+        
+        .user-email {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-disabled {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .role-engineer {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .role-teamlead {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .role-admin {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-approve {
+            background: #4ec9b0;
+            color: white;
+        }
+        
+        .btn-approve:hover {
+            background: #3db89a;
+        }
+        
+        .btn-reject {
+            background: #f48771;
+            color: white;
+        }
+        
+        .btn-reject:hover {
+            background: #e57361;
+        }
+        
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: #5568d3;
+        }
+        
+        .btn-disable {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-disable:hover {
+            background: #5a6268;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            color: #333;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-label .required {
+            color: #f48771;
+        }
+        
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-input:disabled {
+            background: #f8f9fa;
+            color: #999;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e8ed;
+        }
+        
+        .btn-submit {
+            flex: 1;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-submit:hover {
+            background: #5568d3;
+        }
+        
+        .btn-cancel {
+            padding: 12px 24px;
+            background: #f5f7fa;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-cancel:hover {
+            background: #e7eaf0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 100px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="header-content">
+            <h2>👥 用户管理</h2>
+            <div class="header-actions">
+                <a href="dashboard.html" class="btn btn-secondary">← 返回主页</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 加载中 -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <div>正在加载...</div>
+    </div>
+    
+    <!-- 主内容 -->
+    <div id="main-content" class="container" style="display: none;">
+        <!-- 标签页 -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('pending')">
+                待审批用户
+                <span class="badge" id="pending-count">0</span>
+            </div>
+            <div class="tab" onclick="switchTab('approved')">
+                已激活用户
+            </div>
+            <div class="tab" onclick="switchTab('all')">
+                所有用户
+            </div>
+        </div>
+        
+        <!-- 待审批用户 -->
+        <div id="pending-panel" class="panel">
+            <h2>⏳ 待审批用户</h2>
+            <div class="info-box">
+                💡 新用户首次使用Gmail登录后需要管理员审批并补录信息才能激活账号
+            </div>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>用户信息</th>
+                        <th>申请时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="pending-users-tbody">
+                    <!-- 动态加载 -->
+                </tbody>
+            </table>
+            <div id="pending-empty" class="empty-state" style="display: none;">
+                <div class="empty-icon">✅</div>
+                <div>暂无待审批用户</div>
+            </div>
+        </div>
+        
+        <!-- 已激活用户 -->
+        <div id="approved-panel" class="panel" style="display: none;">
+            <h2>✅ 已激活用户</h2>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>用户信息</th>
+                        <th>技术团队</th>
+                        <th>角色</th>
+                        <th>部门领导</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="approved-users-tbody">
+                    <!-- 动态加载 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 所有用户 -->
+        <div id="all-panel" class="panel" style="display: none;">
+            <h2>📋 所有用户</h2>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>用户信息</th>
+                        <th>技术团队</th>
+                        <th>角色</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="all-users-tbody">
+                    <!-- 动态加载 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 审批/编辑模态框 -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">审批用户</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            
+            <form id="user-form">
+                <input type="hidden" id="edit-user-id">
+                
+                <div class="form-group">
+                    <label class="form-label">Gmail邮箱</label>
+                    <input type="email" id="user-email" class="form-input" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Gmail显示名</label>
+                    <input type="text" id="user-display-name" class="form-input" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">中文全名 <span class="required">*</span></label>
+                    <input type="text" id="user-full-name" class="form-input" 
+                           placeholder="例如: 张三" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">所属部门</label>
+                    <input type="text" id="user-department" class="form-input" 
+                           value="ICT部门" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">技术团队 <span class="required">*</span></label>
+                    <select id="user-technical-team" class="form-select" required>
+                        <option value="">请选择</option>
+                        <option value="网络">网络</option>
+                        <option value="系统">系统</option>
+                        <option value="能基">能基</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">用户角色 <span class="required">*</span></label>
+                    <select id="user-role" class="form-select" required onchange="toggleTeamLeadField()">
+                        <option value="engineer">工程师</option>
+                        <option value="team_lead">部门领导</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="team-lead-group">
+                    <label class="form-label">部门领导</label>
+                    <select id="user-team-lead" class="form-select">
+                        <option value="">无（工程师需要指定领导）</option>
+                        <!-- 动态加载领导列表 -->
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit" id="submit-btn">✅ 批准并激活</button>
+                    <button type="button" class="btn-cancel" onclick="closeModal()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
+            authDomain: "weekly-report-d55e9.firebaseapp.com",
+            projectId: "weekly-report-d55e9",
+            storageBucket: "weekly-report-d55e9.appspot.com",
+            messagingSenderId: "315332641675",
+            appId: "1:315332641675:web:e1b52c3d4c5fcc7b8c0de7"
+        };
+
+        // 初始化Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        let currentUser = null;
+        let allUsers = [];
+        let teamLeads = [];
+        let currentTab = 'pending';
+        let editingUserId = null;
+
+        // 系统配置
+        const ADMIN_EMAILS = ['liuxinyu0914@gmail.com'];
+
+        // 检查登录状态和权限
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                
+                // 检查是否是管理员
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (!userDoc.exists || userDoc.data().role !== 'admin') {
+                    alert('❌ 权限不足！只有管理员可以访问此页面。');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                
+                console.log('管理员已登录:', user.email);
+                await loadAllUsers();
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                console.log('用户未登录，跳转到登录页');
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 加载所有用户
+        async function loadAllUsers() {
+            try {
+                const snapshot = await db.collection('users').get();
+                
+                allUsers = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                console.log('加载了', allUsers.length, '个用户');
+                
+                // 提取领导列表
+                teamLeads = allUsers.filter(u => 
+                    u.status === 'approved' && 
+                    (u.role === 'team_lead' || u.role === 'admin')
+                );
+                
+                renderUsers();
+                
+            } catch (error) {
+                console.error('加载用户失败:', error);
+                alert('加载失败: ' + error.message);
+            }
+        }
+
+        // 切换标签页
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // 更新标签样式
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 显示对应面板
+            document.getElementById('pending-panel').style.display = tab === 'pending' ? 'block' : 'none';
+            document.getElementById('approved-panel').style.display = tab === 'approved' ? 'block' : 'none';
+            document.getElementById('all-panel').style.display = tab === 'all' ? 'block' : 'none';
+            
+            renderUsers();
+        }
+
+        // 渲染用户列表
+        function renderUsers() {
+            if (currentTab === 'pending') {
+                renderPendingUsers();
+            } else if (currentTab === 'approved') {
+                renderApprovedUsers();
+            } else {
+                renderAllUsers();
+            }
+        }
+
+        // 渲染待审批用户
+        function renderPendingUsers() {
+            const pending = allUsers.filter(u => u.status === 'pending' || !u.status);
+            const tbody = document.getElementById('pending-users-tbody');
+            const empty = document.getElementById('pending-empty');
+            const badge = document.getElementById('pending-count');
+            
+            badge.textContent = pending.length;
+            
+            if (pending.length === 0) {
+                tbody.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            
+            empty.style.display = 'none';
+            
+            tbody.innerHTML = pending.map(user => `
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            ${user.photoURL 
+                                ? `<img src="${user.photoURL}" class="user-avatar" alt="Avatar">`
+                                : `<div class="user-avatar-placeholder">${user.displayName?.charAt(0) || 'U'}</div>`
+                            }
+                            <div class="user-details">
+                                <div class="user-name">${user.displayName || '未设置'}</div>
+                                <div class="user-email">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.createdAt ? formatDate(user.createdAt) : '-'}</td>
+                    <td><span class="status-badge status-pending">待审批</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-approve" onclick="approveUser('${user.id}')">
+                                ✅ 审批
+                            </button>
+                            <button class="action-btn btn-reject" onclick="rejectUser('${user.id}')">
+                                ❌ 拒绝
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 渲染已激活用户
+        function renderApprovedUsers() {
+            const approved = allUsers.filter(u => u.status === 'approved');
+            const tbody = document.getElementById('approved-users-tbody');
+            
+            tbody.innerHTML = approved.map(user => `
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            ${user.photoURL 
+                                ? `<img src="${user.photoURL}" class="user-avatar" alt="Avatar">`
+                                : `<div class="user-avatar-placeholder">${(user.fullName || user.displayName)?.charAt(0) || 'U'}</div>`
+                            }
+                            <div class="user-details">
+                                <div class="user-name">${user.fullName || user.displayName}</div>
+                                <div class="user-email">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.technicalTeam || '-'}</td>
+                    <td>${getRoleBadge(user.role)}</td>
+                    <td>${user.teamLeadName || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-edit" onclick="editUser('${user.id}')">
+                                ✏️ 编辑
+                            </button>
+                            <button class="action-btn btn-disable" onclick="disableUser('${user.id}')">
+                                🚫 禁用
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 渲染所有用户
+        function renderAllUsers() {
+            const tbody = document.getElementById('all-users-tbody');
+            
+            tbody.innerHTML = allUsers.map(user => `
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            ${user.photoURL 
+                                ? `<img src="${user.photoURL}" class="user-avatar" alt="Avatar">`
+                                : `<div class="user-avatar-placeholder">${(user.fullName || user.displayName)?.charAt(0) || 'U'}</div>`
+                            }
+                            <div class="user-details">
+                                <div class="user-name">${user.fullName || user.displayName || '未设置'}</div>
+                                <div class="user-email">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.technicalTeam || '-'}</td>
+                    <td>${getRoleBadge(user.role)}</td>
+                    <td>${getStatusBadge(user.status)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-edit" onclick="editUser('${user.id}')">
+                                ✏️ 编辑
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // 获取角色徽章
+        function getRoleBadge(role) {
+            const badges = {
+                'engineer': '<span class="role-badge role-engineer">工程师</span>',
+                'team_lead': '<span class="role-badge role-teamlead">部门领导</span>',
+                'admin': '<span class="role-badge role-admin">管理员</span>'
+            };
+            return badges[role] || '<span class="role-badge">未设置</span>';
+        }
+
+        // 获取状态徽章
+        function getStatusBadge(status) {
+            const badges = {
+                'pending': '<span class="status-badge status-pending">待审批</span>',
+                'approved': '<span class="status-badge status-approved">已激活</span>',
+                'rejected': '<span class="status-badge status-rejected">已拒绝</span>',
+                'disabled': '<span class="status-badge status-disabled">已禁用</span>'
+            };
+            return badges[status] || '<span class="status-badge">未知</span>';
+        }
+
+        // 审批用户
+        function approveUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+            
+            editingUserId = userId;
+            
+            // 设置表单
+            document.getElementById('modal-title').textContent = '审批用户';
+            document.getElementById('edit-user-id').value = userId;
+            document.getElementById('user-email').value = user.email;
+            document.getElementById('user-display-name').value = user.displayName || '';
+            document.getElementById('user-full-name').value = user.fullName || '';
+            document.getElementById('user-technical-team').value = user.technicalTeam || '';
+            document.getElementById('user-role').value = user.role || 'engineer';
+            document.getElementById('submit-btn').textContent = '✅ 批准并激活';
+            
+            // 加载领导列表
+            loadTeamLeadOptions();
+            toggleTeamLeadField();
+            
+            // 显示模态框
+            document.getElementById('edit-modal').classList.add('show');
+        }
+
+        // 编辑用户
+        function editUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+            
+            editingUserId = userId;
+            
+            // 设置表单
+            document.getElementById('modal-title').textContent = '编辑用户信息';
+            document.getElementById('edit-user-id').value = userId;
+            document.getElementById('user-email').value = user.email;
+            document.getElementById('user-display-name').value = user.displayName || '';
+            document.getElementById('user-full-name').value = user.fullName || '';
+            document.getElementById('user-technical-team').value = user.technicalTeam || '';
+            document.getElementById('user-role').value = user.role || 'engineer';
+            document.getElementById('user-team-lead').value = user.teamLead || '';
+            document.getElementById('submit-btn').textContent = '💾 保存修改';
+            
+            // 加载领导列表
+            loadTeamLeadOptions();
+            toggleTeamLeadField();
+            
+            // 显示模态框
+            document.getElementById('edit-modal').classList.add('show');
+        }
+
+        // 拒绝用户
+        async function rejectUser(userId) {
+            if (!confirm('确定要拒绝此用户的申请吗？')) {
+                return;
+            }
+            
+            try {
+                await db.collection('users').doc(userId).update({
+                    status: 'rejected',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert('✅ 已拒绝用户申请');
+                await loadAllUsers();
+                
+            } catch (error) {
+                console.error('拒绝用户失败:', error);
+                alert('❌ 操作失败: ' + error.message);
+            }
+        }
+
+        // 禁用用户
+        async function disableUser(userId) {
+            if (!confirm('确定要禁用此用户吗？禁用后用户将无法登录。')) {
+                return;
+            }
+            
+            try {
+                await db.collection('users').doc(userId).update({
+                    status: 'disabled',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert('✅ 用户已禁用');
+                await loadAllUsers();
+                
+            } catch (error) {
+                console.error('禁用用户失败:', error);
+                alert('❌ 操作失败: ' + error.message);
+            }
+        }
+
+        // 加载领导选项
+        function loadTeamLeadOptions() {
+            const select = document.getElementById('user-team-lead');
+            select.innerHTML = '<option value="">无（部门领导/管理员不需要指定）</option>';
+            
+            teamLeads.forEach(lead => {
+                const option = document.createElement('option');
+                option.value = lead.id;
+                option.textContent = `${lead.fullName || lead.displayName} (${lead.technicalTeam || ''})`;
+                select.appendChild(option);
+            });
+        }
+
+        // 切换领导字段显示
+        function toggleTeamLeadField() {
+            const role = document.getElementById('user-role').value;
+            const teamLeadGroup = document.getElementById('team-lead-group');
+            
+            if (role === 'engineer') {
+                teamLeadGroup.style.display = 'block';
+            } else {
+                teamLeadGroup.style.display = 'none';
+            }
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('edit-modal').classList.remove('show');
+            document.getElementById('user-form').reset();
+            editingUserId = null;
+        }
+
+        // 提交表单
+        document.getElementById('user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '保存中...';
+            
+            try {
+                const userId = document.getElementById('edit-user-id').value;
+                const fullName = document.getElementById('user-full-name').value.trim();
+                const technicalTeam = document.getElementById('user-technical-team').value;
+                const role = document.getElementById('user-role').value;
+                const teamLead = document.getElementById('user-team-lead').value;
+                
+                // 获取领导信息
+                let teamLeadName = '';
+                if (teamLead) {
+                    const leadUser = allUsers.find(u => u.id === teamLead);
+                    teamLeadName = leadUser?.fullName || leadUser?.displayName || '';
+                }
+                
+                const updateData = {
+                    fullName: fullName,
+                    department: 'ICT部门',
+                    technicalTeam: technicalTeam,
+                    role: role,
+                    teamLead: teamLead || '',
+                    teamLeadName: teamLeadName,
+                    status: 'approved',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // 如果是首次审批，添加审批信息
+                const user = allUsers.find(u => u.id === userId);
+                if (!user.status || user.status === 'pending') {
+                    updateData.approvedAt = firebase.firestore.FieldValue.serverTimestamp();
+                    updateData.approvedBy = currentUser.uid;
+                }
+                
+                await db.collection('users').doc(userId).update(updateData);
+                
+                console.log('用户信息已更新:', userId);
+                alert('✅ 保存成功！');
+                
+                closeModal();
+                await loadAllUsers();
+                
+            } catch (error) {
+                console.error('保存失败:', error);
+                alert('❌ 保存失败: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = document.getElementById('modal-title').textContent.includes('审批') 
+                    ? '✅ 批准并激活' 
+                    : '💾 保存修改';
+            }
+        });
+
+        // 格式化日期
+        function formatDate(timestamp) {
+            if (!timestamp) return '-';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>
