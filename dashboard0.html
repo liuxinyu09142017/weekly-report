@@ -877,13 +877,6 @@
                         <div class="action-desc">审批用户、分配角色</div>
                     </div>
                 </button>
-                <button class="action-btn" onclick="window.location.href='project-management.html'">
-                    <div class="action-icon">📁</div>
-                    <div class="action-content">
-                        <div class="action-title">项目管理</div>
-                        <div class="action-desc">查看和管理所有项目</div>
-                    </div>
-                </button>
                 <button class="action-btn" onclick="window.location.href='create-work-record.html'">
                     <div class="action-icon">✏️</div>
                     <div class="action-content">
@@ -912,13 +905,6 @@
         function displayTeamLeadActions() {
             const actionsGrid = document.getElementById('actions-grid');
             actionsGrid.innerHTML = `
-                <button class="action-btn" onclick="window.location.href='project-management.html'">
-                    <div class="action-icon">📁</div>
-                    <div class="action-content">
-                        <div class="action-title">项目管理</div>
-                        <div class="action-desc">查看所有项目</div>
-                    </div>
-                </button>
                 <button class="action-btn" onclick="window.location.href='create-work-record.html'">
                     <div class="action-icon">✏️</div>
                     <div class="action-content">
@@ -926,7 +912,7 @@
                         <div class="action-desc">记录工作内容</div>
                     </div>
                 </button>
-                <button class="action-btn secondary" onclick="window.location.href='work-records-list.html'">
+                <button class="action-btn" onclick="window.location.href='work-records-list.html'">
                     <div class="action-icon">📋</div>
                     <div class="action-content">
                         <div class="action-title">查看团队记录</div>
@@ -947,13 +933,6 @@
         function displayEngineerActions() {
             const actionsGrid = document.getElementById('actions-grid');
             actionsGrid.innerHTML = `
-                <button class="action-btn" onclick="window.location.href='project-management.html'">
-                    <div class="action-icon">📁</div>
-                    <div class="action-content">
-                        <div class="action-title">我的项目</div>
-                        <div class="action-desc">查看参与的项目</div>
-                    </div>
-                </button>
                 <button class="action-btn" onclick="window.location.href='create-work-record.html'">
                     <div class="action-icon">✏️</div>
                     <div class="action-content">
