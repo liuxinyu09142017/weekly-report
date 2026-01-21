@@ -371,7 +371,7 @@
             <div class="settings-section">
                 <label class="settings-label">问候语</label>
                 <input type="text" id="greeting" class="settings-input" 
-                       value="骆总、冬梅总：" placeholder="例如: 骆总、冬梅总：">
+                       value="灵峰、冬梅总：" placeholder="例如: 灵峰、冬梅总：">
             </div>
             
             <!-- 周报标题前缀 -->
@@ -542,9 +542,12 @@
         // 加载工作记录
         async function loadWorkRecords() {
             try {
+                // 使用时间范围查询，支持新旧两种数据格式
                 const snapshot = await db.collection('workRecords')
                     .where('userId', '==', currentUser.uid)
-                    .where('weekStart', '==', firebase.firestore.Timestamp.fromDate(currentWeekStart))
+                    .where('startDateTime', '>=', firebase.firestore.Timestamp.fromDate(currentWeekStart))
+                    .where('startDateTime', '<=', firebase.firestore.Timestamp.fromDate(currentWeekEnd))
+                    .orderBy('startDateTime', 'asc')
                     .get();
                 
                 workRecords = snapshot.docs.map(doc => doc.data());
