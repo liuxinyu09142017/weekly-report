@@ -62,6 +62,134 @@
             padding: 0 20px;
         }
         
+        /* 项目选择提示框 */
+        .project-notice {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .project-notice h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .project-notice p {
+            opacity: 0.9;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* 项目匹配提示 */
+        .project-match-alert {
+            display: none;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .project-match-alert.show {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .match-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .match-icon {
+            font-size: 32px;
+        }
+        
+        .match-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .match-content {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .match-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .match-item:last-child {
+            border-bottom: none;
+        }
+        
+        .match-label {
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .match-value {
+            color: #333;
+        }
+        
+        .match-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .match-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-use-project {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-use-project:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-create-new {
+            background: white;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        
+        .btn-create-new:hover {
+            background: #fff8e1;
+        }
+        
         .form-card {
             background: white;
             padding: 40px;
@@ -101,24 +229,23 @@
             margin-bottom: 20px;
         }
         
-        .form-row.three-col {
-            grid-template-columns: 1fr 1fr 1fr;
-        }
-        
-        .form-row.full {
+        .form-row.single {
             grid-template-columns: 1fr;
         }
         
         .form-group {
-            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         
         .form-label {
-            display: block;
             color: #333;
             font-weight: 600;
-            margin-bottom: 8px;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .required {
@@ -126,23 +253,28 @@
         }
         
         .form-input,
-        .form-textarea,
-        .form-select {
-            width: 100%;
-            padding: 12px 15px;
+        .form-select,
+        .form-textarea {
+            padding: 12px;
             border: 2px solid #e1e8ed;
             border-radius: 8px;
             font-size: 14px;
-            transition: all 0.3s;
             font-family: inherit;
+            transition: all 0.3s;
         }
         
         .form-input:focus,
-        .form-textarea:focus,
-        .form-select:focus {
+        .form-select:focus,
+        .form-textarea:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-input:disabled,
+        .form-select:disabled {
+            background: #f5f7fa;
+            cursor: not-allowed;
         }
         
         .form-textarea {
@@ -150,50 +282,26 @@
             min-height: 100px;
         }
         
-        .time-inputs {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .time-separator {
-            color: #666;
-            font-weight: bold;
-        }
-        
         .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 15px;
+            gap: 10px;
+            padding: 12px;
             background: #f8f9fa;
             border-radius: 8px;
         }
         
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
             cursor: pointer;
-        }
-        
-        .checkbox-group label {
-            margin: 0;
-            cursor: pointer;
-            font-weight: normal;
         }
         
         .hours-display {
-            background: #e7f3ff;
-            border: 2px solid #569cd6;
-            border-radius: 8px;
+            background: #f8f9fa;
             padding: 20px;
+            border-radius: 10px;
             margin-top: 20px;
-        }
-        
-        .hours-display h4 {
-            color: #569cd6;
-            margin-bottom: 15px;
         }
         
         .hours-grid {
@@ -202,35 +310,36 @@
             gap: 15px;
         }
         
-        .hours-item {
+        .hour-item {
             text-align: center;
         }
         
-        .hours-value {
+        .hour-value {
             font-size: 28px;
             font-weight: bold;
             color: #667eea;
+            margin-bottom: 5px;
         }
         
-        .hours-label {
+        .hour-label {
             font-size: 12px;
             color: #666;
-            margin-top: 5px;
         }
         
-        .button-group {
+        .submit-section {
             display: flex;
             gap: 15px;
             margin-top: 40px;
             padding-top: 30px;
-            border-top: 2px solid #f0f0f0;
+            border-top: 2px solid #e1e8ed;
         }
         
         .submit-btn {
+            flex: 1;
+            padding: 18px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px 40px;
             border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
@@ -238,7 +347,7 @@
             transition: all 0.3s;
         }
         
-        .submit-btn:hover:not(:disabled) {
+        .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
@@ -250,10 +359,10 @@
         }
         
         .cancel-btn {
-            background: #f5f7fa;
+            padding: 18px 40px;
+            background: white;
             color: #667eea;
             border: 2px solid #667eea;
-            padding: 15px 40px;
             border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
@@ -262,55 +371,7 @@
         }
         
         .cancel-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 100px;
-        }
-        
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .message {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .message.success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            display: block;
-        }
-        
-        .message.error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            display: block;
-        }
-        
-        .help-text {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
+            background: #f5f7fa;
         }
     </style>
 </head>
@@ -318,48 +379,121 @@
     <!-- 顶部导航 -->
     <div class="header">
         <div class="header-content">
-            <h2>📝 创建工作记录</h2>
+            <h2>✏️ 创建工作记录</h2>
             <a href="dashboard.html" class="back-btn">← 返回主页</a>
         </div>
     </div>
     
-    <!-- 加载中 -->
-    <div id="loading" class="loading">
-        <div class="spinner"></div>
-        <div>正在加载...</div>
-    </div>
-    
-    <!-- 主内容 -->
-    <div id="main-content" class="container" style="display: none;">
-        <div class="form-card">
-            <h1>新建工作记录</h1>
-            <p class="form-subtitle">记录本次工作的详细信息</p>
+    <div class="container">
+        <!-- 项目选择提示 -->
+        <div class="project-notice">
+            <h3>💡 智能项目关联</h3>
+            <p>输入客户和项目名称时，系统会自动检测是否已存在该项目。如果项目已存在，可以直接关联；如果是新项目，会自动创建项目记录。</p>
+        </div>
+        
+        <!-- 项目匹配提示框 -->
+        <div class="project-match-alert" id="project-match-alert">
+            <div class="match-header">
+                <span class="match-icon">🎯</span>
+                <div>
+                    <div class="match-title">找到匹配的项目！</div>
+                    <div style="font-size: 13px; color: #856404; margin-top: 5px;">
+                        系统检测到该项目已存在，您可以选择：
+                    </div>
+                </div>
+            </div>
             
-            <div id="message" class="message"></div>
+            <div class="match-content" id="match-content">
+                <!-- 动态填充 -->
+            </div>
+            
+            <div class="match-actions">
+                <button class="match-btn btn-use-project" onclick="useExistingProject()">
+                    ✅ 关联到此项目
+                </button>
+                <button class="match-btn btn-create-new" onclick="createNewProject()">
+                    ➕ 创建新项目
+                </button>
+            </div>
+        </div>
+        
+        <!-- 主表单 -->
+        <div class="form-card">
+            <h1>📝 记录今日工作</h1>
+            <p class="form-subtitle">填写工作内容，系统会自动计算工时</p>
             
             <form id="work-record-form">
                 <!-- 客户信息 -->
                 <div class="form-section">
-                    <h3>🏢 客户信息</h3>
+                    <h3>👤 客户信息</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">客户名称 <span class="required">*</span></label>
+                            <label class="form-label">
+                                客户名称 <span class="required">*</span>
+                            </label>
                             <input type="text" id="customer-name" class="form-input" 
-                                   placeholder="例如: 招商银行伦敦分行" required>
+                                   required placeholder="例如: 招商银行"
+                                   onblur="checkExistingProject()">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">客户所属行业 <span class="required">*</span></label>
-                            <select id="customer-industry" class="form-select" required>
+                            <label class="form-label">客户行业</label>
+                            <select id="customer-industry" class="form-select">
                                 <option value="">请选择</option>
-                                <option value="金融">金融</option>
-                                <option value="制造">制造</option>
+                                <option value="银行">银行</option>
+                                <option value="保险">保险</option>
+                                <option value="证券">证券</option>
+                                <option value="基金">基金</option>
+                                <option value="信托">信托</option>
+                                <option value="制造业">制造业</option>
+                                <option value="能源">能源</option>
                                 <option value="零售">零售</option>
-                                <option value="政府">政府</option>
+                                <option value="物流">物流</option>
+                                <option value="电信">电信</option>
+                                <option value="互联网">互联网</option>
                                 <option value="教育">教育</option>
                                 <option value="医疗">医疗</option>
-                                <option value="能源">能源</option>
-                                <option value="运输">运输</option>
+                                <option value="政府">政府</option>
                                 <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">国家/地区</label>
+                            <select id="customer-country" class="form-select">
+                                <option value="">请选择</option>
+                                <optgroup label="欧洲">
+                                    <option value="英国">英国</option>
+                                    <option value="德国">德国</option>
+                                    <option value="法国">法国</option>
+                                    <option value="意大利">意大利</option>
+                                    <option value="西班牙">西班牙</option>
+                                    <option value="荷兰">荷兰</option>
+                                    <option value="比利时">比利时</option>
+                                    <option value="瑞士">瑞士</option>
+                                    <option value="奥地利">奥地利</option>
+                                    <option value="葡萄牙">葡萄牙</option>
+                                    <option value="卢森堡">卢森堡</option>
+                                </optgroup>
+                                <optgroup label="亚洲">
+                                    <option value="中国">中国</option>
+                                    <option value="香港">香港</option>
+                                    <option value="新加坡">新加坡</option>
+                                    <option value="日本">日本</option>
+                                    <option value="韩国">韩国</option>
+                                    <option value="马来西亚">马来西亚</option>
+                                    <option value="泰国">泰国</option>
+                                    <option value="印度">印度</option>
+                                    <option value="阿联酋">阿联酋</option>
+                                </optgroup>
+                                <optgroup label="北美">
+                                    <option value="美国">美国</option>
+                                    <option value="加拿大">加拿大</option>
+                                </optgroup>
+                                <optgroup label="其他">
+                                    <option value="澳大利亚">澳大利亚</option>
+                                    <option value="其他">其他</option>
+                                </optgroup>
                             </select>
                         </div>
                     </div>
@@ -367,53 +501,46 @@
                 
                 <!-- 项目信息 -->
                 <div class="form-section">
-                    <h3>📋 项目信息</h3>
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label class="form-label">项目名称 <span class="required">*</span></label>
-                            <input type="text" id="project-name" class="form-input" 
-                                   placeholder="例如: IP电话系统升级项目" required>
-                        </div>
-                    </div>
-                    
+                    <h3>📊 项目信息</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">项目类型 <span class="required">*</span></label>
-                            <select id="project-type" class="form-select" required onchange="updateProjectStages()">
+                            <label class="form-label">
+                                项目名称 <span class="required">*</span>
+                            </label>
+                            <input type="text" id="project-name" class="form-input" 
+                                   required placeholder="例如: IP电话系统升级"
+                                   onblur="checkExistingProject()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                项目类型 <span class="required">*</span>
+                            </label>
+                            <select id="project-type" class="form-select" required 
+                                    onchange="updateProjectStages()">
                                 <option value="">请选择</option>
                                 <option value="售前项目">售前项目</option>
                                 <option value="售后项目">售后项目</option>
                             </select>
                         </div>
+                    </div>
+                    
+                    <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">项目阶段 <span class="required">*</span></label>
-                            <select id="project-stage" class="form-select" required disabled>
+                            <label class="form-label">
+                                项目阶段 <span class="required">*</span>
+                            </label>
+                            <select id="project-stage" class="form-select" required>
                                 <option value="">请先选择项目类型</option>
                             </select>
                         </div>
-                    </div>
-                    
-                    <div class="form-row three-col">
                         <div class="form-group">
-                            <label class="form-label">支持类型 <span class="required">*</span></label>
+                            <label class="form-label">
+                                支持类型 <span class="required">*</span>
+                            </label>
                             <select id="support-type" class="form-select" required>
                                 <option value="">请选择</option>
                                 <option value="现场支持">现场支持</option>
                                 <option value="远程支持">远程支持</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">项目金额 (K)</label>
-                            <input type="number" id="project-amount" class="form-input" 
-                                   placeholder="140" step="0.1" min="0">
-                            <div class="help-text">留空表示 NAA (Not Applicable)</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">货币</label>
-                            <select id="project-currency" class="form-select">
-                                <option value="GBP">GBP</option>
-                                <option value="EUR">EUR</option>
-                                <option value="USD">USD</option>
                             </select>
                         </div>
                     </div>
@@ -422,77 +549,77 @@
                         <div class="form-group">
                             <label class="form-label">销售人员</label>
                             <input type="text" id="sales-person" class="form-input" 
-                                   placeholder="例如: 张三">
+                                   placeholder="负责的销售人员">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">项目状态</label>
-                            <select id="project-status" class="form-select">
-                                <option value="进行中">进行中</option>
-                                <option value="已完成">已完成</option>
-                                <option value="已中标">已中标</option>
-                                <option value="已丢标">已丢标</option>
-                                <option value="待公布">待公布中标结果</option>
-                            </select>
+                            <label class="form-label">项目金额（可选）</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="project-amount" class="form-input" 
+                                       placeholder="金额（K）" style="flex: 2;">
+                                <select id="project-currency" class="form-select" style="flex: 1;">
+                                    <option value="GBP">GBP</option>
+                                    <option value="EUR">EUR</option>
+                                    <option value="USD">USD</option>
+                                    <option value="CNY">CNY</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- 工作时间 -->
+                <!-- 时间信息 -->
                 <div class="form-section">
-                    <h3>⏰ 工作时间</h3>
+                    <h3>⏰ 时间信息</h3>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">开始时间 <span class="required">*</span></label>
-                            <div class="time-inputs">
-                                <input type="date" id="start-date" class="form-input" required onchange="calculateHours()">
-                                <span class="time-separator">-</span>
-                                <input type="time" id="start-time" class="form-input" required onchange="calculateHours()">
-                            </div>
+                            <label class="form-label">
+                                工作日期 <span class="required">*</span>
+                            </label>
+                            <input type="date" id="work-date" class="form-input" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">结束时间 <span class="required">*</span></label>
-                            <div class="time-inputs">
-                                <input type="date" id="end-date" class="form-input" required onchange="calculateHours()">
-                                <span class="time-separator">-</span>
-                                <input type="time" id="end-time" class="form-input" required onchange="calculateHours()">
+                            <label class="form-label">是否节假日工作</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="is-holiday" class="checkbox-input" 
+                                       onchange="calculateHours()">
+                                <label for="is-holiday" style="cursor: pointer;">
+                                    节假日工作（全部算加班）
+                                </label>
                             </div>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="is-holiday" onchange="calculateHours()">
-                                <label for="is-holiday">这是节假日加班</label>
-                            </div>
+                            <label class="form-label">
+                                开始时间 <span class="required">*</span>
+                            </label>
+                            <input type="time" id="start-time" class="form-input" 
+                                   required onchange="calculateHours()">
                         </div>
                         <div class="form-group">
-                            <select id="holiday-type" class="form-select" disabled>
-                                <option value="">节假日类型（可选）</option>
-                                <option value="bank_holiday">Bank Holiday</option>
-                                <option value="christmas">Christmas</option>
-                                <option value="easter">Easter</option>
-                                <option value="new_year">New Year</option>
-                                <option value="other">其他</option>
-                            </select>
+                            <label class="form-label">
+                                结束时间 <span class="required">*</span>
+                            </label>
+                            <input type="time" id="end-time" class="form-input" 
+                                   required onchange="calculateHours()">
                         </div>
                     </div>
                     
                     <!-- 工时显示 -->
                     <div class="hours-display" id="hours-display" style="display: none;">
-                        <h4>📊 工时统计</h4>
                         <div class="hours-grid">
-                            <div class="hours-item">
-                                <div class="hours-value" id="normal-hours">0.0</div>
-                                <div class="hours-label">正常工时 (小时)</div>
+                            <div class="hour-item">
+                                <div class="hour-value" id="normal-hours">0.0</div>
+                                <div class="hour-label">正常工时</div>
                             </div>
-                            <div class="hours-item">
-                                <div class="hours-value" id="overtime-hours">0.0</div>
-                                <div class="hours-label">加班工时 (小时)</div>
+                            <div class="hour-item">
+                                <div class="hour-value" id="overtime-hours">0.0</div>
+                                <div class="hour-label">加班工时</div>
                             </div>
-                            <div class="hours-item">
-                                <div class="hours-value" id="total-hours">0.0</div>
-                                <div class="hours-label">总工时 (小时)</div>
+                            <div class="hour-item">
+                                <div class="hour-value" id="total-hours">0.0</div>
+                                <div class="hour-label">总工时</div>
                             </div>
                         </div>
                     </div>
@@ -500,44 +627,35 @@
                 
                 <!-- 工作内容 -->
                 <div class="form-section">
-                    <h3>📝 工作内容</h3>
-                    <div class="form-row full">
+                    <h3>📋 工作内容</h3>
+                    <div class="form-row single">
                         <div class="form-group">
-                            <label class="form-label">工作描述 <span class="required">*</span></label>
+                            <label class="form-label">
+                                工作描述 <span class="required">*</span>
+                            </label>
                             <textarea id="work-description" class="form-textarea" 
-                                      placeholder="详细描述本次工作的具体内容..." required></textarea>
+                                      required placeholder="详细描述今天完成的工作内容..."></textarea>
                         </div>
                     </div>
                     
-                    <div class="form-row full">
+                    <div class="form-row single">
                         <div class="form-group">
-                            <label class="form-label">主要成果</label>
-                            <textarea id="achievements" class="form-textarea" 
-                                      placeholder="本次工作完成的主要成果..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label class="form-label">遇到的问题</label>
-                            <textarea id="challenges" class="form-textarea" 
-                                      placeholder="遇到的困难和挑战..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row full">
-                        <div class="form-group">
-                            <label class="form-label">下一步工作计划</label>
-                            <textarea id="next-plan" class="form-textarea" 
-                                      placeholder="后续的工作安排..."></textarea>
+                            <label class="form-label">下周工作计划</label>
+                            <textarea id="next-week-plan" class="form-textarea" 
+                                      placeholder="下一步的工作计划..."></textarea>
                         </div>
                     </div>
                 </div>
                 
                 <!-- 提交按钮 -->
-                <div class="button-group">
-                    <button type="submit" class="submit-btn" id="submit-btn">💾 保存工作记录</button>
-                    <button type="button" class="cancel-btn" onclick="window.location.href='dashboard.html'">取消</button>
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn" id="submit-btn">
+                        ✅ 保存工作记录
+                    </button>
+                    <button type="button" class="cancel-btn" 
+                            onclick="window.location.href='dashboard.html'">
+                        取消
+                    </button>
                 </div>
             </form>
         </div>
@@ -560,141 +678,267 @@
         const db = firebase.firestore();
         
         let currentUser = null;
+        let userData = null;
+        let matchedProject = null;
 
         // 项目阶段定义
-        const PRESALES_STAGES = [
-            "需求调研", "项目立项", "售前方案", "售前询价", "售前交流",
-            "招标材料准备", "投标材料准备", "答标", 
-            "待公布中标结果", "已中标", "已丢标"
+        const presalesStages = [
+            '需求收集', '方案设计', '方案演示', 'POC测试', '技术交流',
+            '投标准备', '投标答辩', '合同谈判', '项目立项', '其他售前', '待定'
         ];
         
-        const POSTSALES_STAGES = [
-            "确认合同清单和采购清单", "确认到货时间", "确认送货时间", 
-            "确认实施时间", "现场验货", "实施启动会", "现场实施",
-            "实施方案准备", "功能测试", "系统上线", "割接", "现场保障",
-            "用户培训", "项目交接", "验收"
+        const postsalesStages = [
+            '项目启动', '需求确认', '方案设计', '设备采购', '设备到货',
+            '安装部署', '系统配置', '功能测试', '试运行', '用户培训',
+            '项目验收', '运维支持', '故障处理', '其他售后', '已完成'
         ];
 
         // 检查登录状态
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
-                console.log('用户已登录:', user.email);
-                initializeForm();
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
+                await loadUserData();
+                initForm();
             } else {
-                console.log('用户未登录，跳转到登录页');
                 window.location.href = 'index.html';
             }
         });
 
-        // 初始化表单
-        function initializeForm() {
-            // 设置默认日期和时间为今天
-            const now = new Date();
-            const today = now.toISOString().split('T')[0];
-            document.getElementById('start-date').value = today;
-            document.getElementById('end-date').value = today;
-            
-            // 设置默认时间为工作时间
-            document.getElementById('start-time').value = '09:00';
-            document.getElementById('end-time').value = '17:30';
-            
-            // 节假日复选框监听
-            document.getElementById('is-holiday').addEventListener('change', function() {
-                document.getElementById('holiday-type').disabled = !this.checked;
-                if (!this.checked) {
-                    document.getElementById('holiday-type').value = '';
+        // 加载用户数据
+        async function loadUserData() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    userData = userDoc.data();
                 }
-            });
-            
-            // 初始计算工时
-            calculateHours();
+            } catch (error) {
+                console.error('加载用户数据失败:', error);
+            }
         }
 
-        // 更新项目阶段选项
+        // 初始化表单
+        function initForm() {
+            // 设置今天的日期
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('work-date').value = today;
+            
+            // 检查URL参数（从项目详情页跳转过来）
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('projectId');
+            
+            if (projectId) {
+                loadProjectData(projectId);
+            }
+        }
+
+        // 加载项目数据（从项目详情页跳转过来）
+        async function loadProjectData(projectId) {
+            try {
+                const projectDoc = await db.collection('projects').doc(projectId).get();
+                if (projectDoc.exists) {
+                    matchedProject = { id: projectDoc.id, ...projectDoc.data() };
+                    useExistingProject();
+                }
+            } catch (error) {
+                console.error('加载项目数据失败:', error);
+            }
+        }
+
+        // 更新项目阶段
         function updateProjectStages() {
             const projectType = document.getElementById('project-type').value;
             const stageSelect = document.getElementById('project-stage');
             
-            stageSelect.innerHTML = '<option value="">请选择</option>';
-            stageSelect.disabled = false;
-            
-            let stages = [];
-            if (projectType === '售前项目') {
-                stages = PRESALES_STAGES;
-            } else if (projectType === '售后项目') {
-                stages = POSTSALES_STAGES;
+            if (!projectType) {
+                stageSelect.innerHTML = '<option value="">请先选择项目类型</option>';
+                return;
             }
             
-            stages.forEach(stage => {
-                const option = document.createElement('option');
-                option.value = stage;
-                option.textContent = stage;
-                stageSelect.appendChild(option);
-            });
+            const stages = projectType === '售前项目' ? presalesStages : postsalesStages;
+            stageSelect.innerHTML = '<option value="">请选择</option>' + 
+                stages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
+        }
+
+        // 检查已有项目
+        async function checkExistingProject() {
+            const customerName = document.getElementById('customer-name').value.trim();
+            const projectName = document.getElementById('project-name').value.trim();
+            
+            if (!customerName || !projectName) {
+                return;
+            }
+            
+            try {
+                // 查询匹配的项目
+                const projectsSnapshot = await db.collection('projects')
+                    .where('customerName', '==', customerName)
+                    .where('projectName', '==', projectName)
+                    .limit(1)
+                    .get();
+                
+                if (!projectsSnapshot.empty) {
+                    // 找到匹配的项目
+                    matchedProject = {
+                        id: projectsSnapshot.docs[0].id,
+                        ...projectsSnapshot.docs[0].data()
+                    };
+                    
+                    showProjectMatch();
+                } else {
+                    // 没找到，隐藏提示
+                    hideProjectMatch();
+                    matchedProject = null;
+                }
+            } catch (error) {
+                console.error('查询项目失败:', error);
+            }
+        }
+
+        // 显示项目匹配提示
+        function showProjectMatch() {
+            const alert = document.getElementById('project-match-alert');
+            const content = document.getElementById('match-content');
+            
+            content.innerHTML = `
+                <div class="match-item">
+                    <span class="match-label">项目名称</span>
+                    <span class="match-value">${matchedProject.projectName}</span>
+                </div>
+                <div class="match-item">
+                    <span class="match-label">客户名称</span>
+                    <span class="match-value">${matchedProject.customerName}</span>
+                </div>
+                <div class="match-item">
+                    <span class="match-label">项目类型</span>
+                    <span class="match-value">${matchedProject.projectType}</span>
+                </div>
+                <div class="match-item">
+                    <span class="match-label">当前阶段</span>
+                    <span class="match-value">${matchedProject.projectStage}</span>
+                </div>
+                <div class="match-item">
+                    <span class="match-label">项目状态</span>
+                    <span class="match-value">${matchedProject.status}</span>
+                </div>
+                <div class="match-item">
+                    <span class="match-label">已有工作记录</span>
+                    <span class="match-value">${matchedProject.totalSessions || 0} 条</span>
+                </div>
+                <div class="match-item">
+                    <span class="match-label">累计工时</span>
+                    <span class="match-value">${(matchedProject.totalWorkHours || 0).toFixed(1)} 小时</span>
+                </div>
+            `;
+            
+            alert.classList.add('show');
+        }
+
+        // 隐藏项目匹配提示
+        function hideProjectMatch() {
+            document.getElementById('project-match-alert').classList.remove('show');
+        }
+
+        // 使用现有项目
+        function useExistingProject() {
+            if (!matchedProject) return;
+            
+            // 自动填充项目信息
+            document.getElementById('customer-name').value = matchedProject.customerName;
+            document.getElementById('customer-industry').value = matchedProject.customerIndustry || '';
+            document.getElementById('customer-country').value = matchedProject.customerCountry || '';
+            document.getElementById('project-name').value = matchedProject.projectName;
+            document.getElementById('project-type').value = matchedProject.projectType;
+            
+            // 更新阶段列表
+            updateProjectStages();
+            document.getElementById('project-stage').value = matchedProject.projectStage;
+            
+            document.getElementById('sales-person').value = matchedProject.salesPerson || '';
+            document.getElementById('project-amount').value = matchedProject.projectAmount || '';
+            document.getElementById('project-currency').value = matchedProject.projectCurrency || 'GBP';
+            
+            // 禁用项目信息字段（已关联到项目）
+            document.getElementById('customer-name').disabled = true;
+            document.getElementById('customer-industry').disabled = true;
+            document.getElementById('customer-country').disabled = true;
+            document.getElementById('project-name').disabled = true;
+            document.getElementById('project-type').disabled = true;
+            document.getElementById('project-stage').disabled = true;
+            document.getElementById('sales-person').disabled = true;
+            document.getElementById('project-amount').disabled = true;
+            document.getElementById('project-currency').disabled = true;
+            
+            hideProjectMatch();
+            
+            alert('✅ 已关联到现有项目！项目信息已自动填充。');
+        }
+
+        // 创建新项目
+        function createNewProject() {
+            matchedProject = null;
+            
+            // 启用所有字段
+            document.getElementById('customer-name').disabled = false;
+            document.getElementById('customer-industry').disabled = false;
+            document.getElementById('customer-country').disabled = false;
+            document.getElementById('project-name').disabled = false;
+            document.getElementById('project-type').disabled = false;
+            document.getElementById('project-stage').disabled = false;
+            document.getElementById('sales-person').disabled = false;
+            document.getElementById('project-amount').disabled = false;
+            document.getElementById('project-currency').disabled = false;
+            
+            hideProjectMatch();
+            
+            alert('✅ 将创建新项目！请完整填写项目信息。');
         }
 
         // 计算工时
         function calculateHours() {
-            const startDate = document.getElementById('start-date').value;
+            const workDate = document.getElementById('work-date').value;
             const startTime = document.getElementById('start-time').value;
-            const endDate = document.getElementById('end-date').value;
             const endTime = document.getElementById('end-time').value;
             const isHoliday = document.getElementById('is-holiday').checked;
             
-            if (!startDate || !startTime || !endDate || !endTime) {
+            if (!workDate || !startTime || !endTime) {
                 return;
             }
             
-            const start = new Date(`${startDate}T${startTime}`);
-            const end = new Date(`${endDate}T${endTime}`);
+            // 计算总工时
+            const start = new Date(`${workDate} ${startTime}`);
+            const end = new Date(`${workDate} ${endTime}`);
+            const totalHours = (end - start) / (1000 * 60 * 60);
             
-            if (end <= start) {
-                showMessage('结束时间必须晚于开始时间', 'error');
+            if (totalHours <= 0) {
+                alert('结束时间必须晚于开始时间！');
                 return;
             }
-            
-            // 计算总工时（小时）
-            const totalMinutes = (end - start) / 1000 / 60;
-            const totalHours = totalMinutes / 60;
             
             let normalHours = 0;
             let overtimeHours = 0;
             
-            // 获取星期几 (0=周日, 1=周一, ..., 6=周六)
+            // 检查是否是周末
             const dayOfWeek = start.getDay();
-            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
             
-            if (isHoliday) {
-                // 节假日：全部算加班
-                overtimeHours = totalHours;
-            } else if (isWeekend) {
-                // 周末：全部算加班
+            if (isHoliday || isWeekend) {
+                // 节假日或周末，全部算加班
                 overtimeHours = totalHours;
             } else {
-                // 工作日：计算正常工时和加班
-                const workStart = new Date(`${startDate}T09:00`);
-                const workEnd = new Date(`${startDate}T17:30`);
+                // 工作日，计算正常和加班工时
+                const workStart = 9;  // 9:00
+                const workEnd = 17.5; // 17:30
                 
-                // 开始时间在09:00之前
-                if (start < workStart) {
-                    overtimeHours += (workStart - start) / 1000 / 60 / 60;
-                }
+                const startHour = start.getHours() + start.getMinutes() / 60;
+                const endHour = end.getHours() + end.getMinutes() / 60;
                 
-                // 结束时间在17:30之后
-                if (end > workEnd) {
-                    overtimeHours += (end - workEnd) / 1000 / 60 / 60;
-                }
+                // 计算正常工时
+                const normalStart = Math.max(startHour, workStart);
+                const normalEnd = Math.min(endHour, workEnd);
+                normalHours = Math.max(0, normalEnd - normalStart);
                 
-                // 正常工时
-                const actualStart = start < workStart ? workStart : start;
-                const actualEnd = end > workEnd ? workEnd : end;
-                
-                if (actualEnd > actualStart) {
-                    normalHours = (actualEnd - actualStart) / 1000 / 60 / 60;
-                }
+                // 加班工时 = 总工时 - 正常工时
+                overtimeHours = totalHours - normalHours;
             }
             
             // 显示工时
@@ -704,141 +948,117 @@
             document.getElementById('hours-display').style.display = 'block';
         }
 
-        // 显示消息
-        function showMessage(message, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = message;
-            messageDiv.className = `message ${type}`;
-            messageDiv.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            if (type === 'success') {
-                setTimeout(() => {
-                    messageDiv.style.display = 'none';
-                }, 3000);
-            }
-        }
-
-        // 获取本周的周一和周日
-        function getWeekRange(date) {
-            const d = new Date(date);
-            const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // 调整到周一
-            
-            const monday = new Date(d.setDate(diff));
-            monday.setHours(0, 0, 0, 0);
-            
-            const sunday = new Date(monday);
-            sunday.setDate(monday.getDate() + 6);
-            sunday.setHours(23, 59, 59, 999);
-            
-            return { weekStart: monday, weekEnd: sunday };
-        }
-
         // 提交表单
         document.getElementById('work-record-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (!currentUser) {
-                showMessage('请先登录', 'error');
-                return;
-            }
             
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
             submitBtn.textContent = '保存中...';
             
             try {
-                // 收集表单数据
-                const startDate = document.getElementById('start-date').value;
+                // 如果没有匹配的项目，先创建项目
+                let projectId = matchedProject ? matchedProject.id : null;
+                
+                if (!projectId) {
+                    const projectData = {
+                        customerName: document.getElementById('customer-name').value.trim(),
+                        customerIndustry: document.getElementById('customer-industry').value,
+                        customerCountry: document.getElementById('customer-country').value,
+                        projectName: document.getElementById('project-name').value.trim(),
+                        projectType: document.getElementById('project-type').value,
+                        projectStage: document.getElementById('project-stage').value,
+                        status: '进行中',
+                        salesPerson: document.getElementById('sales-person').value.trim(),
+                        projectAmount: document.getElementById('project-amount').value ? 
+                            parseFloat(document.getElementById('project-amount').value) : null,
+                        projectCurrency: document.getElementById('project-currency').value,
+                        startDate: document.getElementById('work-date').value,
+                        totalWorkHours: 0,
+                        totalSessions: 0,
+                        assignedEngineers: [currentUser.uid],
+                        createdBy: currentUser.uid,
+                        createdByName: userData?.chineseName || currentUser.displayName || currentUser.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    const projectRef = await db.collection('projects').add(projectData);
+                    projectId = projectRef.id;
+                    console.log('创建新项目:', projectId);
+                }
+                
+                // 创建工作记录
+                const workDate = document.getElementById('work-date').value;
                 const startTime = document.getElementById('start-time').value;
-                const endDate = document.getElementById('end-date').value;
                 const endTime = document.getElementById('end-time').value;
                 
-                const start = new Date(`${startDate}T${startTime}`);
-                const end = new Date(`${endDate}T${endTime}`);
-                
-                // 获取工时
-                const normalHours = parseFloat(document.getElementById('normal-hours').textContent);
-                const overtimeHours = parseFloat(document.getElementById('overtime-hours').textContent);
-                const totalHours = parseFloat(document.getElementById('total-hours').textContent);
-                
-                // 获取本周范围
-                const weekRange = getWeekRange(start);
-                
-                // 获取项目金额
-                const projectAmount = document.getElementById('project-amount').value;
-                
                 const recordData = {
+                    // 关联项目
+                    projectId: projectId,
+                    
                     // 用户信息
                     userId: currentUser.uid,
-                    userName: currentUser.displayName || currentUser.email,
+                    userName: userData?.chineseName || currentUser.displayName,
                     userEmail: currentUser.email,
-                    technicalDirection: "", // 后续从用户配置读取
+                    department: userData?.department || 'ICT部门',
+                    technicalTeam: userData?.technicalTeam || '',
                     
-                    // 客户信息
+                    // 客户和项目信息
                     customerName: document.getElementById('customer-name').value.trim(),
                     customerIndustry: document.getElementById('customer-industry').value,
-                    
-                    // 项目信息
+                    customerCountry: document.getElementById('customer-country').value,
                     projectName: document.getElementById('project-name').value.trim(),
                     projectType: document.getElementById('project-type').value,
                     projectStage: document.getElementById('project-stage').value,
                     supportType: document.getElementById('support-type').value,
                     salesPerson: document.getElementById('sales-person').value.trim(),
-                    projectAmount: projectAmount ? parseFloat(projectAmount) : null,
+                    projectAmount: document.getElementById('project-amount').value ? 
+                        parseFloat(document.getElementById('project-amount').value) : null,
                     projectCurrency: document.getElementById('project-currency').value,
-                    projectStatus: document.getElementById('project-status').value,
                     
                     // 时间信息
-                    startDate: startDate,
+                    startDate: workDate,
                     startTime: startTime,
-                    endDate: endDate,
                     endTime: endTime,
-                    startDateTime: firebase.firestore.Timestamp.fromDate(start),
-                    endDateTime: firebase.firestore.Timestamp.fromDate(end),
-                    
-                    // 工时统计
-                    normalWorkingHours: normalHours,
-                    overtimeHours: overtimeHours,
-                    totalWorkingHours: totalHours,
-                    
-                    // 节假日
+                    startDateTime: firebase.firestore.Timestamp.fromDate(new Date(`${workDate} ${startTime}`)),
+                    endDateTime: firebase.firestore.Timestamp.fromDate(new Date(`${workDate} ${endTime}`)),
                     isHolidayWork: document.getElementById('is-holiday').checked,
-                    holidayType: document.getElementById('holiday-type').value,
+                    
+                    // 工时
+                    normalWorkingHours: parseFloat(document.getElementById('normal-hours').textContent),
+                    overtimeHours: parseFloat(document.getElementById('overtime-hours').textContent),
+                    totalWorkingHours: parseFloat(document.getElementById('total-hours').textContent),
                     
                     // 工作内容
                     workDescription: document.getElementById('work-description').value.trim(),
-                    achievements: document.getElementById('achievements').value.trim(),
-                    challenges: document.getElementById('challenges').value.trim(),
-                    nextWeekPlan: document.getElementById('next-plan').value.trim(),
-                    
-                    // 周报归属
-                    weekStart: firebase.firestore.Timestamp.fromDate(weekRange.weekStart),
-                    weekEnd: firebase.firestore.Timestamp.fromDate(weekRange.weekEnd),
+                    nextWeekPlan: document.getElementById('next-week-plan').value.trim(),
                     
                     // 元数据
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdBy: currentUser.uid
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
-                // 保存到Firestore
-                const docRef = await db.collection('workRecords').add(recordData);
+                await db.collection('workRecords').add(recordData);
                 
-                console.log('工作记录已保存，文档ID:', docRef.id);
-                showMessage('✅ 工作记录保存成功！2秒后返回主页...', 'success');
+                // 更新项目统计
+                const projectRef = db.collection('projects').doc(projectId);
+                await projectRef.update({
+                    totalWorkHours: firebase.firestore.FieldValue.increment(recordData.totalWorkingHours),
+                    totalSessions: firebase.firestore.FieldValue.increment(1),
+                    assignedEngineers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 
-                // 2秒后跳转
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 2000);
+                alert('✅ 工作记录保存成功！');
+                window.location.href = 'dashboard.html';
                 
             } catch (error) {
                 console.error('保存失败:', error);
-                showMessage('❌ 保存失败: ' + error.message, 'error');
+                alert('❌ 保存失败: ' + error.message);
+            } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '💾 保存工作记录';
+                submitBtn.textContent = '✅ 保存工作记录';
             }
         });
     </script>

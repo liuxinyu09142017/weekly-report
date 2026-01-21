@@ -460,6 +460,16 @@
                 <div class="info-section">
                     <div class="section-title">项目信息</div>
                     <div class="info-item">
+                        <span class="info-icon">🏭</span>
+                        <span class="info-label">行业</span>
+                        <span class="info-value" id="project-industry">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-icon">🌍</span>
+                        <span class="info-label">国家</span>
+                        <span class="info-value" id="project-country">-</span>
+                    </div>
+                    <div class="info-item">
                         <span class="info-icon">📋</span>
                         <span class="info-label">类型</span>
                         <span class="info-value" id="project-type">-</span>
@@ -645,6 +655,8 @@
             }[projectData.status];
             
             // 基本信息
+            document.getElementById('project-industry').textContent = projectData.customerIndustry || '-';
+            document.getElementById('project-country').textContent = projectData.customerCountry || '-';
             document.getElementById('project-type').textContent = projectData.projectType;
             document.getElementById('project-stage').textContent = projectData.projectStage;
             document.getElementById('project-sales').textContent = projectData.salesPerson || '-';

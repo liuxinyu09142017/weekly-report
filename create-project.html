@@ -234,12 +234,58 @@
                                 <option value="银行">银行</option>
                                 <option value="保险">保险</option>
                                 <option value="证券">证券</option>
+                                <option value="基金">基金</option>
+                                <option value="信托">信托</option>
                                 <option value="制造业">制造业</option>
+                                <option value="能源">能源</option>
                                 <option value="零售">零售</option>
                                 <option value="物流">物流</option>
+                                <option value="电信">电信</option>
+                                <option value="互联网">互联网</option>
                                 <option value="教育">教育</option>
                                 <option value="医疗">医疗</option>
+                                <option value="政府">政府</option>
                                 <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">国家/地区</label>
+                            <select id="customer-country" class="form-select">
+                                <option value="">请选择</option>
+                                <optgroup label="欧洲">
+                                    <option value="英国">英国</option>
+                                    <option value="德国">德国</option>
+                                    <option value="法国">法国</option>
+                                    <option value="意大利">意大利</option>
+                                    <option value="西班牙">西班牙</option>
+                                    <option value="荷兰">荷兰</option>
+                                    <option value="比利时">比利时</option>
+                                    <option value="瑞士">瑞士</option>
+                                    <option value="奥地利">奥地利</option>
+                                    <option value="葡萄牙">葡萄牙</option>
+                                    <option value="卢森堡">卢森堡</option>
+                                </optgroup>
+                                <optgroup label="亚洲">
+                                    <option value="中国">中国</option>
+                                    <option value="香港">香港</option>
+                                    <option value="新加坡">新加坡</option>
+                                    <option value="日本">日本</option>
+                                    <option value="韩国">韩国</option>
+                                    <option value="马来西亚">马来西亚</option>
+                                    <option value="泰国">泰国</option>
+                                    <option value="印度">印度</option>
+                                    <option value="阿联酋">阿联酋</option>
+                                </optgroup>
+                                <optgroup label="北美">
+                                    <option value="美国">美国</option>
+                                    <option value="加拿大">加拿大</option>
+                                </optgroup>
+                                <optgroup label="其他">
+                                    <option value="澳大利亚">澳大利亚</option>
+                                    <option value="其他">其他</option>
+                                </optgroup>
                             </select>
                         </div>
                     </div>
@@ -410,6 +456,7 @@
                     // 客户信息
                     customerName: document.getElementById('customer-name').value.trim(),
                     customerIndustry: document.getElementById('customer-industry').value,
+                    customerCountry: document.getElementById('customer-country').value,
                     
                     // 项目信息
                     projectName: document.getElementById('project-name').value.trim(),
