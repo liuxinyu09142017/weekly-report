@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 工程师工时系统</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 60px 50px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+        
+        .company-name {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .google-btn {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+        
+        .google-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .google-icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .divider {
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e1e8ed;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            color: #999;
+            font-size: 12px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .info-box strong {
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .info-box ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        
+        .info-box li {
+            margin-bottom: 5px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🕐</div>
+        <h1 class="title">工程师工时系统</h1>
+        <p class="subtitle">
+            <span class="company-name">China Telecom (Europe)</span> ICT部门
+        </p>
+        
+        <button id="google-login-btn" class="google-btn" onclick="handleGoogleLogin()">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            使用 Gmail 登录
+        </button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>正在登录...</div>
+        </div>
+        
+        <div class="error-message" id="error-message"></div>
+        
+        <div class="divider">
+            <span>系统说明</span>
+        </div>
+        
+        <div class="info-box">
+            <strong>📋 新用户注册流程：</strong>
+            <ul>
+                <li>首次登录自动创建账号</li>
+                <li>等待管理员审批</li>
+                <li>管理员补录信息后激活</li>
+                <li>开始正常使用系统</li>
+            </ul>
+            
+            <strong style="margin-top: 15px;">✨ 系统功能：</strong>
+            <ul>
+                <li>工作记录管理</li>
+                <li>自动工时计算</li>
+                <li>周报一键生成</li>
+                <li>数据统计分析</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
+            authDomain: "weekly-report-d55e9.firebaseapp.com",
+            projectId: "weekly-report-d55e9",
+            storageBucket: "weekly-report-d55e9.appspot.com",
+            messagingSenderId: "315332641675",
+            appId: "1:315332641675:web:e1b52c3d4c5fcc7b8c0de7"
+        };
+
+        // 初始化Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // 管理员邮箱列表
+        const ADMIN_EMAILS = ['liuxinyu0914@gmail.com'];
+        
+        // Google登录
+        async function handleGoogleLogin() {
+            const btn = document.getElementById('google-login-btn');
+            const loading = document.getElementById('loading');
+            const errorMsg = document.getElementById('error-message');
+            
+            btn.disabled = true;
+            loading.classList.add('show');
+            errorMsg.classList.remove('show');
+            
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                const user = result.user;
+                
+                console.log('Google登录成功:', user.email);
+                
+                // 检查用户是否存在
+                await checkAndCreateUser(user);
+                
+            } catch (error) {
+                console.error('登录失败:', error);
+                showError('登录失败: ' + error.message);
+                btn.disabled = false;
+                loading.classList.remove('show');
+            }
+        }
+        
+        // 检查并创建用户
+        async function checkAndCreateUser(user) {
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (userDoc.exists) {
+                    // 用户已存在，检查状态
+                    const userData = userDoc.data();
+                    handleExistingUser(userData);
+                } else {
+                    // 新用户，创建记录
+                    await createNewUser(user);
+                }
+                
+            } catch (error) {
+                console.error('检查用户失败:', error);
+                showError('系统错误: ' + error.message);
+            }
+        }
+        
+        // 创建新用户
+        async function createNewUser(user) {
+            try {
+                const isAdmin = ADMIN_EMAILS.includes(user.email);
+                
+                const userData = {
+                    userId: user.uid,
+                    email: user.email,
+                    displayName: user.displayName || '',
+                    photoURL: user.photoURL || '',
+                    
+                    // 状态
+                    status: isAdmin ? 'approved' : 'pending',
+                    
+                    // 基本信息（待补录）
+                    fullName: '',
+                    department: 'ICT部门',
+                    technicalTeam: '',
+                    
+                    // 角色
+                    role: isAdmin ? 'admin' : 'engineer',
+                    
+                    // 领导关系
+                    teamLead: '',
+                    teamLeadName: '',
+                    
+                    // 时间戳
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // 如果是管理员，自动审批
+                if (isAdmin) {
+                    userData.approvedAt = firebase.firestore.FieldValue.serverTimestamp();
+                    userData.approvedBy = user.uid;
+                }
+                
+                await db.collection('users').doc(user.uid).set(userData);
+                
+                console.log('新用户创建成功:', user.email, '状态:', userData.status);
+                
+                if (isAdmin) {
+                    // 管理员直接跳转到Dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // 普通用户跳转到等待审批页面
+                    window.location.href = 'pending-approval.html';
+                }
+                
+            } catch (error) {
+                console.error('创建用户失败:', error);
+                showError('创建账号失败: ' + error.message);
+            }
+        }
+        
+        // 处理已存在用户
+        function handleExistingUser(userData) {
+            console.log('用户状态:', userData.status);
+            
+            // 更新最后登录时间
+            db.collection('users').doc(userData.userId).update({
+                lastLoginAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(err => console.error('更新登录时间失败:', err));
+            
+            switch (userData.status) {
+                case 'approved':
+                    // 已激活，跳转到Dashboard
+                    window.location.href = 'dashboard.html';
+                    break;
+                    
+                case 'pending':
+                    // 待审批，跳转到等待页面
+                    window.location.href = 'pending-approval.html';
+                    break;
+                    
+                case 'rejected':
+                    showError('您的申请已被拒绝，请联系管理员。');
+                    break;
+                    
+                case 'disabled':
+                    showError('您的账号已被禁用，请联系管理员。');
+                    break;
+                    
+                default:
+                    showError('账号状态异常，请联系管理员。');
+            }
+        }
+        
+        // 显示错误信息
+        function showError(message) {
+            const errorMsg = document.getElementById('error-message');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+            
+            // 重新启用登录按钮
+            document.getElementById('google-login-btn').disabled = false;
+            document.getElementById('loading').classList.remove('show');
+        }
+        
+        // 检查是否已登录
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log('检测到已登录用户:', user.email);
+                // 检查用户状态
+                checkAndCreateUser(user);
+            }
+        });
+    </script>
+</body>
+</html>
