@@ -149,61 +149,60 @@ const REGION_NAMES = {
  * 填充国家选择器
  * @param {string} selectId - select元素的ID
  * @param {object} options - 配置选项
- * @param {boolean} options.addEmptyOption - 是否添加默认空选项 (默认true)
- * @param {string} options.emptyOptionText - 默认选项显示的文字 (如 "全部国家" 或 "请选择")
- * @param {Array} options.excludeRegions - 要排除的地区
+ * @param {boolean} options.includeAllRegions - 是否包含所有地区（默认true）
+ * @param {Array} options.excludeRegions - 要排除的地区（可选）
+ * @param {boolean} options.addEmptyOption - 是否添加"请选择"选项（默认true）
  */
 function populateCountrySelect(selectId, options = {}) {
     const select = document.getElementById(selectId);
     if (!select) {
-        console.warn(`未找到 ID 为 '${selectId}' 的选择器`);
+        console.error(`Select element with id '${selectId}' not found`);
         return;
     }
     
-    // 合并配置项
+    // 默认配置
     const config = {
-        addEmptyOption: true,
-        emptyOptionText: '请选择', // 默认文字
+        includeAllRegions: true,
         excludeRegions: [],
+        addEmptyOption: true,
         ...options
     };
     
-    // 清空现有内容并使用片段(Fragment)提升性能
+    // 清空现有选项
     select.innerHTML = '';
-    const fragment = document.createDocumentFragment();
     
-    // 1. 添加默认空选项
+    // 添加"请选择"选项
     if (config.addEmptyOption) {
         const emptyOption = document.createElement('option');
         emptyOption.value = '';
-        emptyOption.textContent = config.emptyOptionText;
-        fragment.appendChild(emptyOption);
+        emptyOption.textContent = '请选择';
+        select.appendChild(emptyOption);
     }
     
-    // 2. 按地区添加国家
+    // 按地区添加国家选项
     Object.keys(COUNTRIES_LIST).forEach(region => {
-        if (config.excludeRegions.includes(region)) return;
+        if (config.excludeRegions.includes(region)) {
+            return;
+        }
         
         const countries = COUNTRIES_LIST[region];
         const regionName = REGION_NAMES[region];
         
+        // 创建optgroup
         const optgroup = document.createElement('optgroup');
         optgroup.label = regionName;
         
+        // 添加国家选项
         countries.forEach(country => {
             const option = document.createElement('option');
             option.value = country.value;
             option.textContent = country.label;
-            // 存储额外元数据
             option.dataset.en = country.en;
             optgroup.appendChild(option);
         });
         
-        fragment.appendChild(optgroup);
+        select.appendChild(optgroup);
     });
-    
-    // 一次性挂载到 DOM
-    select.appendChild(fragment);
 }
 
 /**
