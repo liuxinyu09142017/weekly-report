@@ -10,9 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
-    <!-- 国家列表模块 -->
-    <script src="js/countries-list.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -220,25 +217,6 @@
             font-size: 13px;
             color: #1565c0;
         }
-        
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-            margin-left: auto;
-            margin-right: 10px;
-        }
-        
-        .btn-danger:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-        }
-        
-        .btn-danger:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
     </style>
 </head>
 <body>
@@ -301,7 +279,39 @@
                         <div class="form-group">
                             <label class="form-label">国家/地区</label>
                             <select id="customer-country" class="form-select">
-                                <!-- 通过 countries-list.js 自动填充 -->
+                                <option value="">请选择</option>
+                                <optgroup label="欧洲">
+                                    <option value="英国">英国</option>
+                                    <option value="德国">德国</option>
+                                    <option value="法国">法国</option>
+                                    <option value="意大利">意大利</option>
+                                    <option value="西班牙">西班牙</option>
+                                    <option value="荷兰">荷兰</option>
+                                    <option value="比利时">比利时</option>
+                                    <option value="瑞士">瑞士</option>
+                                    <option value="奥地利">奥地利</option>
+                                    <option value="葡萄牙">葡萄牙</option>
+                                    <option value="卢森堡">卢森堡</option>
+                                </optgroup>
+                                <optgroup label="亚洲">
+                                    <option value="中国">中国</option>
+                                    <option value="香港">香港</option>
+                                    <option value="新加坡">新加坡</option>
+                                    <option value="日本">日本</option>
+                                    <option value="韩国">韩国</option>
+                                    <option value="马来西亚">马来西亚</option>
+                                    <option value="泰国">泰国</option>
+                                    <option value="印度">印度</option>
+                                    <option value="阿联酋">阿联酋</option>
+                                </optgroup>
+                                <optgroup label="北美">
+                                    <option value="美国">美国</option>
+                                    <option value="加拿大">加拿大</option>
+                                </optgroup>
+                                <optgroup label="其他">
+                                    <option value="澳大利亚">澳大利亚</option>
+                                    <option value="其他">其他</option>
+                                </optgroup>
                             </select>
                         </div>
                     </div>
@@ -403,11 +413,6 @@
     </div>
 
     <script>
-        // 页面加载完成后初始化国家列表
-        document.addEventListener('DOMContentLoaded', () => {
-            populateCountrySelect('customer-country');
-        });
-        
         // Firebase配置
         const firebaseConfig = {
             apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
@@ -443,20 +448,6 @@
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
-        
-        // 获取用户数据并检查权限
-        try {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            const userData = userDoc.data();
-            
-            // 如果是管理员，显示删除按钮
-            if (userData && userData.role === 'admin') {
-                const deleteBtn = document.getElementById('delete-project-btn');
-                if (deleteBtn) deleteBtn.style.display = 'inline-block';
-            }
-        } catch (error) {
-            console.error('获取用户数据失败:', error);
-        }
                 console.log('用户已登录:', user.email);
                 
                 // 获取项目ID
@@ -586,47 +577,6 @@
                 submitBtn.textContent = '✅ 保存修改';
             }
         });
-
-        // 删除项目函数
-        async function deleteProject() {
-            const projectName = document.getElementById('project-name')?.value || '此项目';
-            
-            if (!confirm(`⚠️ 确定要删除项目"${projectName}"吗？\n\n删除后所有相关数据将无法恢复！`)) {
-                return;
-            }
-            if (!confirm('⚠️ 最后确认：此操作不可撤销，确定删除？')) {
-                return;
-            }
-            
-            try {
-                const deleteBtn = document.getElementById('delete-project-btn');
-                const submitBtn = document.getElementById('submit-btn');
-                
-                deleteBtn.disabled = true;
-                deleteBtn.textContent = '删除中...';
-                submitBtn.disabled = true;
-                
-                const urlParams = new URLSearchParams(window.location.search);
-                const projectId = urlParams.get('id');
-                
-                await db.collection('projects').doc(projectId).delete();
-                
-                alert('✅ 项目已成功删除');
-                window.location.href = 'project-management.html';
-                
-            } catch (error) {
-                console.error('删除项目失败:', error);
-                alert('❌ 删除失败: ' + error.message);
-                
-                const deleteBtn = document.getElementById('delete-project-btn');
-                const submitBtn = document.getElementById('submit-btn');
-                if (deleteBtn) {
-                    deleteBtn.disabled = false;
-                    deleteBtn.textContent = '🗑️ 删除项目';
-                }
-                if (submitBtn) submitBtn.disabled = false;
-            }
-        }
     </script>
 </body>
 </html>

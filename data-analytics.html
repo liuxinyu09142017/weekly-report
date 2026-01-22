@@ -10,9 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
-    <!-- 国家列表模块 -->
-    <script src="js/countries-list.js"></script>
-    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -471,7 +468,22 @@
                     <label class="filter-label">国家/地区</label>
                     <select id="country" class="filter-select">
                         <option value="">全部</option>
-                        <!-- 通过 countries-list.js 自动填充 -->
+                        <optgroup label="欧洲">
+                            <option value="英国">英国</option>
+                            <option value="德国">德国</option>
+                            <option value="法国">法国</option>
+                            <option value="意大利">意大利</option>
+                            <option value="西班牙">西班牙</option>
+                            <option value="荷兰">荷兰</option>
+                            <option value="比利时">比利时</option>
+                            <option value="瑞士">瑞士</option>
+                        </optgroup>
+                        <optgroup label="亚洲">
+                            <option value="中国">中国</option>
+                            <option value="香港">香港</option>
+                            <option value="新加坡">新加坡</option>
+                            <option value="日本">日本</option>
+                        </optgroup>
                     </select>
                 </div>
             </div>
@@ -598,14 +610,6 @@
     </div>
 
     <script>
-        // 页面加载完成后初始化国家列表
-        document.addEventListener('DOMContentLoaded', () => {
-            populateCountrySelect('country', {
-                addEmptyOption: false  // 因为已经有"全部"选项
-            });
-        });
-        
-        <script>
         // Firebase配置
         const firebaseConfig = {
             apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",

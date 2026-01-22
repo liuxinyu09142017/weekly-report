@@ -10,9 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
-    <!-- 国家列表模块 -->
-    <script src="js/countries-list.js"></script>
-    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -500,15 +497,6 @@
                         <!-- 动态填充 -->
                     </select>
                 </div>
-                
-                <!-- 国家筛选 ⭐ 新增 -->
-                <div class="filter-item">
-                    <label class="filter-label">按国家统计</label>
-                    <select id="country-filter" class="filter-select">
-                        <option value="">全部国家</option>
-                        <!-- 通过 countries-list.js 自动填充 -->
-                    </select>
-                </div>
             </div>
             
             <div class="filter-actions">
@@ -655,14 +643,6 @@
     </div>
 
     <script>
-        // 页面加载完成后初始化国家列表
-        document.addEventListener('DOMContentLoaded', () => {
-            populateCountrySelect('country-filter', {
-                addEmptyOption: false  // 因为已经有"全部国家"选项
-            });
-        });
-        
-        <script>
         // Firebase配置
         const firebaseConfig = {
             apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
