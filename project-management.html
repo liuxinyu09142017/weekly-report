@@ -486,31 +486,58 @@
         // 加载用户数据
         async function loadUserData() {
             try {
+                console.log('加载用户数据，UID:', currentUser.uid);
                 const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                
                 if (userDoc.exists) {
                     userData = userDoc.data();
+                    console.log('用户数据加载成功:', userData);
+                    
+                    // 检查用户状态
+                    if (userData.status !== 'approved') {
+                        console.warn('用户未审批，状态:', userData.status);
+                        alert('您的账号尚未审批，无法访问系统');
+                        window.location.href = 'pending-approval.html';
+                        return;
+                    }
+                } else {
+                    console.error('用户文档不存在');
+                    alert('用户信息未找到，请联系管理员');
+                    auth.signOut();
+                    window.location.href = 'index.html';
+                    return;
                 }
             } catch (error) {
                 console.error('加载用户数据失败:', error);
+                alert('加载用户数据失败: ' + error.message);
             }
         }
 
         // 加载项目
         async function loadProjects() {
             try {
+                console.log('开始加载项目...');
+                console.log('当前用户:', currentUser ? currentUser.email : 'null');
+                console.log('用户数据:', userData);
+                
                 let query = db.collection('projects');
                 
                 // 根据角色加载数据
                 if (userData && userData.role === 'admin') {
+                    console.log('以管理员身份加载所有项目');
                     // 管理员看所有项目
                 } else if (userData && userData.role === 'team_lead') {
+                    console.log('以部门领导身份加载所有项目');
                     // 部门领导看ICT部门所有项目
                 } else {
-                    // 工程师只看自己参与的项目
+                    console.log('以工程师身份加载参与的项目');
+                    // 工程师只看自己参与的项目（包括 userData 为 null 的情况）
                     query = query.where('assignedEngineers', 'array-contains', currentUser.uid);
                 }
                 
+                console.log('执行查询...');
                 const snapshot = await query.get();
+                console.log('查询返回', snapshot.size, '个项目');
                 
                 allProjects = await Promise.all(snapshot.docs.map(async doc => {
                     const projectData = doc.data();
