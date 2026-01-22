@@ -361,19 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
     populateCountrySelect('customer-country');
 });
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
-            authDomain: "weekly-report-d55e9.firebaseapp.com",
-            projectId: "weekly-report-d55e9",
-            storageBucket: "weekly-report-d55e9.appspot.com",
-            messagingSenderId: "315332641675",
-            appId: "1:315332641675:web:e1b52c3d4c5fcc7b8c0de7"
-        };
-
-        // 初始化Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+<script src="js/firebase-init.js"></script>
         
         let currentUser = null;
 
