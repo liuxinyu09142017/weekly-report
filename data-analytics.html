@@ -468,8 +468,7 @@
                 <div class="filter-item">
                     <label class="filter-label">国家/地区</label>
                     <select id="country" class="filter-select">
-    <option value="">全部</option>
-    <!-- 通过 countries-list.js 自动填充 -->
+                        <!-- 通过 countries-list.js 自动填充 -->
                     </select>
                 </div>
             </div>
@@ -599,7 +598,8 @@
     // 页面加载完成后初始化国家列表
     document.addEventListener('DOMContentLoaded', () => {
         populateCountrySelect('country', {
-            addEmptyOption: false  // 因为已经有"全部"选项
+            addEmptyOption: true,
+            emptyOptionText: '全部'  // 自定义文本为"全部"
         });
     });
         // Firebase配置

@@ -165,18 +165,17 @@ function populateCountrySelect(selectId, options = {}) {
         includeAllRegions: true,
         excludeRegions: [],
         addEmptyOption: true,
-        emptyOptionText: '请选择',  // 新增：可自定义空选项文本
         ...options
     };
     
     // 清空现有选项
     select.innerHTML = '';
     
-    // 添加空选项（可自定义文本）
+    // 添加"请选择"选项
     if (config.addEmptyOption) {
         const emptyOption = document.createElement('option');
         emptyOption.value = '';
-        emptyOption.textContent = config.emptyOptionText;
+        emptyOption.textContent = '请选择';
         select.appendChild(emptyOption);
     }
     
