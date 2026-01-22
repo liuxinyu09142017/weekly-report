@@ -46,6 +46,40 @@
         .header-actions {
             display: flex;
             gap: 15px;
+            align-items: center;
+        }
+        
+        /* 视图切换按钮 */
+        .view-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+        }
+        
+        .view-toggle-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .view-toggle-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .view-toggle-btn.active {
+            background: white;
+            color: #667eea;
         }
         
         .btn {
@@ -161,6 +195,111 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
+        }
+        
+        /* 列表视图样式 */
+        .projects-list {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .projects-list.active {
+            display: flex;
+        }
+        
+        .project-list-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            cursor: pointer;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 100px;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .project-list-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .list-item-main {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .list-item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .list-item-subtitle {
+            font-size: 13px;
+            color: #667eea;
+        }
+        
+        .list-item-meta {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .list-item-stat {
+            text-align: center;
+        }
+        
+        .list-item-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .list-item-stat-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .list-item-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        
+        .icon-btn {
+            padding: 8px;
+            border: none;
+            background: #f5f7fa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .icon-btn:hover {
+            background: #e5e7eb;
+            transform: scale(1.1);
+        }
+        
+        .icon-btn.delete {
+            background: #fee;
+            color: #c00;
+        }
+        
+        .icon-btn.delete:hover {
+            background: #fcc;
         }
         
         .project-card {
@@ -349,6 +488,92 @@
             color: #666;
             margin-bottom: 20px;
         }
+        
+        /* 删除确认对话框 */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-modal.active {
+            display: flex;
+        }
+        
+        .delete-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .delete-modal-icon {
+            font-size: 64px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .delete-modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .delete-modal-text {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .delete-modal-project-info {
+            background: #f5f7fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .delete-modal-project-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .delete-modal-project-meta {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .delete-modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .delete-modal-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -359,6 +584,16 @@
                 <h2>📁 项目管理</h2>
             </div>
             <div class="header-actions">
+                <div class="view-toggle">
+                    <button class="view-toggle-btn active" id="card-view-btn" onclick="switchView('card')">
+                        <span>🎴</span>
+                        <span>卡片</span>
+                    </button>
+                    <button class="view-toggle-btn" id="list-view-btn" onclick="switchView('list')">
+                        <span>📋</span>
+                        <span>列表</span>
+                    </button>
+                </div>
                 <button class="btn btn-primary" onclick="window.location.href='create-project.html'">
                     ➕ 新建项目
                 </button>
@@ -439,6 +674,11 @@
             <!-- 动态加载 -->
         </div>
         
+        <!-- 项目列表视图 -->
+        <div class="projects-list" id="projects-list">
+            <!-- 动态加载 -->
+        </div>
+        
         <!-- 空状态 -->
         <div id="empty-state" class="empty-state" style="display: none;">
             <div class="empty-icon">📁</div>
@@ -446,6 +686,25 @@
             <button class="btn btn-primary" onclick="window.location.href='create-project.html'">
                 创建第一个项目
             </button>
+        </div>
+    </div>
+    
+    <!-- 删除确认对话框 -->
+    <div class="delete-modal" id="delete-modal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-icon">⚠️</div>
+            <div class="delete-modal-title">确认删除项目</div>
+            <div class="delete-modal-text">
+                删除项目后，所有相关的工作记录和数据将被永久删除，此操作不可撤销！
+            </div>
+            <div class="delete-modal-project-info">
+                <div class="delete-modal-project-name" id="delete-project-name"></div>
+                <div class="delete-modal-project-meta" id="delete-project-meta"></div>
+            </div>
+            <div class="delete-modal-actions">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+            </div>
         </div>
     </div>
 
@@ -733,6 +992,108 @@
         // 编辑项目
         function editProject(projectId) {
             window.location.href = `edit-project.html?id=${projectId}`;
+        }
+        
+        // 当前视图模式
+        let currentView = 'card'; // 'card' or 'list'
+        
+        // 切换视图
+        function switchView(viewType) {
+            currentView = viewType;
+            
+            const cardViewBtn = document.getElementById('card-view-btn');
+            const listViewBtn = document.getElementById('list-view-btn');
+            const cardGrid = document.getElementById('projects-grid');
+            const listView = document.getElementById('projects-list');
+            
+            if (viewType === 'card') {
+                // 卡片视图
+                cardViewBtn.classList.add('active');
+                listViewBtn.classList.remove('active');
+                cardGrid.style.display = 'grid';
+                listView.classList.remove('active');
+            } else {
+                // 列表视图
+                cardViewBtn.classList.remove('active');
+                listViewBtn.classList.add('active');
+                cardGrid.style.display = 'none';
+                listView.classList.add('active');
+            }
+            
+            // 重新渲染
+            renderProjects();
+        }
+        
+        // 删除相关变量
+        let projectToDelete = null;
+        
+        // 显示删除确认对话框
+        function showDeleteModal(projectId, event) {
+            if (event) {
+                event.stopPropagation(); // 阻止事件冒泡
+            }
+            
+            const project = allProjects.find(p => p.id === projectId);
+            if (!project) {
+                alert('项目不存在');
+                return;
+            }
+            
+            projectToDelete = project;
+            
+            document.getElementById('delete-project-name').textContent = project.projectName;
+            document.getElementById('delete-project-meta').textContent = 
+                `客户：${project.customerName} | 类型：${project.projectType} | 金额：${project.projectAmount || '未设置'}`;
+            
+            document.getElementById('delete-modal').classList.add('active');
+        }
+        
+        // 关闭删除对话框
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('active');
+            projectToDelete = null;
+        }
+        
+        // 确认删除
+        async function confirmDelete() {
+            if (!projectToDelete) {
+                alert('未选择要删除的项目');
+                return;
+            }
+            
+            try {
+                // 显示加载状态
+                const deleteBtn = document.querySelector('.btn-danger');
+                deleteBtn.disabled = true;
+                deleteBtn.textContent = '删除中...';
+                
+                // 删除项目
+                await db.collection('projects').doc(projectToDelete.id).delete();
+                
+                console.log('项目已删除:', projectToDelete.id);
+                
+                // 关闭对话框
+                closeDeleteModal();
+                
+                // 从列表中移除
+                allProjects = allProjects.filter(p => p.id !== projectToDelete.id);
+                
+                // 重新应用筛选和渲染
+                applyFilters();
+                updateStats();
+                
+                // 显示成功提示
+                alert('✅ 项目已成功删除');
+                
+            } catch (error) {
+                console.error('删除项目失败:', error);
+                alert('❌ 删除失败: ' + error.message);
+                
+                // 恢复按钮状态
+                const deleteBtn = document.querySelector('.btn-danger');
+                deleteBtn.disabled = false;
+                deleteBtn.textContent = '确认删除';
+            }
         }
     </script>
 </body>
