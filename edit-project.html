@@ -285,6 +285,63 @@
                     <div class="section-title">👤 客户信息</div>
                     <div class="form-row">
                         <div class="form-group">
+                            <label class="form-label">客户名称 <span class="required">*</span></label>
+                            <input type="text" id="customer-name" class="form-input" required
+                                   placeholder="例如: 招商银行">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">客户行业</label>
+                            <select id="customer-industry" class="form-select">
+                                <option value="">请选择</option>
+                                <option value="银行">银行</option>
+                                <option value="保险">保险</option>
+                                <option value="证券">证券</option>
+                                <option value="基金">基金</option>
+                                <option value="信托">信托</option>
+                                <option value="制造业">制造业</option>
+                                <option value="能源">能源</option>
+                                <option value="零售">零售</option>
+                                <option value="物流">物流</option>
+                                <option value="电信">电信</option>
+                                <option value="互联网">互联网</option>
+                                <option value="教育">教育</option>
+                                <option value="医疗">医疗</option>
+                                <option value="政府">政府</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">国家/地区</label>
+                            <select id="customer-country" class="form-select">
+                          <!-- 通过 countries-list.js 自动填充 -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 项目信息 -->
+                <div class="form-section">
+                    <div class="section-title">📊 项目信息</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">项目名称 <span class="required">*</span></label>
+                            <input type="text" id="project-name" class="form-input" required
+                                   placeholder="例如: IP电话系统升级项目">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">项目类型 <span class="required">*</span></label>
+                            <select id="project-type" class="form-select" required onchange="updateProjectStages()">
+                                <option value="">请选择</option>
+                                <option value="售前项目">售前项目</option>
+                                <option value="售后项目">售后项目</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
                             <label class="form-label">项目阶段 <span class="required">*</span></label>
                             
                             <!-- 阶段分类选择器（售后项目显示） -->
@@ -409,7 +466,10 @@ document.addEventListener('DOMContentLoaded', () => {
         let projectId = null;
         let projectData = null;
 
-        // 项目阶段定义已移至 js/project-stages.js
+        // 项目阶段定义
+        // presalesStages已移至project-stages.js
+        
+        // postsalesStages已移至project-stages.js
 
         // 检查登录状态
         auth.onAuthStateChanged(async (user) => {
@@ -450,13 +510,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 填充表单
                 document.getElementById('customer-name').value = projectData.customerName || '';
                 document.getElementById('customer-industry').value = projectData.customerIndustry || '';
-                
                 // 国家/地区（安全检查）
                 const customerCountry = document.getElementById('customer-country');
                 if (customerCountry) {
                     customerCountry.value = projectData.customerCountry || '';
                 }
-                
                 document.getElementById('project-name').value = projectData.projectName || '';
                 document.getElementById('project-type').value = projectData.projectType || '';
                 
@@ -482,6 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // 更新项目阶段选项
         // 更新项目阶段（使用分类）
         function updateProjectStages() {
             const projectType = document.getElementById('project-type').value;
@@ -541,6 +600,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentValue && categoryData.stages.includes(currentValue)) {
                 stageSelect.value = currentValue;
             }
+        }
+            
+            const stages = projectType === '售前项目' ? presalesStages : postsalesStages;
+            
+            stageSelect.innerHTML = '<option value="">请选择</option>' + 
+                stages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
         }
 
         // 提交表单
