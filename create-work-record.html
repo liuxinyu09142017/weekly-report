@@ -533,6 +533,32 @@
                             <label class="form-label">
                                 项目阶段 <span class="required">*</span>
                             </label>
+                            
+                            <!-- 阶段分类选择器（售后项目显示） -->
+                            <div class="stage-category-selector" id="stage-category-selector">
+                                <button type="button" class="category-btn active" data-category="general" onclick="selectCategory('general')">
+                                    📦 通用阶段
+                                </button>
+                                <button type="button" class="category-btn" data-category="network" onclick="selectCategory('network')">
+                                    🌐 网络项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="system" onclick="selectCategory('system')">
+                                    🖥️ 系统项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="infrastructure" onclick="selectCategory('infrastructure')">
+                                    🏢 能基项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="emergency" onclick="selectCategory('emergency')">
+                                    🚨 应急项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="expansion" onclick="selectCategory('expansion')">
+                                    📈 扩容项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="optimization" onclick="selectCategory('optimization')">
+                                    ⚡ 优化项目
+                                </button>
+                            </div>
+                            
                             <select id="project-stage" class="form-select" required>
                                 <option value="">请先选择项目类型</option>
                             </select>
