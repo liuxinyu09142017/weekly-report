@@ -299,11 +299,6 @@
             cursor: pointer;
         }
         
-        .checkbox-label {
-            cursor: pointer;
-            user-select: none;
-        }
-        
         .hours-display {
             background: #f8f9fa;
             padding: 20px;
@@ -608,25 +603,29 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">
-                                开始日期 <span class="required">*</span>
+                                工作日期 <span class="required">*</span>
                             </label>
-                            <input type="date" id="start-date" class="form-input" required onchange="calculateHours()">
+                            <input type="date" id="work-date" class="form-input" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">
-                                开始时间 <span class="required">*</span>
-                            </label>
-                            <input type="time" id="start-time" class="form-input" 
-                                   required onchange="calculateHours()">
+                            <label class="form-label">是否节假日工作</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="is-holiday" class="checkbox-input" 
+                                       onchange="calculateHours()">
+                                <label for="is-holiday" style="cursor: pointer;">
+                                    节假日工作（全部算加班）
+                                </label>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">
-                                结束日期 <span class="required">*</span>
+                                开始时间 <span class="required">*</span>
                             </label>
-                            <input type="date" id="end-date" class="form-input" required onchange="calculateHours()">
+                            <input type="time" id="start-time" class="form-input" 
+                                   required onchange="calculateHours()">
                         </div>
                         <div class="form-group">
                             <label class="form-label">
@@ -635,19 +634,6 @@
                             <input type="time" id="end-time" class="form-input" 
                                    required onchange="calculateHours()">
                         </div>
-                    </div>
-                    
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="is-holiday" class="checkbox-input" onchange="toggleHolidayType()">
-                        <label for="is-holiday" class="checkbox-label">这是节假日工作</label>
-                        <select id="holiday-type" class="form-select" style="margin-left: 20px; width: 200px; display: none;" onchange="calculateHours()">
-                            <option value="">选择节假日类型</option>
-                            <option value="Bank Holiday">Bank Holiday</option>
-                            <option value="Christmas">Christmas</option>
-                            <option value="Easter">Easter</option>
-                            <option value="New Year">New Year</option>
-                            <option value="Custom">其他</option>
-                        </select>
                     </div>
                     
                     <!-- 工时显示 -->
@@ -967,19 +953,18 @@
 
         // 计算工时
         function calculateHours() {
-            const startDate = document.getElementById('start-date').value;
+            const workDate = document.getElementById('work-date').value;
             const startTime = document.getElementById('start-time').value;
-            const endDate = document.getElementById('end-date').value;
             const endTime = document.getElementById('end-time').value;
             const isHoliday = document.getElementById('is-holiday').checked;
             
-            if (!startDate || !startTime || !endDate || !endTime) {
+            if (!workDate || !startTime || !endTime) {
                 return;
             }
             
-            // 计算总工时（支持跨天）
-            const start = new Date(`${startDate}T${startTime}`);
-            const end = new Date(`${endDate}T${endTime}`);
+            // 计算总工时
+            const start = new Date(`${workDate} ${startTime}`);
+            const end = new Date(`${workDate} ${endTime}`);
             const totalHours = (end - start) / (1000 * 60 * 60);
             
             if (totalHours <= 0) {
@@ -990,7 +975,7 @@
             let normalHours = 0;
             let overtimeHours = 0;
             
-            // 检查是否是周末（开始日期）
+            // 检查是否是周末
             const dayOfWeek = start.getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
             
@@ -1002,37 +987,13 @@
                 const workStart = 9;  // 9:00
                 const workEnd = 17.5; // 17:30
                 
-                // 如果跨天，需要更复杂的计算
-                if (startDate === endDate) {
-                    // 同一天
-                    const startHour = start.getHours() + start.getMinutes() / 60;
-                    const endHour = end.getHours() + end.getMinutes() / 60;
-                    
-                    const normalStart = Math.max(startHour, workStart);
-                    const normalEnd = Math.min(endHour, workEnd);
-                    normalHours = Math.max(0, normalEnd - normalStart);
-                } else {
-                    // 跨天：第一天的正常工时
-                    const startHour = start.getHours() + start.getMinutes() / 60;
-                    if (startHour < workEnd) {
-                        const normalStart = Math.max(startHour, workStart);
-                        normalHours = Math.max(0, workEnd - normalStart);
-                    }
-                    
-                    // 第二天及以后的正常工时
-                    const daysDiff = Math.floor((end - start) / (1000 * 60 * 60 * 24));
-                    if (daysDiff >= 1) {
-                        // 完整工作日的工时（每天8.5小时）
-                        normalHours += (daysDiff - 1) * 8.5;
-                        
-                        // 最后一天的正常工时
-                        const endHour = end.getHours() + end.getMinutes() / 60;
-                        if (endHour > workStart) {
-                            const normalEnd = Math.min(endHour, workEnd);
-                            normalHours += Math.max(0, normalEnd - workStart);
-                        }
-                    }
-                }
+                const startHour = start.getHours() + start.getMinutes() / 60;
+                const endHour = end.getHours() + end.getMinutes() / 60;
+                
+                // 计算正常工时
+                const normalStart = Math.max(startHour, workStart);
+                const normalEnd = Math.min(endHour, workEnd);
+                normalHours = Math.max(0, normalEnd - normalStart);
                 
                 // 加班工时 = 总工时 - 正常工时
                 overtimeHours = totalHours - normalHours;
@@ -1043,21 +1004,6 @@
             document.getElementById('overtime-hours').textContent = overtimeHours.toFixed(1);
             document.getElementById('total-hours').textContent = totalHours.toFixed(1);
             document.getElementById('hours-display').style.display = 'block';
-        }
-        
-        // 切换节假日类型选择
-        function toggleHolidayType() {
-            const isHoliday = document.getElementById('is-holiday').checked;
-            const holidayTypeSelect = document.getElementById('holiday-type');
-            
-            if (isHoliday) {
-                holidayTypeSelect.style.display = 'inline-block';
-            } else {
-                holidayTypeSelect.style.display = 'none';
-                holidayTypeSelect.value = '';
-            }
-            
-            calculateHours();
         }
 
         // 提交表单
@@ -1085,7 +1031,7 @@
                         projectAmount: document.getElementById('project-amount').value ? 
                             parseFloat(document.getElementById('project-amount').value) : null,
                         projectCurrency: document.getElementById('project-currency').value,
-                        startDate: document.getElementById('start-date').value,
+                        startDate: document.getElementById('work-date').value,
                         totalWorkHours: 0,
                         totalSessions: 0,
                         assignedEngineers: [currentUser.uid],
@@ -1101,9 +1047,8 @@
                 }
                 
                 // 创建工作记录
-                const startDate = document.getElementById('start-date').value;
+                const workDate = document.getElementById('work-date').value;
                 const startTime = document.getElementById('start-time').value;
-                const endDate = document.getElementById('end-date').value;
                 const endTime = document.getElementById('end-time').value;
                 
                 const recordData = {
@@ -1130,16 +1075,13 @@
                         parseFloat(document.getElementById('project-amount').value) : null,
                     projectCurrency: document.getElementById('project-currency').value,
                     
-                    // 时间信息（支持跨天）
-                    startDate: startDate,
+                    // 时间信息
+                    startDate: workDate,
                     startTime: startTime,
-                    endDate: endDate,
                     endTime: endTime,
-                    startDateTime: firebase.firestore.Timestamp.fromDate(new Date(`${startDate}T${startTime}`)),
-                    endDateTime: firebase.firestore.Timestamp.fromDate(new Date(`${endDate}T${endTime}`)),
+                    startDateTime: firebase.firestore.Timestamp.fromDate(new Date(`${workDate} ${startTime}`)),
+                    endDateTime: firebase.firestore.Timestamp.fromDate(new Date(`${workDate} ${endTime}`)),
                     isHolidayWork: document.getElementById('is-holiday').checked,
-                    holidayType: document.getElementById('is-holiday').checked ? 
-                        (document.getElementById('holiday-type').value || 'Custom') : null,
                     
                     // 工时
                     normalWorkingHours: parseFloat(document.getElementById('normal-hours').textContent),
