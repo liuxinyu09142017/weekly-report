@@ -3,22 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>编辑项目 - 工程师工时系统</title>
+    <title>新建项目 - 工程师工时系统</title>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
-    <!-- Firebase初始化模块 -->
-    <script src="js/firebase-init.js"></script>
-    
-    <!-- 货币转换模块 -->
-    <script src="js/currency-converter.js"></script>
-    
-    <!-- 金额格式化模块 -->
-    <script src="js/amount-formatter.js"></script>
-    <!-- 国家列表模块 -->
     <script src="js/countries-list.js"></script>
     <style>
         * {
@@ -198,26 +188,6 @@
             background: #e7eaf0;
         }
         
-        .loading {
-            text-align: center;
-            padding: 100px;
-        }
-        
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
         .info-box {
             background: #e3f2fd;
             border-left: 4px solid #2196f3;
@@ -233,27 +203,21 @@
     <!-- 顶部导航 -->
     <div class="header">
         <div class="header-content">
-            <h2>✏️ 编辑项目</h2>
-            <a href="javascript:history.back()" class="btn-back">← 返回</a>
+            <h2>➕ 新建项目</h2>
+            <a href="project-management.html" class="btn-back">← 返回项目列表</a>
         </div>
     </div>
     
-    <!-- 加载中 -->
-    <div id="loading" class="loading">
-        <div class="spinner"></div>
-        <div>正在加载项目信息...</div>
-    </div>
-    
     <!-- 主内容 -->
-    <div id="main-content" class="container" style="display: none;">
+    <div class="container">
         <div class="form-card">
-            <h2 class="form-title">📁 编辑项目信息</h2>
+            <h2 class="form-title">📁 创建新项目</h2>
             
             <div class="info-box">
-                💡 编辑项目的基本信息。已关联的工作记录不会受到影响。
+                💡 创建项目后，可以在创建工作记录时快速关联到该项目，系统会自动统计项目总工时和工作内容。
             </div>
             
-            <form id="edit-project-form">
+            <form id="create-project-form">
                 <!-- 客户信息 -->
                 <div class="form-section">
                     <div class="section-title">👤 客户信息</div>
@@ -289,7 +253,7 @@
                         <div class="form-group">
                             <label class="form-label">国家/地区</label>
                             <select id="customer-country" class="form-select">
-                          <!-- 通过 countries-list.js 自动填充 -->
+    <!-- 通过 countries-list.js 自动填充 -->
                             </select>
                         </div>
                     </div>
@@ -325,7 +289,7 @@
                             <label class="form-label">项目状态 <span class="required">*</span></label>
                             <select id="project-status" class="form-select" required>
                                 <option value="规划中">规划中</option>
-                                <option value="进行中">进行中</option>
+                                <option value="进行中" selected>进行中</option>
                                 <option value="已完成">已完成</option>
                                 <option value="已暂停">已暂停</option>
                             </select>
@@ -380,9 +344,9 @@
                 <!-- 操作按钮 -->
                 <div class="form-actions">
                     <button type="submit" class="btn-submit" id="submit-btn">
-                        ✅ 保存修改
+                        ✅ 创建项目
                     </button>
-                    <button type="button" class="btn-cancel" onclick="window.history.back()">
+                    <button type="button" class="btn-cancel" onclick="window.location.href='project-management.html'">
                         取消
                     </button>
                 </div>
@@ -396,10 +360,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     populateCountrySelect('customer-country');
 });
-        // Firebase已由firebase-init.js初始化
-        // auth 和 db 变量已全局可用
-        // 以下代码已注释（保留供参考）
-        /*
+
+
+        // Firebase配置
         const firebaseConfig = {
             apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
             authDomain: "weekly-report-d55e9.firebaseapp.com",
@@ -413,11 +376,8 @@ document.addEventListener('DOMContentLoaded', () => {
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        */
         
         let currentUser = null;
-        let projectId = null;
-        let projectData = null;
 
         // 项目阶段定义
         const presalesStages = [
@@ -432,69 +392,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ];
 
         // 检查登录状态
-        auth.onAuthStateChanged(async (user) => {
+        auth.onAuthStateChanged((user) => {
             if (user) {
                 currentUser = user;
                 console.log('用户已登录:', user.email);
-                
-                // 获取项目ID
-                const urlParams = new URLSearchParams(window.location.search);
-                projectId = urlParams.get('id');
-                
-                if (!projectId) {
-                    alert('缺少项目ID参数');
-                    window.location.href = 'project-management.html';
-                    return;
-                }
-                
-                await loadProject();
             } else {
                 console.log('用户未登录，跳转到登录页');
                 window.location.href = 'index.html';
             }
         });
-
-        // 加载项目
-        async function loadProject() {
-            try {
-                const projectDoc = await db.collection('projects').doc(projectId).get();
-                
-                if (!projectDoc.exists) {
-                    alert('项目不存在');
-                    window.location.href = 'project-management.html';
-                    return;
-                }
-                
-                projectData = projectDoc.data();
-                
-                // 填充表单
-                document.getElementById('customer-name').value = projectData.customerName || '';
-                document.getElementById('customer-industry').value = projectData.customerIndustry || '';
-                document.getElementById('customer-country').value = projectData.customerCountry || '';
-                document.getElementById('project-name').value = projectData.projectName || '';
-                document.getElementById('project-type').value = projectData.projectType || '';
-                
-                // 更新阶段列表
-                updateProjectStages();
-                document.getElementById('project-stage').value = projectData.projectStage || '';
-                
-                document.getElementById('project-status').value = projectData.status || '进行中';
-                document.getElementById('sales-person').value = projectData.salesPerson || '';
-                document.getElementById('project-amount').value = projectData.projectAmount || '';
-                document.getElementById('project-currency').value = projectData.projectCurrency || 'GBP';
-                document.getElementById('start-date').value = projectData.startDate || '';
-                document.getElementById('end-date').value = projectData.endDate || '';
-                document.getElementById('project-description').value = projectData.description || '';
-                
-                // 显示页面
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-                
-            } catch (error) {
-                console.error('加载项目失败:', error);
-                alert('加载失败: ' + error.message);
-            }
-        }
 
         // 更新项目阶段选项
         function updateProjectStages() {
@@ -513,15 +419,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 提交表单
-        document.getElementById('edit-project-form').addEventListener('submit', async (e) => {
+        document.getElementById('create-project-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submit-btn');
             submitBtn.disabled = true;
-            submitBtn.textContent = '保存中...';
+            submitBtn.textContent = '创建中...';
             
             try {
-                const updateData = {
+                const projectData = {
                     // 客户信息
                     customerName: document.getElementById('customer-name').value.trim(),
                     customerIndustry: document.getElementById('customer-industry').value,
@@ -544,24 +450,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 描述
                     description: document.getElementById('project-description').value.trim(),
                     
-                    // 更新时间
+                    // 统计信息（初始值）
+                    totalWorkHours: 0,
+                    totalSessions: 0,
+                    assignedEngineers: [currentUser.uid],
+                    
+                    // 元数据
+                    createdBy: currentUser.uid,
+                    createdByName: currentUser.displayName || currentUser.email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
-                await db.collection('projects').doc(projectId).update(updateData);
+                const docRef = await db.collection('projects').add(projectData);
                 
-                console.log('项目更新成功');
-                alert('✅ 项目信息已更新！');
+                console.log('项目创建成功，ID:', docRef.id);
+                alert('✅ 项目创建成功！');
                 
-                // 返回项目详情页
-                window.location.href = `project-detail.html?id=${projectId}`;
+                // 跳转到项目详情页
+                window.location.href = `project-detail.html?id=${docRef.id}`;
                 
             } catch (error) {
-                console.error('更新项目失败:', error);
-                alert('❌ 更新失败: ' + error.message);
+                console.error('创建项目失败:', error);
+                alert('❌ 创建失败: ' + error.message);
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = '✅ 保存修改';
+                submitBtn.textContent = '✅ 创建项目';
             }
         });
     </script>

@@ -9,6 +9,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Firebase初始化模块 -->
+    <script src="js/firebase-init.js"></script>
+    
+    <!-- 货币转换模块 -->
+    <script src="js/currency-converter.js"></script>
+    
+    <!-- 金额格式化模块 -->
+    <script src="js/amount-formatter.js"></script>
     <script src="js/countries-list.js"></script>
     <style>
         * {
@@ -363,6 +372,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         // Firebase配置
+        // Firebase已由firebase-init.js初始化
+        // auth 和 db 变量已全局可用
+        // 以下代码已注释（保留供参考）
+        /*
         const firebaseConfig = {
             apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
             authDomain: "weekly-report-d55e9.firebaseapp.com",
@@ -376,6 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        */
         
         let currentUser = null;
 
