@@ -383,130 +383,6 @@
         .cancel-btn:hover {
             background: #f5f7fa;
         }
-    
-        /* ========================================
-           项目阶段分类选择器样式
-           ======================================== */
-        .stage-category-selector {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
-        
-        .category-btn {
-            padding: 10px 16px;
-            border: 2px solid #E5E7EB;
-            background: white;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #374151;
-        }
-        
-        .category-btn:hover {
-            border-color: #667eea;
-            background: #F9FAFB;
-            transform: translateY(-1px);
-        }
-        
-        .category-btn.active {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }
-        
-        /* ========================================
-           自定义阶段输入区域样式
-           ======================================== */
-        .custom-stage-section {
-            margin-top: 12px;
-            padding: 16px;
-            background: #F9FAFB;
-            border-radius: 10px;
-            border: 2px dashed #D1D5DB;
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .custom-input-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        
-        .custom-input-group input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 2px solid #D1D5DB;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        
-        .custom-input-group input:focus {
-            border-color: #667eea;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .btn-add-custom {
-            padding: 10px 20px;
-            background: #10B981;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        
-        .btn-add-custom:hover {
-            background: #059669;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-        
-        .btn-cancel-custom {
-            padding: 10px 20px;
-            background: #6B7280;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        
-        .btn-cancel-custom:hover {
-            background: #4B5563;
-        }
-        
-        .custom-hint {
-            font-size: 12px;
-            color: #6B7280;
-            padding: 6px 0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
     </style>
 </head>
 <body>
@@ -631,44 +507,9 @@
                             <label class="form-label">
                                 项目阶段 <span class="required">*</span>
                             </label>
-                            
-                            <!-- 阶段分类选择（仅售后项目显示） -->
-                            <div class="stage-category-selector" id="stage-category-selector" style="display: none;">
-                                <button type="button" class="category-btn active" data-category="general" onclick="selectStageCategory('general')">
-                                    📦 通用阶段
-                                </button>
-                                <button type="button" class="category-btn" data-category="network" onclick="selectStageCategory('network')">
-                                    🌐 网络项目
-                                </button>
-                                <button type="button" class="category-btn" data-category="system" onclick="selectStageCategory('system')">
-                                    🖥️ 系统项目
-                                </button>
-                                <button type="button" class="category-btn" data-category="infrastructure" onclick="selectStageCategory('infrastructure')">
-                                    🏢 能基项目
-                                </button>
-                            </div>
-                            
-                            <!-- 阶段选择下拉列表 -->
                             <select id="project-stage" class="form-select" required>
                                 <option value="">请先选择项目类型</option>
                             </select>
-                            
-                            <!-- 自定义阶段输入区域 -->
-                            <div class="custom-stage-section" id="custom-stage-section" style="display: none;">
-                                <div class="custom-input-group">
-                                    <input type="text" id="custom-stage-input" class="form-input" 
-                                           placeholder="输入自定义阶段名称（例如：容器化部署）">
-                                    <button type="button" class="btn-add-custom" onclick="addCustomStage()">
-                                        ✅ 添加
-                                    </button>
-                                    <button type="button" class="btn-cancel-custom" onclick="cancelCustomStage()">
-                                        ❌ 取消
-                                    </button>
-                                </div>
-                                <div class="custom-hint">
-                                    💡 此阶段将保存到您的个人选项库，以便下次使用
-                                </div>
-                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">
@@ -828,90 +669,17 @@
         let userData = null;
         let matchedProject = null;
 
-        // ============================================
-        // 项目阶段完整定义（260个专业阶段）
-        // ============================================
-        
-        // 售前项目阶段（37个）
+        // 项目阶段定义
         const presalesStages = [
-            '初步接触', '客户拜访', '需求挖掘', '商机识别', '需求调研',
-            '预算确认', '决策流程了解', '时间计划确认', '资格评估',
-            '需求分析', '技术交流', '方案设计', '方案评审', '成本估算',
-            '方案演示', 'POC测试', '技术答疑', '现场勘查', '深度技术交流',
-            '投标准备', 'RFP响应', '投标答辩', '商务报价', '合规审查',
-            '合同谈判', '价格谈判', '付款条件谈判', 'SLA谈判', '风险评估',
-            '合同审批', '法务审核', '合同签署', '项目立项',
-            '项目暂停', '客户关系维护', '其他售前活动', '待定'
+            '需求收集', '方案设计', '方案演示', 'POC测试', '技术交流',
+            '投标准备', '投标答辩', '合同谈判', '项目立项', '其他售前', '待定'
         ];
         
-        // 网络项目阶段（56个）
-        const networkStages = [
-            '需求分析', '网络拓扑设计', '设备选型', 'IP地址规划', 'VLAN规划', '路由规划', '安全策略设计',
-            '网络布线', '设备安装上架', '交换机配置', '路由器配置', 'VLAN配置', '链路聚合配置',
-            '数据中心网络设计', '核心交换配置', '服务器接入配置', '存储网络配置',
-            'WAN链路配置', 'MPLS配置', 'VPN配置', 'SD-WAN部署',
-            '无线AP部署', 'AC控制器配置', '无线网络优化', '无线覆盖测试',
-            'IP电话系统设计', 'CUCM服务器部署', '语音网关配置', 'SIP中继配置', '话机配置', '语音质量测试',
-            '视频会议系统部署', 'MCU配置', '视频终端配置', '视频会议测试',
-            '防火墙部署', '防火墙策略配置', 'IPS/IDS部署', '堡垒机部署', '上网行为管理', 'NAC部署',
-            '网络连通性测试', '网络性能测试', '网络安全测试', '压力测试', '故障切换测试',
-            '网络监控部署', '网络运维', '网络优化', '故障排查', '设备维护', '配置备份',
-            '网络割接', '网络扩容', '网络升级', '应急响应'
+        const postsalesStages = [
+            '项目启动', '需求确认', '方案设计', '设备采购', '设备到货',
+            '安装部署', '系统配置', '功能测试', '试运行', '用户培训',
+            '项目验收', '运维支持', '故障处理', '其他售后', '已完成'
         ];
-        
-        // 系统项目阶段（61个）
-        const systemStages = [
-            '需求分析', '系统架构设计', '容量规划', '高可用设计', '灾备方案设计', '服务器选型', '存储选型',
-            '服务器安装上架', 'RAID配置', '操作系统安装', '系统初始化', '系统配置', '系统加固', '补丁安装',
-            '存储设备安装', '存储配置', 'LUN划分', '存储映射', '存储性能优化',
-            '虚拟化平台部署', 'VMware ESXi安装', 'vCenter配置', '虚拟机创建', '虚拟网络配置', '虚拟存储配置', '虚拟机迁移',
-            '云平台部署', '云账号开通', '云资源申请', '云网络配置', '云安全配置', '云监控配置', '应用云化改造', '数据云迁移',
-            '中间件部署', '数据库安装', '数据库配置', '应用软件部署', '应用配置', '数据导入',
-            '备份系统部署', '备份策略配置', '备份测试', '灾备系统部署', '灾备演练',
-            '功能测试', '性能测试', '压力测试', '兼容性测试', '安全测试', '容灾切换测试',
-            '系统监控部署', '系统运维', '性能优化', '补丁管理', '备份管理', '故障恢复',
-            '系统升级', '系统扩容', '系统迁移', '业务割接'
-        ];
-        
-        // 能基项目阶段（66个）
-        const infrastructureStages = [
-            '需求调研', '现场勘查', '机房设计', '机房规划', '承重评估', '电力容量评估', '制冷需求评估',
-            '机房装修', '防静电地板铺设', '吊顶安装', '隔断安装', '机房门窗安装',
-            '配电柜安装', '配电系统安装', 'UPS安装', 'UPS配置', '电池安装', 'PDU安装', '供电测试',
-            '精密空调安装', '空调配置', '冷通道部署', '新风系统安装', '制冷测试',
-            '机柜安装', '机柜布局', '机柜接地', '机柜理线',
-            '桥架安装', '综合布线', '网络布线', '电力布线', '光纤熔接', '线缆标识', '布线测试',
-            '气体消防系统安装', '烟感探测器安装', '消防测试',
-            '门禁系统安装', '门禁配置', '视频监控安装', '监控配置', '监控存储配置',
-            '动环监控系统部署', '温湿度传感器安装', '漏水检测安装', '电量监测配置', '动环平台配置', '告警配置',
-            '供电系统测试', '制冷系统测试', '消防系统测试', '安防系统测试', '动环系统测试', '综合测试', '满负载测试',
-            '机房巡检', '设备维护', 'UPS维护', '空调维护', '电池维护', '环境监测',
-            '机房搬迁', '机房改造', '机房扩容', '应急维护'
-        ];
-        
-        // 通用阶段（40个）
-        const generalStages = [
-            '项目启动', '项目立项', '需求确认', '需求分析', '方案设计', '方案评审',
-            '设备选型', '设备采购', '设备到货', '设备验收',
-            '现场勘查', '设备安装', '系统部署', '系统配置', '系统集成',
-            '单元测试', '集成测试', '系统测试', '用户验收测试', '性能测试',
-            '试运行', '数据迁移', '业务割接', '正式上线',
-            '用户培训', '管理员培训', '操作手册编写', '技术文档编写',
-            '项目验收', '验收报告', '项目交接',
-            '质保期维护', '运维支持', '日常维护', '故障处理', '巡检维护', '应急响应',
-            '项目暂停', '项目完成', '其他'
-        ];
-        
-        // 售后项目阶段分类
-        const postsalesStageCategories = {
-            general: { label: '通用阶段', icon: '📦', stages: generalStages },
-            network: { label: '网络项目', icon: '🌐', stages: networkStages },
-            system: { label: '系统项目', icon: '🖥️', stages: systemStages },
-            infrastructure: { label: '能基项目', icon: '🏢', stages: infrastructureStages }
-        };
-        
-        // 当前选中的售后阶段分类
-        let currentStageCategory = 'general';
 
         // 检查登录状态
         auth.onAuthStateChanged(async (user) => {
@@ -949,24 +717,6 @@
             if (projectId) {
                 loadProjectData(projectId);
             }
-            
-            // 添加事件监听器
-            // 项目类型变更时更新阶段
-            document.getElementById('project-type').addEventListener('change', function() {
-                updateStageOptions(this.value);
-                checkExistingProject();
-            });
-            
-            // 项目阶段选择变更时，检查是否选择自定义
-            document.getElementById('project-stage').addEventListener('change', function(e) {
-                if (e.target.value === '__custom__') {
-                    document.getElementById('custom-stage-section').style.display = 'block';
-                    document.getElementById('custom-stage-input').focus();
-                    e.target.value = '';
-                } else {
-                    document.getElementById('custom-stage-section').style.display = 'none';
-                }
-            });
         }
 
         // 加载项目数据（从项目详情页跳转过来）
@@ -991,186 +741,6 @@
                 stageSelect.innerHTML = '<option value="">请先选择项目类型</option>';
                 return;
             }
-        
-        // ============================================
-        // 项目阶段管理函数（新增）
-        // ============================================
-        
-        // 更新项目阶段选项（主函数）
-        function updateStageOptions(projectType) {
-            const stageSelect = document.getElementById('project-stage');
-            const categorySelector = document.getElementById('stage-category-selector');
-            
-            if (projectType === '售前项目') {
-                // 售前项目：隐藏分类选择，显示售前阶段
-                categorySelector.style.display = 'none';
-                populateStageSelect(presalesStages, projectType);
-                
-            } else if (projectType === '售后项目' || projectType === '交付实施中') {
-                // 售后项目：显示分类选择，默认显示通用阶段
-                categorySelector.style.display = 'flex';
-                currentStageCategory = 'general';
-                selectStageCategory('general');
-            } else {
-                // 其他情况：清空
-                stageSelect.innerHTML = '<option value="">请先选择项目类型</option>';
-                categorySelector.style.display = 'none';
-            }
-        }
-        
-        // 选择售后阶段分类
-        function selectStageCategory(category) {
-            currentStageCategory = category;
-            
-            // 更新按钮状态
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                if (btn.dataset.category === category) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            
-            // 加载对应分类的阶段
-            const projectType = document.getElementById('project-type').value;
-            const categoryData = postsalesStageCategories[category];
-            populateStageSelect(categoryData.stages, projectType);
-        }
-        
-        // 填充阶段选择列表
-        async function populateStageSelect(stages, projectType) {
-            const stageSelect = document.getElementById('project-stage');
-            
-            let html = '<option value="">请选择</option>';
-            
-            // 添加标准阶段
-            stages.forEach(stage => {
-                html += `<option value="${stage}">${stage}</option>`;
-            });
-            
-            // 加载并添加用户自定义阶段
-            const customStages = await loadCustomStages(projectType);
-            if (customStages && customStages.length > 0) {
-                html += '<option disabled>───────────</option>';
-                html += '<option disabled>📌 我的自定义阶段</option>';
-                customStages.forEach(stage => {
-                    html += `<option value="${stage}">${stage}</option>`;
-                });
-            }
-            
-            // 添加"自定义"选项
-            html += '<option disabled>───────────</option>';
-            html += '<option value="__custom__">➕ 自定义...</option>';
-            
-            stageSelect.innerHTML = html;
-        }
-        
-        // 加载用户自定义阶段
-        async function loadCustomStages(projectType) {
-            try {
-                const doc = await db.collection('customOptions').doc(currentUser.uid).get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    const field = projectType === '售前项目' ? 'presales' : 'postsales';
-                    return data.customStages?.[field] || [];
-                }
-                return [];
-            } catch (error) {
-                console.error('加载自定义阶段失败:', error);
-                return [];
-            }
-        }
-        
-        // ============================================
-        // 自定义阶段功能
-        // ============================================
-        
-        // 添加自定义阶段
-        async function addCustomStage() {
-            const input = document.getElementById('custom-stage-input');
-            const customStage = input.value.trim();
-            
-            if (!customStage) {
-                alert('⚠️ 请输入阶段名称');
-                return;
-            }
-            
-            // 验证长度
-            if (customStage.length > 30) {
-                alert('⚠️ 阶段名称不能超过30个字符');
-                return;
-            }
-            
-            const projectType = document.getElementById('project-type').value;
-            
-            // 检查是否已存在
-            const allStages = getAllStages(projectType);
-            if (allStages.includes(customStage)) {
-                alert('⚠️ 此阶段已存在！');
-                return;
-            }
-            
-            try {
-                // 保存到Firestore
-                await saveCustomStage(customStage, projectType);
-                
-                // 重新加载阶段列表
-                if (projectType === '售前项目') {
-                    await populateStageSelect(presalesStages, projectType);
-                } else {
-                    selectStageCategory(currentStageCategory);
-                }
-                
-                // 选中刚添加的阶段
-                setTimeout(() => {
-                    document.getElementById('project-stage').value = customStage;
-                }, 100);
-                
-                // 隐藏输入框
-                document.getElementById('custom-stage-section').style.display = 'none';
-                input.value = '';
-                
-                alert('✅ 自定义阶段已添加并保存！');
-                
-            } catch (error) {
-                console.error('保存失败:', error);
-                alert('❌ 保存失败: ' + error.message);
-            }
-        }
-        
-        // 取消自定义
-        function cancelCustomStage() {
-            document.getElementById('custom-stage-section').style.display = 'none';
-            document.getElementById('custom-stage-input').value = '';
-            document.getElementById('project-stage').value = '';
-        }
-        
-        // 保存自定义阶段到Firestore
-        async function saveCustomStage(stage, projectType) {
-            const field = projectType === '售前项目' ? 'presales' : 'postsales';
-            
-            await db.collection('customOptions').doc(currentUser.uid).set({
-                [`customStages.${field}`]: firebase.firestore.FieldValue.arrayUnion(stage),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-        }
-        
-        // 获取所有阶段（用于验证）
-        function getAllStages(projectType) {
-            if (projectType === '售前项目') {
-                return presalesStages;
-            } else {
-                return [
-                    ...generalStages,
-                    ...networkStages,
-                    ...systemStages,
-                    ...infrastructureStages,
-                    ...emergencyStages,
-                    ...expansionStages,
-                    ...optimizationStages
-                ];
-            }
-        }
             
             const stages = projectType === '售前项目' ? presalesStages : postsalesStages;
             stageSelect.innerHTML = '<option value="">请选择</option>' + 
