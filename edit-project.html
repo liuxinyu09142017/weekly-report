@@ -450,7 +450,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 填充表单
                 document.getElementById('customer-name').value = projectData.customerName || '';
                 document.getElementById('customer-industry').value = projectData.customerIndustry || '';
-                document.getElementById('customer-country').value = projectData.customerCountry || '';
+                
+                // 国家/地区（安全检查）
+                const customerCountry = document.getElementById('customer-country');
+                if (customerCountry) {
+                    customerCountry.value = projectData.customerCountry || '';
+                }
+                
                 document.getElementById('project-name').value = projectData.projectName || '';
                 document.getElementById('project-type').value = projectData.projectType || '';
                 

@@ -568,6 +568,12 @@
             document.getElementById('customer-name').value = record.customerName || '';
             document.getElementById('customer-industry').value = record.customerIndustry || '';
             
+            // 国家/地区
+            const customerCountry = document.getElementById('customer-country');
+            if (customerCountry) {
+                customerCountry.value = record.customerCountry || '';
+            }
+            
             // 项目信息
             document.getElementById('project-name').value = record.projectName || '';
             document.getElementById('project-type').value = record.projectType || '';
