@@ -10,6 +10,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
+    <!-- Firebase初始化模块 -->
+    <script src="js/firebase-init.js"></script>
+    
+    <!-- 货币转换模块 -->
+    <script src="js/currency-converter.js"></script>
+    
+    <!-- 金额格式化模块 -->
+    <script src="js/amount-formatter.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -371,7 +380,7 @@
             <div class="settings-section">
                 <label class="settings-label">问候语</label>
                 <input type="text" id="greeting" class="settings-input" 
-                       value="灵峰、冬梅总：" placeholder="例如: 灵峰、冬梅总：">
+                       value="骆总、冬梅总：" placeholder="例如: 骆总、冬梅总：">
             </div>
             
             <!-- 周报标题前缀 -->
@@ -421,6 +430,10 @@
 
     <script>
         // Firebase配置
+        // Firebase已由firebase-init.js初始化
+        // auth 和 db 变量已全局可用
+        // 以下代码已注释（保留供参考）
+        /*
         const firebaseConfig = {
             apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
             authDomain: "weekly-report-d55e9.firebaseapp.com",
@@ -434,6 +447,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        */
         
         let currentUser = null;
         let currentWeekStart = null;
@@ -620,13 +634,9 @@
                 // 项目规模（取第一条记录）
                 const firstRecord = records[0];
                 if (firstRecord.projectAmount) {
-                    // 金额除以1000，因为数据库存的是以K为单位
-                    const amountInK = (firstRecord.projectAmount / 1000).toFixed(0);
-                    report += `规模：${amountInK}K ${firstRecord.projectCurrency}`;
-                    
-                    // 只有售后项目才显示技术方向
-                    if (firstRecord.projectType === '售后项目' && firstRecord.technicalDirection) {
-                        report += ` (${firstRecord.technicalDirection}部分)`;
+                    report += `规模：${firstRecord.projectAmount}K ${firstRecord.projectCurrency}`;
+                    if (firstRecord.projectType === '售前项目') {
+                        report += ` (${firstRecord.technicalDirection || '网络'}部分)`;
                     }
                     report += `\n`;
                 } else {
