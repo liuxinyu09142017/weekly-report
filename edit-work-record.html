@@ -10,15 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
-    <!-- Firebase初始化模块 -->
-    <script src="js/firebase-init.js"></script>
-    
-    <!-- 货币转换模块 -->
-    <script src="js/currency-converter.js"></script>
-    
-    <!-- 金额格式化模块 -->
-    <script src="js/amount-formatter.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -279,6 +270,40 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
+    
+        /* 项目阶段分类选择器 */
+        .stage-category-selector {
+            display: none;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .category-btn {
+            padding: 10px 18px;
+            border: 2px solid #E5E7EB;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #374151;
+        }
+        
+        .category-btn:hover {
+            border-color: #667eea;
+            background: #F9FAFB;
+            transform: translateY(-1px);
+        }
+        
+        .category-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
     </style>
 </head>
 <body>
@@ -311,48 +336,33 @@
                     <div class="section-title">👤 客户信息</div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">客户名称 <span class="required">*</span></label>
-                            <input type="text" id="customer-name" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">客户行业</label>
-                            <select id="customer-industry" class="form-select">
-                                <option value="">请选择</option>
-                                <option value="银行">银行</option>
-                                <option value="保险">保险</option>
-                                <option value="证券">证券</option>
-                                <option value="制造业">制造业</option>
-                                <option value="零售">零售</option>
-                                <option value="物流">物流</option>
-                                <option value="教育">教育</option>
-                                <option value="医疗">医疗</option>
-                                <option value="其他">其他</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- 项目信息 -->
-                <div class="form-section">
-                    <div class="section-title">📊 项目信息</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">项目名称 <span class="required">*</span></label>
-                            <input type="text" id="project-name" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">项目类型 <span class="required">*</span></label>
-                            <select id="project-type" class="form-select" required onchange="updateProjectStages()">
-                                <option value="">请选择</option>
-                                <option value="售前项目">售前项目</option>
-                                <option value="售后项目">售后项目</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
                             <label class="form-label">项目阶段 <span class="required">*</span></label>
+                            
+                            <!-- 阶段分类选择器（售后项目显示） -->
+                            <div class="stage-category-selector" id="stage-category-selector">
+                                <button type="button" class="category-btn active" data-category="general" onclick="selectCategory('general')">
+                                    📦 通用阶段
+                                </button>
+                                <button type="button" class="category-btn" data-category="network" onclick="selectCategory('network')">
+                                    🌐 网络项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="system" onclick="selectCategory('system')">
+                                    🖥️ 系统项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="infrastructure" onclick="selectCategory('infrastructure')">
+                                    🏢 能基项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="emergency" onclick="selectCategory('emergency')">
+                                    🚨 应急项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="expansion" onclick="selectCategory('expansion')">
+                                    📈 扩容项目
+                                </button>
+                                <button type="button" class="category-btn" data-category="optimization" onclick="selectCategory('optimization')">
+                                    ⚡ 优化项目
+                                </button>
+                            </div>
+                            
                             <select id="project-stage" class="form-select" required>
                                 <option value="">请先选择项目类型</option>
                             </select>
@@ -476,10 +486,6 @@
 
     <script>
         // Firebase配置
-        // Firebase已由firebase-init.js初始化
-        // auth 和 db 变量已全局可用
-        // 以下代码已注释（保留供参考）
-        /*
         const firebaseConfig = {
             apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
             authDomain: "weekly-report-d55e9.firebaseapp.com",
@@ -493,23 +499,12 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        */
         
         let currentUser = null;
         let recordId = null;
         let originalRecord = null;
 
-        // 项目阶段定义
-        const presalesStages = [
-            '需求收集', '方案设计', '方案演示', 'POC测试', '技术交流',
-            '投标准备', '投标答辩', '合同谈判', '项目立项', '其他售前', '待定'
-        ];
-        
-        const postsalesStages = [
-            '项目启动', '需求确认', '方案设计', '设备采购', '设备到货',
-            '安装部署', '系统配置', '功能测试', '试运行', '用户培训',
-            '项目验收', '运维支持', '故障处理', '其他售后', '已完成'
-        ];
+        // 项目阶段定义已移至 js/project-stages.js
 
         // 检查登录状态
         auth.onAuthStateChanged(async (user) => {
@@ -604,20 +599,65 @@
             calculateHours();
         }
 
-        // 更新项目阶段选项
+        // 更新项目阶段（使用分类）
         function updateProjectStages() {
             const projectType = document.getElementById('project-type').value;
             const stageSelect = document.getElementById('project-stage');
+            const categorySelector = document.getElementById('stage-category-selector');
             
-            if (!projectType) {
-                stageSelect.innerHTML = '<option value="">请先选择项目类型</option>';
+            if (!categorySelector) {
+                console.error('找不到stage-category-selector元素');
                 return;
             }
             
-            const stages = projectType === '售前项目' ? presalesStages : postsalesStages;
+            if (!projectType) {
+                stageSelect.innerHTML = '<option value="">请先选择项目类型</option>';
+                categorySelector.style.display = 'none';
+                return;
+            }
             
+            if (projectType === '售前项目') {
+                // 售前项目：隐藏分类，显示所有售前阶段
+                categorySelector.style.display = 'none';
+                stageSelect.innerHTML = '<option value="">请选择</option>' + 
+                    presalesStages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
+            } else {
+                // 售后项目：显示分类按钮，默认显示通用阶段
+                categorySelector.style.display = 'flex';
+                selectCategory('general');
+            }
+        }
+        
+        // 选择分类
+        function selectCategory(category) {
+            // 更新按钮状态
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // 获取该分类的阶段
+            const categoryData = postsalesStageCategories[category];
+            if (!categoryData) {
+                console.error('分类不存在:', category);
+                return;
+            }
+            
+            // 获取当前选中的值（如果有）
+            const stageSelect = document.getElementById('project-stage');
+            const currentValue = stageSelect.value;
+            
+            // 更新下拉列表
             stageSelect.innerHTML = '<option value="">请选择</option>' + 
-                stages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
+                categoryData.stages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
+            
+            // 如果当前值在新列表中，保持选中
+            if (currentValue && categoryData.stages.includes(currentValue)) {
+                stageSelect.value = currentValue;
+            }
         }
 
         // 切换节假日类型
