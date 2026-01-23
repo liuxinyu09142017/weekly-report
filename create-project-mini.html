@@ -10,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="js/countries-list.js"></script>
-    <script src="js/project-stages.js"></script>
     <style>
         * {
             margin: 0;
@@ -198,40 +197,6 @@
             font-size: 13px;
             color: #1565c0;
         }
-    
-        /* 项目阶段分类选择器 */
-        .stage-category-selector {
-            display: none;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .category-btn {
-            padding: 10px 18px;
-            border: 2px solid #E5E7EB;
-            background: white;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #374151;
-        }
-        
-        .category-btn:hover {
-            border-color: #667eea;
-            background: #F9FAFB;
-            transform: translateY(-1px);
-        }
-        
-        .category-btn.active {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }
-
     </style>
 </head>
 <body>
@@ -414,7 +379,93 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let currentUser = null;
 
-        // 项目阶段定义已移至 js/project-stages.js
+        // 项目阶段定义
+        const presalesStages = [
+            '初步接触', '客户拜访', '需求挖掘', '商机识别', '需求调研',
+            '预算确认', '决策流程了解', '时间计划确认', '资格评估',
+            '需求分析', '技术交流', '方案设计', '方案评审', '成本估算',
+            '方案演示', 'POC测试', '技术答疑', '现场勘查', '深度技术交流',
+            '投标准备', 'RFP响应', '投标答辩', '商务报价', '合规审查',
+            '合同谈判', '价格谈判', '付款条件谈判', 'SLA谈判', '风险评估',
+            '合同审批', '法务审核', '合同签署', '项目立项',
+            '项目暂停', '客户关系维护', '其他售前活动', '待定'
+        ];
+        
+        const postsalesStages = [
+            // 通用阶段
+            '项目启动', '需求确认', '方案细化', '资源规划', '风险评估',
+            '项目实施', '进度跟踪', '质量控制', '变更管理',
+            '项目验收', '项目交付', '运维支持', '项目总结', '经验归档',
+            
+            // 网络项目
+            '需求分析', '网络拓扑设计', '设备选型', 'IP地址规划', 'VLAN规划',
+            '路由规划', '安全策略设计', '网络布线', '设备安装上架',
+            '交换机配置', '路由器配置', 'VLAN配置', '链路聚合配置',
+            '数据中心网络设计', '核心交换配置', '服务器接入配置', '存储网络配置',
+            'WAN链路配置', 'MPLS配置', 'VPN配置', 'SD-WAN部署',
+            '防火墙部署', '防火墙策略配置', 'IPS部署', '负载均衡配置',
+            'NAC部署', 'NAC策略配置',
+            'CUCM服务器部署', 'CUCM配置', 'IP电话部署', '语音网关配置',
+            '视频会议系统部署', '视频会议配置',
+            '无线网络规划', '无线控制器部署', 'AP部署', '无线覆盖测试',
+            '网络性能测试', '压力测试', '故障切换测试', '安全扫描',
+            '网络优化', '网络割接', '网络验收',
+            
+            // 系统项目
+            '服务器选型', '服务器安装', '操作系统安装', '系统配置',
+            '虚拟化平台部署', 'VMware部署', 'Hyper-V部署', 'KVM部署',
+            '虚拟机创建', '虚拟机配置', '虚拟机迁移',
+            '存储系统规划', '存储系统部署', '存储配置', 'SAN配置', 'NAS配置',
+            '备份系统部署', '备份策略配置', '备份测试', '灾备方案设计',
+            '数据库安装', '数据库配置', '数据库优化', '数据库备份',
+            '中间件部署', 'WebLogic部署', 'Tomcat部署', 'JBoss部署',
+            '应用系统部署', '应用配置', '应用集成', 'API对接',
+            '监控系统部署', '监控配置', '告警配置',
+            '日志系统部署', '日志采集配置',
+            '系统性能测试', '系统优化', '系统加固', '系统验收',
+            
+            // 能基项目
+            '机房选址', '机房设计', '机房装修', '机房布局规划',
+            '供配电系统设计', '供配电系统施工', 'UPS选型', 'UPS安装',
+            'UPS配置', '发电机安装', '配电柜安装',
+            '空调系统设计', '精密空调安装', '空调配置', '新风系统安装',
+            '消防系统设计', '消防系统施工', '气体灭火系统',
+            '监控系统设计', '视频监控安装', '门禁系统安装', '环境监控部署',
+            '综合布线设计', '综合布线施工', '机柜安装', '理线',
+            '机房测试', '机房验收', '机房运维',
+            
+            // 搬迁相关
+            '搬迁需求分析', '搬迁方案设计', '设备清单盘点', '设备依赖梳理',
+            '数据备份', '设备拆卸', '设备打包', '设备运输',
+            '设备开箱', '设备上架', '设备安装', '设备连线',
+            '系统恢复', '数据恢复', '功能测试', '性能测试',
+            '网络割接', '业务割接', '搬迁验收',
+            
+            // 升级替换
+            '现状评估', '升级方案设计', '兼容性测试', '升级计划',
+            '设备备份', '设备替换', '配置迁移', '系统升级',
+            '升级测试', '升级验收', '旧设备下线',
+            
+            // 应急项目
+            '应急启动', '应急团队集结', '现场评估', '影响范围确认',
+            '故障快速定位', '应急方案制定', '临时措施实施', '业务快速恢复',
+            '根因分析', '永久解决方案', '系统修复', '功能验证',
+            '应急总结', '改进措施', '文档归档',
+            
+            // 扩容项目
+            '容量现状评估', '业务增长预测', '扩容需求分析',
+            '扩容方案设计', '资源规划', '预算评估',
+            '资源采购', '扩容实施', '配置调整',
+            '性能测试', '压力测试', '扩容验收',
+            
+            // 优化项目
+            '性能现状分析', '瓶颈识别', '优化需求确认',
+            '优化方案设计', '优化目标设定',
+            '优化措施实施', '参数调优', '配置优化',
+            '优化效果测试', '优化成果验收',
+            
+            '其他', '待定'
+        ];
 
         // 检查登录状态
         auth.onAuthStateChanged((user) => {
@@ -427,52 +478,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 更新项目阶段（使用分类）
+        // 更新项目阶段选项
         function updateProjectStages() {
             const projectType = document.getElementById('project-type').value;
             const stageSelect = document.getElementById('project-stage');
-            const categorySelector = document.getElementById('stage-category-selector');
             
             if (!projectType) {
                 stageSelect.innerHTML = '<option value="">请先选择项目类型</option>';
-                categorySelector.style.display = 'none';
                 return;
             }
             
-            if (projectType === '售前项目') {
-                // 售前项目：隐藏分类，显示所有售前阶段
-                categorySelector.style.display = 'none';
-                stageSelect.innerHTML = '<option value="">请选择</option>' + 
-                    presalesStages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
-            } else {
-                // 售后项目：显示分类按钮，默认显示通用阶段
-                categorySelector.style.display = 'flex';
-                selectCategory('general');
-            }
-        }
-        
-        // 选择分类
-        function selectCategory(category) {
-            // 更新按钮状态
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                if (btn.dataset.category === category) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
+            const stages = projectType === '售前项目' ? presalesStages : postsalesStages;
             
-            // 获取该分类的阶段
-            const categoryData = postsalesStageCategories[category];
-            if (!categoryData) {
-                console.error('分类不存在:', category);
-                return;
-            }
-            
-            // 更新下拉列表
-            const stageSelect = document.getElementById('project-stage');
             stageSelect.innerHTML = '<option value="">请选择</option>' + 
-                categoryData.stages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
+                stages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
         }
 
         // 提交表单
