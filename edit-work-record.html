@@ -718,12 +718,6 @@
                 stageSelect.value = currentValue;
             }
         }
-            
-            const stages = projectType === '售前项目' ? presalesStages : postsalesStages;
-            
-            stageSelect.innerHTML = '<option value="">请选择</option>' + 
-                stages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
-        }
 
         // 切换节假日类型
         function toggleHolidayType() {

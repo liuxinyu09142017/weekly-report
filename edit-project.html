@@ -601,12 +601,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 stageSelect.value = currentValue;
             }
         }
-            
-            const stages = projectType === '售前项目' ? presalesStages : postsalesStages;
-            
-            stageSelect.innerHTML = '<option value="">请选择</option>' + 
-                stages.map(stage => `<option value="${stage}">${stage}</option>`).join('');
-        }
 
         // 提交表单
         document.getElementById('edit-project-form').addEventListener('submit', async (e) => {
