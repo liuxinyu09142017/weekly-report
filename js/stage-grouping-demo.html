@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目阶段分组显示示例</title>
+    <script src="project-stages-v3.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            padding: 40px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        select:hover {
+            border-color: #667eea;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* optgroup样式 */
+        optgroup {
+            font-weight: bold;
+            font-style: normal;
+            color: #667eea;
+            background: #f0f3ff;
+        }
+        
+        option {
+            padding: 8px 12px;
+            color: #333;
+        }
+        
+        .info-box {
+            background: #f0f3ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .info-box li {
+            padding: 5px 0;
+            color: #666;
+        }
+        
+        .info-box li::before {
+            content: '✓ ';
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 项目阶段分组显示示例</h1>
+        <p class="subtitle">演示售前和售后阶段的optgroup分组效果</p>
+        
+        <div class="form-group">
+            <label for="presales-stage">售前项目阶段（10个分组）</label>
+            <select id="presales-stage" onchange="showSelected(this)">
+                <option value="">请选择阶段</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="postsales-stage">售后项目阶段（7个分类）</label>
+            <select id="postsales-stage" onchange="showSelected(this)">
+                <option value="">请选择阶段</option>
+            </select>
+        </div>
+        
+        <div class="info-box">
+            <h3>💡 优化亮点</h3>
+            <ul>
+                <li>售前项目：按销售流程分10个阶段组</li>
+                <li>售后项目：按技术领域分7个专业类别</li>
+                <li>每个分组都有清晰的emoji图标</li>
+                <li>选项按逻辑顺序排列，不再杂乱</li>
+                <li>快速定位需要的阶段</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // 填充售前阶段（使用optgroup）
+        function populatePresalesStages() {
+            const select = document.getElementById('presales-stage');
+            
+            // 添加空选项
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = '请选择阶段';
+            select.appendChild(emptyOption);
+            
+            // 按分组添加
+            Object.keys(presalesStageCategories).forEach(key => {
+                const category = presalesStageCategories[key];
+                
+                // 创建optgroup
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = category.name;
+                
+                // 添加阶段选项
+                category.stages.forEach(stage => {
+                    const option = document.createElement('option');
+                    option.value = stage;
+                    option.textContent = stage;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            });
+        }
+        
+        // 填充售后阶段（使用optgroup）
+        function populatePostsalesStages() {
+            const select = document.getElementById('postsales-stage');
+            
+            // 添加空选项
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = '请选择阶段';
+            select.appendChild(emptyOption);
+            
+            // 按分类添加
+            Object.keys(postsalesStageCategories).forEach(key => {
+                const category = postsalesStageCategories[key];
+                
+                // 创建optgroup
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = category.name;
+                
+                // 添加阶段选项
+                category.stages.forEach(stage => {
+                    const option = document.createElement('option');
+                    option.value = stage;
+                    option.textContent = stage;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            });
+        }
+        
+        // 显示选中的值
+        function showSelected(select) {
+            if (select.value) {
+                console.log('选中:', select.value);
+            }
+        }
+        
+        // 页面加载时初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            populatePresalesStages();
+            populatePostsalesStages();
+            console.log('✅ 阶段分组显示初始化完成');
+        });
+    </script>
+</body>
+</html>
