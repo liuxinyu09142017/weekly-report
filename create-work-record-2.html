@@ -617,7 +617,8 @@
                             <label class="form-label">
                                 项目类型 <span class="required">*</span>
                             </label>
-                            <select id="project-type" class="form-select" required>
+                            <select id="project-type" class="form-select" required 
+                                    onchange="updateProjectStages()">
                                 <option value="">请选择</option>
                                 <option value="售前项目">售前项目</option>
                                 <option value="售后项目">售后项目</option>
@@ -981,8 +982,7 @@
             }
         }
 
-        /* 旧函数 - 已被updateStageOptions替代
-// 更新项目阶段
+        // 更新项目阶段
         function updateProjectStages() {
             const projectType = document.getElementById('project-type').value;
             const stageSelect = document.getElementById('project-stage');
@@ -991,7 +991,6 @@
                 stageSelect.innerHTML = '<option value="">请先选择项目类型</option>';
                 return;
             }
-*/
         
         // ============================================
         // 项目阶段管理函数（新增）
@@ -1269,7 +1268,7 @@
             document.getElementById('project-type').value = matchedProject.projectType;
             
             // 更新阶段列表
-            updateStageOptions(this.value);
+            updateProjectStages();
             document.getElementById('project-stage').value = matchedProject.projectStage;
             
             document.getElementById('sales-person').value = matchedProject.salesPerson || '';
