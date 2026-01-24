@@ -245,9 +245,9 @@
                         </div>
                         
                         <div class="convert-section" id="convert-to-postsales">
-                            <h3>🔄 创建售后项目</h3>
-                            <p>售前签约完成后，可创建对应的售后实施项目继续交付</p>
-                            <button type="button" class="btn-convert" onclick="createPostsalesProject()">创建售后项目</button>
+                            <h3>🔄 转换为售后项目</h3>
+                            <p>售前签约完成后，可转换为售后实施项目继续交付</p>
+                            <button type="button" class="btn-convert" onclick="convertToPostsales()">转换为售后项目</button>
                         </div>
                     </div>
                 </div>
@@ -293,12 +293,6 @@
                             </table>
                             <button type="button" class="add-allocation-btn" onclick="addPostsalesAllocation()">+ 添加合作工程师</button>
                             <div class="percentage-total" id="postsales-percentage-total">业绩比例合计：0%</div>
-                        </div>
-                        
-                        <div class="convert-section" id="convert-to-maintenance" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-color: #3b82f6;">
-                            <h3 style="color: #1e40af;">🔧 创建运维项目</h3>
-                            <p style="color: #1d4ed8;">售后报竣完成后，可创建对应的运维项目持续服务</p>
-                            <button type="button" class="btn-convert" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);" onclick="createMaintenanceProject()">创建运维项目</button>
                         </div>
                     </div>
                 </div>
@@ -584,119 +578,6 @@
             document.getElementById('project-type').value = '售后项目';
             onProjectTypeChange();
             alert('已转换为售后项目，请设置报竣信息后保存。');
-        }
-
-        // 创建售后项目（从售前项目）
-        async function createPostsalesProject() {
-            // 先保存当前售前项目
-            const contractSigned = document.getElementById('tag-contract-signed')?.checked;
-            if (!contractSigned) {
-                alert('请先勾选"已签约"并保存项目后再创建售后项目');
-                return;
-            }
-            
-            const contractAmount = document.getElementById('actual-contract-amount')?.value;
-            if (!contractAmount) {
-                alert('请先填写实际签约金额');
-                return;
-            }
-
-            if (!confirm('确定创建对应的售后项目？\n\n• 将创建新的售后项目："' + projectData.projectName + '售后"\n• 原售前项目保持不变\n• 客户信息将自动复制')) return;
-            
-            try {
-                // 创建新的售后项目
-                const newProject = {
-                    customerName: document.getElementById('customer-name').value.trim(),
-                    customerIndustry: document.getElementById('customer-industry').value,
-                    customerCountry: document.getElementById('customer-country').value,
-                    projectName: projectData.projectName + '售后',
-                    projectType: '售后项目',
-                    projectStage: '项目启动',
-                    status: '进行中',
-                    salesPerson: document.getElementById('sales-person').value.trim(),
-                    projectAmount: parseFloat(contractAmount) || 0,
-                    projectCurrency: document.getElementById('actual-contract-currency')?.value || 'GBP',
-                    startDate: new Date().toISOString().split('T')[0],
-                    endDate: '',
-                    description: '由售前项目转入：' + projectData.projectName,
-                    presalesProjectId: projectId,  // 关联原售前项目
-                    performanceData: {},
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdBy: currentUser.uid,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedBy: currentUser.uid
-                };
-                
-                const docRef = await db.collection('projects').add(newProject);
-                
-                // 更新原售前项目，记录已创建售后项目
-                await db.collection('projects').doc(projectId).update({
-                    postsalesProjectId: docRef.id,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                alert('售后项目创建成功！即将跳转到新项目编辑页面。');
-                window.location.href = 'edit-project.html?id=' + docRef.id;
-            } catch (e) {
-                alert('创建失败: ' + e.message);
-            }
-        }
-
-        // 创建运维项目（从售后项目）
-        async function createMaintenanceProject() {
-            const reported = document.getElementById('tag-reported')?.checked;
-            if (!reported) {
-                alert('请先勾选"已报竣"并保存项目后再创建运维项目');
-                return;
-            }
-            
-            const settlementAmount = document.getElementById('actual-settlement-amount')?.value;
-
-            // 获取原始项目名称（去掉"售后"后缀）
-            let baseName = projectData.projectName;
-            if (baseName.endsWith('售后')) {
-                baseName = baseName.slice(0, -2);
-            }
-
-            if (!confirm('确定创建对应的运维项目？\n\n• 将创建新的运维项目："' + baseName + '运维"\n• 原售后项目保持不变\n• 客户信息将自动复制')) return;
-            
-            try {
-                const newProject = {
-                    customerName: document.getElementById('customer-name').value.trim(),
-                    customerIndustry: document.getElementById('customer-industry').value,
-                    customerCountry: document.getElementById('customer-country').value,
-                    projectName: baseName + '运维',
-                    projectType: '售后项目',  // 运维也是售后类型
-                    projectStage: '运维服务启动',
-                    status: '进行中',
-                    salesPerson: document.getElementById('sales-person').value.trim(),
-                    projectAmount: parseFloat(settlementAmount) || 0,
-                    projectCurrency: document.getElementById('actual-settlement-currency')?.value || 'GBP',
-                    startDate: new Date().toISOString().split('T')[0],
-                    endDate: '',
-                    description: '由售后项目转入运维：' + projectData.projectName,
-                    postsalesProjectId: projectId,  // 关联原售后项目
-                    isMaintenanceProject: true,     // 标记为运维项目
-                    performanceData: {},
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdBy: currentUser.uid,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedBy: currentUser.uid
-                };
-                
-                const docRef = await db.collection('projects').add(newProject);
-                
-                // 更新原售后项目，记录已创建运维项目
-                await db.collection('projects').doc(projectId).update({
-                    maintenanceProjectId: docRef.id,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                alert('运维项目创建成功！即将跳转到新项目编辑页面。');
-                window.location.href = 'edit-project.html?id=' + docRef.id;
-            } catch (e) {
-                alert('创建失败: ' + e.message);
-            }
         }
 
         function collectPerformanceData() {
