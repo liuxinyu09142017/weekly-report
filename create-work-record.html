@@ -994,8 +994,10 @@
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
+                console.log('✅ 用户已登录:', user.email, 'UID:', user.uid);
                 await loadUserData();
-                initForm();
+                await initForm();  // 确保等待initForm完成
+                console.log('✅ 初始化完成');
             } else {
                 window.location.href = 'index.html';
             }
@@ -1015,31 +1017,40 @@
 
         // 初始化表单
         async function initForm() {
-            // 设置今天的日期
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('work-date').value = today;
-            
-            // 检查URL参数（从项目详情页跳转过来）
-            const urlParams = new URLSearchParams(window.location.search);
-            const projectId = urlParams.get('projectId');
-            
-            // ⭐ 如果有projectId，先加载该项目，不需要等待加载所有项目
-            if (projectId) {
-                console.log('从项目详情页跳转，项目ID:', projectId);
-                await loadProjectData(projectId);
-            }
-            
-            // ⭐ 加载用户的所有项目（用于智能搜索）
-            await loadAllUserProjects();
-            
-            // 点击页面其他地方关闭搜索结果
-            document.addEventListener('click', (e) => {
-                const wrapper = document.querySelector('.autocomplete-wrapper');
-                const resultsDiv = document.getElementById('search-results');
-                if (wrapper && !wrapper.contains(e.target)) {
-                    resultsDiv.classList.remove('show');
+            try {
+                // 设置今天的日期
+                const today = new Date().toISOString().split('T')[0];
+                const startDateEl = document.getElementById('start-date');
+                if (startDateEl) {
+                    startDateEl.value = today;
                 }
-            });
+                
+                // ⭐ 加载用户的所有项目（用于智能搜索）
+                await loadAllUserProjects();
+                
+                // 检查URL参数（从项目详情页跳转过来）
+                const urlParams = new URLSearchParams(window.location.search);
+                const projectId = urlParams.get('projectId');
+                
+                // ⭐ 如果有projectId，加载该项目并自动填充
+                if (projectId) {
+                    console.log('从项目详情页跳转，项目ID:', projectId);
+                    await loadProjectData(projectId);
+                }
+                
+                // 点击页面其他地方关闭搜索结果
+                document.addEventListener('click', (e) => {
+                    const wrapper = document.querySelector('.autocomplete-wrapper');
+                    const resultsDiv = document.getElementById('search-results');
+                    if (wrapper && !wrapper.contains(e.target) && resultsDiv) {
+                        resultsDiv.classList.remove('show');
+                    }
+                });
+                
+                console.log('✅ 表单初始化完成');
+            } catch (error) {
+                console.error('❌ 初始化表单失败:', error);
+            }
         }
         
         // ========== 智能项目搜索功能 ==========
@@ -1048,76 +1059,84 @@
         async function loadAllUserProjects() {
             try {
                 console.log('开始加载用户项目列表...');
+                console.log('当前用户UID:', currentUser.uid);
                 allUserProjects = [];
                 
-                // 方法1：加载用户创建的项目
+                // 首先尝试直接加载所有项目（不带条件）
                 try {
-                    const createdSnapshot = await db.collection('projects')
-                        .where('createdBy', '==', currentUser.uid)
+                    console.log('尝试加载所有项目...');
+                    const allSnapshot = await db.collection('projects')
+                        .orderBy('updatedAt', 'desc')
+                        .limit(200)
                         .get();
                     
-                    createdSnapshot.forEach(doc => {
+                    allSnapshot.forEach(doc => {
                         allUserProjects.push({
                             id: doc.id,
                             ...doc.data()
                         });
                     });
-                    console.log('用户创建的项目:', createdSnapshot.size, '个');
-                } catch (e) {
-                    console.error('加载创建的项目失败:', e);
-                }
-                
-                // 方法2：加载用户被分配的项目
-                try {
-                    const assignedSnapshot = await db.collection('projects')
-                        .where('assignedEngineers', 'array-contains', currentUser.uid)
-                        .get();
+                    console.log('✅ 成功加载所有项目:', allSnapshot.size, '个');
                     
-                    assignedSnapshot.forEach(doc => {
-                        // 避免重复添加
-                        if (!allUserProjects.find(p => p.id === doc.id)) {
-                            allUserProjects.push({
-                                id: doc.id,
-                                ...doc.data()
-                            });
-                        }
-                    });
-                    console.log('用户被分配的项目:', assignedSnapshot.size, '个');
+                    // 打印前3个项目信息用于调试
+                    if (allUserProjects.length > 0) {
+                        console.log('示例项目:', allUserProjects.slice(0, 3).map(p => ({
+                            name: p.projectName,
+                            customer: p.customerName,
+                            createdBy: p.createdBy
+                        })));
+                    }
                 } catch (e) {
-                    console.error('加载分配的项目失败:', e);
-                }
-                
-                // 方法3：如果上面都没加载到，尝试加载所有项目（小团队场景）
-                if (allUserProjects.length === 0) {
-                    console.log('尝试加载所有项目...');
+                    console.error('加载所有项目失败，尝试其他方法:', e.message);
+                    
+                    // 方法2：加载用户创建的项目
                     try {
-                        const allSnapshot = await db.collection('projects')
-                            .limit(100)
+                        const createdSnapshot = await db.collection('projects')
+                            .where('createdBy', '==', currentUser.uid)
                             .get();
                         
-                        allSnapshot.forEach(doc => {
+                        createdSnapshot.forEach(doc => {
                             allUserProjects.push({
                                 id: doc.id,
                                 ...doc.data()
                             });
                         });
-                        console.log('加载了所有项目:', allSnapshot.size, '个');
-                    } catch (e) {
-                        console.error('加载所有项目失败:', e);
+                        console.log('用户创建的项目:', createdSnapshot.size, '个');
+                    } catch (e2) {
+                        console.error('加载创建的项目也失败:', e2.message);
+                    }
+                    
+                    // 方法3：加载用户被分配的项目
+                    try {
+                        const assignedSnapshot = await db.collection('projects')
+                            .where('assignedEngineers', 'array-contains', currentUser.uid)
+                            .get();
+                        
+                        assignedSnapshot.forEach(doc => {
+                            if (!allUserProjects.find(p => p.id === doc.id)) {
+                                allUserProjects.push({
+                                    id: doc.id,
+                                    ...doc.data()
+                                });
+                            }
+                        });
+                        console.log('用户被分配的项目:', assignedSnapshot.size, '个');
+                    } catch (e3) {
+                        console.error('加载分配的项目也失败:', e3.message);
                     }
                 }
                 
                 // 按更新时间排序
                 allUserProjects.sort((a, b) => {
-                    const timeA = a.updatedAt?.toDate?.() || new Date(0);
-                    const timeB = b.updatedAt?.toDate?.() || new Date(0);
+                    const timeA = a.updatedAt?.toDate?.() || a.updatedAt?.seconds ? new Date(a.updatedAt.seconds * 1000) : new Date(0);
+                    const timeB = b.updatedAt?.toDate?.() || b.updatedAt?.seconds ? new Date(b.updatedAt.seconds * 1000) : new Date(0);
                     return timeB - timeA;
                 });
                 
-                console.log('总共加载', allUserProjects.length, '个项目');
+                console.log('📊 总共加载', allUserProjects.length, '个项目');
                 
             } catch (error) {
-                console.error('加载项目列表失败:', error);
+                console.error('❌ 加载项目列表失败:', error);
             }
         }
         
@@ -1311,6 +1330,16 @@
             // 如果输入太短，隐藏结果
             if (input.length < 1) {
                 hideSearchResults();
+                return;
+            }
+            
+            // 检查项目是否已加载
+            if (allUserProjects.length === 0) {
+                console.log('⚠️ 项目列表未加载，尝试重新加载...');
+                loadAllUserProjects().then(() => {
+                    console.log('重新加载完成，项目数:', allUserProjects.length);
+                    performProjectSearch(input);
+                });
                 return;
             }
             

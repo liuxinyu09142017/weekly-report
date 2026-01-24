@@ -820,71 +820,80 @@ document.addEventListener('DOMContentLoaded', () => {
         async function loadAllUserProjects() {
             try {
                 console.log('开始加载项目列表...');
+                console.log('当前用户UID:', currentUser.uid);
                 allUserProjects = [];
                 const customerSet = new Set();
                 
-                // 方法1：加载用户创建的项目
+                // 首先尝试直接加载所有项目（不带条件）
                 try {
-                    const createdSnapshot = await db.collection('projects')
-                        .where('createdBy', '==', currentUser.uid)
+                    console.log('尝试加载所有项目...');
+                    const allSnapshot = await db.collection('projects')
+                        .orderBy('updatedAt', 'desc')
+                        .limit(200)
                         .get();
                     
-                    createdSnapshot.forEach(doc => {
+                    allSnapshot.forEach(doc => {
                         const project = { id: doc.id, ...doc.data() };
                         allUserProjects.push(project);
                         if (project.customerName) {
                             customerSet.add(project.customerName);
                         }
                     });
-                    console.log('用户创建的项目:', createdSnapshot.size, '个');
+                    console.log('✅ 成功加载所有项目:', allSnapshot.size, '个');
                 } catch (e) {
-                    console.error('加载创建的项目失败:', e);
-                }
-                
-                // 方法2：加载用户被分配的项目
-                try {
-                    const assignedSnapshot = await db.collection('projects')
-                        .where('assignedEngineers', 'array-contains', currentUser.uid)
-                        .get();
+                    console.error('加载所有项目失败，尝试其他方法:', e.message);
                     
-                    assignedSnapshot.forEach(doc => {
-                        if (!allUserProjects.find(p => p.id === doc.id)) {
-                            const project = { id: doc.id, ...doc.data() };
-                            allUserProjects.push(project);
-                            if (project.customerName) {
-                                customerSet.add(project.customerName);
-                            }
-                        }
-                    });
-                    console.log('用户被分配的项目:', assignedSnapshot.size, '个');
-                } catch (e) {
-                    console.error('加载分配的项目失败:', e);
-                }
-                
-                // 方法3：如果上面都没加载到，尝试加载所有项目
-                if (allUserProjects.length === 0) {
+                    // 方法2：加载用户创建的项目
                     try {
-                        const allSnapshot = await db.collection('projects')
-                            .limit(100)
+                        const createdSnapshot = await db.collection('projects')
+                            .where('createdBy', '==', currentUser.uid)
                             .get();
                         
-                        allSnapshot.forEach(doc => {
+                        createdSnapshot.forEach(doc => {
                             const project = { id: doc.id, ...doc.data() };
                             allUserProjects.push(project);
                             if (project.customerName) {
                                 customerSet.add(project.customerName);
                             }
                         });
-                        console.log('加载了所有项目:', allSnapshot.size, '个');
-                    } catch (e) {
-                        console.error('加载所有项目失败:', e);
+                        console.log('用户创建的项目:', createdSnapshot.size, '个');
+                    } catch (e2) {
+                        console.error('加载创建的项目也失败:', e2.message);
+                    }
+                    
+                    // 方法3：加载用户被分配的项目
+                    try {
+                        const assignedSnapshot = await db.collection('projects')
+                            .where('assignedEngineers', 'array-contains', currentUser.uid)
+                            .get();
+                        
+                        assignedSnapshot.forEach(doc => {
+                            if (!allUserProjects.find(p => p.id === doc.id)) {
+                                const project = { id: doc.id, ...doc.data() };
+                                allUserProjects.push(project);
+                                if (project.customerName) {
+                                    customerSet.add(project.customerName);
+                                }
+                            }
+                        });
+                        console.log('用户被分配的项目:', assignedSnapshot.size, '个');
+                    } catch (e3) {
+                        console.error('加载分配的项目也失败:', e3.message);
                     }
                 }
                 
                 allCustomers = Array.from(customerSet).sort();
-                console.log('总共加载', allUserProjects.length, '个项目，', allCustomers.length, '个客户');
+                console.log('📊 总共加载', allUserProjects.length, '个项目，', allCustomers.length, '个客户');
+                
+                // 打印前3个项目用于调试
+                if (allUserProjects.length > 0) {
+                    console.log('示例项目:', allUserProjects.slice(0, 3).map(p => ({
+                        name: p.projectName,
+                        customer: p.customerName
+                    })));
+                }
             } catch (error) {
-                console.error('加载项目列表失败:', error);
+                console.error('❌ 加载项目列表失败:', error);
             }
         }
 
