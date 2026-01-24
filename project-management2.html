@@ -679,9 +679,6 @@
                 const perf = project.performanceData || {};
                 const showSigned = project.projectType === '售前项目' && perf.contractSigned;
                 const showReported = project.projectType === '售后项目' && perf.reported;
-                // 修复金额显示：只有当金额字段不存在时才显示 -
-                const hasAmount = project.projectAmount !== undefined && project.projectAmount !== null && project.projectAmount !== '';
-                const amountDisplay = hasAmount ? (project.projectAmount/1000).toFixed(0) + 'K ' + (project.projectCurrency || 'GBP') : '-';
                 return `
                     <div class="project-card" onclick="viewProject('${project.id}')">
                         <div class="performance-badges">
@@ -700,7 +697,7 @@
                             <div class="meta-item"><span class="meta-icon">🌍</span><span>${project.customerCountry || '-'}</span></div>
                             <div class="meta-item"><span class="meta-icon">📋</span><span>${project.projectType || '-'}</span></div>
                             <div class="meta-item"><span class="meta-icon">👤</span><span>${project.salesPerson || '-'}</span></div>
-                            <div class="meta-item"><span class="meta-icon">💰</span><span>${amountDisplay}</span></div>
+                            <div class="meta-item"><span class="meta-icon">💰</span><span>${project.projectAmount ? (project.projectAmount/1000).toFixed(0) + 'K ' + (project.projectCurrency || 'GBP') : '-'}</span></div>
                             <div class="meta-item"><span class="meta-icon">📅</span><span>${project.startDate || '-'}</span></div>
                         </div>
                         <div class="project-stats">
@@ -720,9 +717,7 @@
             const listBody = document.getElementById('list-body');
             listBody.innerHTML = filteredProjects.map(project => {
                 const statusClass = { '规划中': 'status-planning', '进行中': 'status-active', '已完成': 'status-completed', '已暂停': 'status-paused' }[project.status] || 'status-planning';
-                // 修复金额显示：只有当金额字段不存在时才显示 -
-                const hasAmount = project.projectAmount !== undefined && project.projectAmount !== null && project.projectAmount !== '';
-                const amount = hasAmount ? (project.projectAmount/1000).toFixed(0) + 'K ' + (project.projectCurrency || 'GBP') : '-';
+                const amount = project.projectAmount ? (project.projectAmount/1000).toFixed(0) + 'K ' + (project.projectCurrency || 'GBP') : '-';
                 const perf = project.performanceData || {};
                 const showSigned = project.projectType === '售前项目' && perf.contractSigned;
                 const showReported = project.projectType === '售后项目' && perf.reported;
