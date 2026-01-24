@@ -356,12 +356,9 @@
                 allEngineers = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    // 优先使用fullName（中文名），其次displayName（拼音）
-                    const name = data.fullName || data.displayName || data.name || data.email?.split('@')[0] || data.email;
                     allEngineers.push({ 
                         id: doc.id, 
-                        name: name,
-                        email: data.email,
+                        name: data.displayName || data.fullName || data.email,
                         ...data 
                     });
                 });
