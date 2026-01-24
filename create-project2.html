@@ -594,8 +594,8 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">技术方向 <span class="required">*</span></label>
-                            <select id="tech-direction" class="form-select" required>
+                            <label class="form-label">技术方向</label>
+                            <select id="tech-direction" class="form-select">
                                 <option value="">请选择</option>
                                 <option value="网络">🌐 网络</option>
                                 <option value="系统">🖥️ 系统</option>
@@ -1274,16 +1274,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = '检测中...';
             
             try {
-                // 验证技术方向必填
-                const techDirection = document.getElementById('tech-direction').value;
-                if (!techDirection) {
-                    alert('⚠️ 请选择技术方向！\n\n技术方向为必填项，用于业绩统计分类。');
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '✅ 创建项目';
-                    document.getElementById('tech-direction').focus();
-                    return;
-                }
-                
                 const projectName = document.getElementById('project-name').value.trim();
                 const customerName = document.getElementById('customer-name').value.trim();
                 
