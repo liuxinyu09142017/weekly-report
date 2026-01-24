@@ -658,6 +658,12 @@
         </div>
     </div>
 
+		// 页面加载完成后初始化国家列表
+document.addEventListener('DOMContentLoaded', () => {
+    populateCountrySelect('customer-country');
+});
+
+
     <script>
         // Firebase配置
         const firebaseConfig = {
@@ -813,16 +819,6 @@
         };
 
         // 检查登录状态
-        // 页面加载完成后初始化国家列表
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof populateCountrySelect === 'function') {
-                populateCountrySelect('customer-country', {
-                    addEmptyOption: true,
-                    emptyOptionText: '请选择国家'
-                });
-            }
-        });
-
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;

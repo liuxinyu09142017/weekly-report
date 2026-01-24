@@ -429,14 +429,7 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => { 
-            if (typeof populateCountrySelect === 'function') {
-                populateCountrySelect('customer-country', {
-                    addEmptyOption: true,
-                    emptyOptionText: '请选择国家'
-                });
-            }
-        });
+        document.addEventListener('DOMContentLoaded', () => { if (typeof populateCountrySelect === 'function') populateCountrySelect('customer-country'); });
         
         const firebaseConfig = {
             apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",

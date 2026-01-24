@@ -976,12 +976,7 @@
     <script>
     // 页面加载完成后初始化国家列表
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof populateCountrySelect === 'function') {
-            populateCountrySelect('customer-country', {
-                addEmptyOption: true,
-                emptyOptionText: '请选择国家'
-            });
-        }
+        populateCountrySelect('customer-country');
     });
     
     // Firebase配置
