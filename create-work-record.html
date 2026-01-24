@@ -1019,16 +1019,18 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('work-date').value = today;
             
-            // ⭐ 加载用户的所有项目（用于智能搜索）
-            await loadAllUserProjects();
-            
             // 检查URL参数（从项目详情页跳转过来）
             const urlParams = new URLSearchParams(window.location.search);
             const projectId = urlParams.get('projectId');
             
+            // ⭐ 如果有projectId，先加载该项目，不需要等待加载所有项目
             if (projectId) {
-                loadProjectData(projectId);
+                console.log('从项目详情页跳转，项目ID:', projectId);
+                await loadProjectData(projectId);
             }
+            
+            // ⭐ 加载用户的所有项目（用于智能搜索）
+            await loadAllUserProjects();
             
             // 点击页面其他地方关闭搜索结果
             document.addEventListener('click', (e) => {
@@ -1042,43 +1044,80 @@
         
         // ========== 智能项目搜索功能 ==========
         
-        // 加载用户所有项目
+        // 加载用户所有项目（包括创建的和被分配的）
         async function loadAllUserProjects() {
             try {
                 console.log('开始加载用户项目列表...');
-                const snapshot = await db.collection('projects')
-                    .where('createdBy', '==', currentUser.uid)
-                    .orderBy('updatedAt', 'desc')
-                    .get();
-                
                 allUserProjects = [];
-                snapshot.forEach(doc => {
-                    allUserProjects.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
                 
-                console.log('已加载', allUserProjects.length, '个项目');
-            } catch (error) {
-                console.error('加载项目列表失败:', error);
-                // 如果索引问题，尝试不排序
+                // 方法1：加载用户创建的项目
                 try {
-                    const snapshot = await db.collection('projects')
+                    const createdSnapshot = await db.collection('projects')
                         .where('createdBy', '==', currentUser.uid)
                         .get();
                     
-                    allUserProjects = [];
-                    snapshot.forEach(doc => {
+                    createdSnapshot.forEach(doc => {
                         allUserProjects.push({
                             id: doc.id,
                             ...doc.data()
                         });
                     });
-                    console.log('(无排序)已加载', allUserProjects.length, '个项目');
+                    console.log('用户创建的项目:', createdSnapshot.size, '个');
                 } catch (e) {
-                    console.error('备用加载也失败:', e);
+                    console.error('加载创建的项目失败:', e);
                 }
+                
+                // 方法2：加载用户被分配的项目
+                try {
+                    const assignedSnapshot = await db.collection('projects')
+                        .where('assignedEngineers', 'array-contains', currentUser.uid)
+                        .get();
+                    
+                    assignedSnapshot.forEach(doc => {
+                        // 避免重复添加
+                        if (!allUserProjects.find(p => p.id === doc.id)) {
+                            allUserProjects.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        }
+                    });
+                    console.log('用户被分配的项目:', assignedSnapshot.size, '个');
+                } catch (e) {
+                    console.error('加载分配的项目失败:', e);
+                }
+                
+                // 方法3：如果上面都没加载到，尝试加载所有项目（小团队场景）
+                if (allUserProjects.length === 0) {
+                    console.log('尝试加载所有项目...');
+                    try {
+                        const allSnapshot = await db.collection('projects')
+                            .limit(100)
+                            .get();
+                        
+                        allSnapshot.forEach(doc => {
+                            allUserProjects.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
+                        console.log('加载了所有项目:', allSnapshot.size, '个');
+                    } catch (e) {
+                        console.error('加载所有项目失败:', e);
+                    }
+                }
+                
+                // 按更新时间排序
+                allUserProjects.sort((a, b) => {
+                    const timeA = a.updatedAt?.toDate?.() || new Date(0);
+                    const timeB = b.updatedAt?.toDate?.() || new Date(0);
+                    return timeB - timeA;
+                });
+                
+                console.log('总共加载', allUserProjects.length, '个项目');
+                
+            } catch (error) {
+                console.error('加载项目列表失败:', error);
             }
         }
         
@@ -1281,21 +1320,49 @@
             }, 200);
         }
         
-        // 执行项目搜索
+        // 执行项目搜索 - 综合客户名称和项目名称
         function performProjectSearch(query) {
             const normalizedQuery = normalizeText(query);
-            const canonicalQuery = getCanonicalCustomerName(query);  // 也尝试客户名别名匹配
+            const canonicalQuery = getCanonicalCustomerName(query);
             const resultsDiv = document.getElementById('search-results');
+            
+            // 同时获取客户名称输入框的值
+            const customerNameInput = document.getElementById('customer-name').value.trim();
+            const normalizedCustomerInput = normalizeText(customerNameInput);
+            
+            console.log('搜索参数:', {
+                query: query,
+                customerNameInput: customerNameInput,
+                totalProjects: allUserProjects.length
+            });
             
             // 显示加载中
             resultsDiv.innerHTML = '<div class="search-loading">搜索中...</div>';
             resultsDiv.classList.add('show');
             
-            // 模糊匹配 - 使用智能匹配
+            // 模糊匹配 - 综合客户名称和项目名称
             const results = allUserProjects.filter(project => {
                 const normalizedName = normalizeText(project.projectName);
                 const normalizedCustomer = normalizeText(project.customerName);
                 
+                // 如果已输入客户名称，优先筛选该客户的项目
+                if (customerNameInput) {
+                    // 客户名称必须匹配
+                    const customerMatch = normalizedCustomer.includes(normalizedCustomerInput) ||
+                                         normalizedCustomerInput.includes(normalizedCustomer) ||
+                                         isCustomerMatch(project.customerName, customerNameInput);
+                    
+                    if (customerMatch) {
+                        // 客户匹配后，检查项目名称
+                        if (normalizedName.includes(normalizedQuery)) return true;
+                        if (isProjectSimilar(project.projectName, query)) return true;
+                        // 如果项目名称输入为空或很短，显示该客户的所有项目
+                        if (query.length < 2) return true;
+                    }
+                    return false;
+                }
+                
+                // 没有输入客户名称时，按原逻辑搜索
                 // 项目名称匹配
                 if (normalizedName.includes(normalizedQuery)) return true;
                 if (project.projectName && project.projectName.toLowerCase().includes(query.toLowerCase())) return true;
@@ -1311,6 +1378,8 @@
                 return false;
             });
             
+            console.log('搜索结果数量:', results.length);
+            
             // 按最近更新排序，限制结果数量
             const topResults = results
                 .sort((a, b) => {
@@ -1318,7 +1387,7 @@
                     const timeB = b.updatedAt?.toDate?.() || new Date(0);
                     return timeB - timeA;
                 })
-                .slice(0, 6);
+                .slice(0, 8);
             
             displaySearchResults(topResults, query);
         }
@@ -1528,10 +1597,50 @@
         // 加载项目数据（从项目详情页跳转过来）
         async function loadProjectData(projectId) {
             try {
+                console.log('从URL加载项目数据，ID:', projectId);
                 const projectDoc = await db.collection('projects').doc(projectId).get();
+                
                 if (projectDoc.exists) {
-                    matchedProject = { id: projectDoc.id, ...projectDoc.data() };
-                    useExistingProject();
+                    const project = { id: projectDoc.id, ...projectDoc.data() };
+                    console.log('项目数据:', project);
+                    
+                    // 设置为已选择的项目
+                    selectedProject = project;
+                    matchedProject = project;
+                    
+                    // 显示已选择项目提示
+                    document.getElementById('selected-project-badge').classList.add('show');
+                    document.getElementById('selected-project-name').textContent = project.projectName;
+                    document.getElementById('selected-project-customer').textContent = project.customerName || '';
+                    
+                    // 填充表单
+                    document.getElementById('project-name').value = project.projectName || '';
+                    document.getElementById('customer-name').value = project.customerName || '';
+                    document.getElementById('customer-industry').value = project.customerIndustry || '';
+                    document.getElementById('customer-country').value = project.customerCountry || '';
+                    document.getElementById('project-type').value = project.projectType || '';
+                    
+                    // 更新项目阶段选项
+                    updateProjectStages();
+                    
+                    // 延迟设置阶段值（等待下拉框更新）
+                    setTimeout(() => {
+                        document.getElementById('project-stage').value = project.projectStage || '';
+                    }, 150);
+                    
+                    document.getElementById('sales-person').value = project.salesPerson || '';
+                    document.getElementById('project-amount').value = project.projectAmount || '';
+                    document.getElementById('project-currency').value = project.projectCurrency || 'GBP';
+                    
+                    // 禁用项目相关字段（已关联到项目）
+                    disableProjectFields();
+                    
+                    // 隐藏搜索结果
+                    hideSearchResults();
+                    
+                    console.log('项目信息已自动填充并锁定');
+                } else {
+                    console.error('项目不存在:', projectId);
                 }
             } catch (error) {
                 console.error('加载项目数据失败:', error);
