@@ -45,15 +45,16 @@
         /* 业绩统计区域 */
         .performance-section { background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%); border: 2px solid #e0e7ff; border-radius: 12px; padding: 25px; margin-bottom: 35px; }
         .performance-section .section-title { color: #4f46e5; border-bottom-color: #c7d2fe; margin-bottom: 15px; }
-        .performance-help { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 15px; margin-bottom: 20px; font-size: 13px; color: #92400e; line-height: 1.8; }
+        .performance-help { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 12px 15px; margin-bottom: 20px; font-size: 13px; color: #92400e; line-height: 1.6; }
         
-        /* 单个里程碑选项 */
-        .milestone-single { display: flex; align-items: center; gap: 12px; padding: 15px 20px; background: white; border: 2px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: all 0.2s; margin-bottom: 20px; }
-        .milestone-single:hover { border-color: #667eea; background: #fafaff; }
-        .milestone-single.checked { border-color: #10b981; background: #ecfdf5; }
-        .milestone-single input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #10b981; }
-        .milestone-single .milestone-title { font-size: 15px; font-weight: 600; color: #1f2937; }
-        .milestone-single.checked .milestone-title { color: #059669; }
+        /* 里程碑选项 */
+        .milestone-options { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+        .milestone-item { display: flex; align-items: center; gap: 10px; padding: 12px 18px; background: white; border: 2px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .milestone-item:hover { border-color: #667eea; background: #fafaff; }
+        .milestone-item.checked { border-color: #10b981; background: #ecfdf5; }
+        .milestone-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #10b981; }
+        .milestone-title { font-size: 14px; font-weight: 600; color: #1f2937; }
+        .milestone-item.checked .milestone-title { color: #059669; }
         
         /* 详情字段 */
         .conditional-fields { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #d1d5db; }
@@ -61,18 +62,20 @@
         
         /* 业绩分配 */
         .allocation-section { margin-top: 20px; padding: 20px; background: white; border-radius: 10px; border: 1px solid #e5e7eb; }
-        .allocation-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 5px; }
-        .allocation-subtitle { font-size: 12px; color: #6b7280; margin-bottom: 15px; }
+        .allocation-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 15px; }
         .allocation-table { width: 100%; border-collapse: collapse; }
         .allocation-table th, .allocation-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
         .allocation-table th { background: #f8fafc; font-weight: 600; font-size: 13px; color: #64748b; }
         .allocation-table input[type="number"] { width: 70px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; text-align: center; }
-        .allocation-table input[type="text"] { width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; }
         .allocation-table .remove-btn { background: #fee2e2; color: #dc2626; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .add-allocation-btn { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 8px 16px; background: #e0e7ff; color: #4f46e5; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; }
         .percentage-total { margin-top: 10px; font-size: 13px; padding: 8px 12px; border-radius: 6px; background: #f1f5f9; }
         .percentage-total.warning { background: #fef2f2; color: #dc2626; }
         .percentage-total.valid { background: #ecfdf5; color: #059669; }
+        
+        /* 业绩提示 */
+        .credit-notice { margin-top: 15px; padding: 12px 15px; background: #ecfdf5; border: 1px solid #10b981; border-radius: 8px; color: #059669; font-size: 13px; display: none; }
+        .credit-notice.show { display: block; }
         
         /* 转换区块 */
         .convert-section { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: center; }
@@ -80,15 +83,7 @@
         .convert-section p { color: #a16207; font-size: 14px; margin-bottom: 15px; }
         .btn-convert { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
         
-        /* 工程师选择器 */
-        .engineer-selector { position: relative; }
-        .engineer-input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
-        .engineer-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: 4px; max-height: 200px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .engineer-dropdown.show { display: block; }
-        .engineer-option { padding: 10px 12px; cursor: pointer; font-size: 14px; }
-        .engineer-option:hover { background: #f0f4ff; }
-        
-        @media (max-width: 768px) { .form-row, .form-row.triple { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .form-row, .form-row.triple { grid-template-columns: 1fr; } .milestone-options { flex-direction: column; } }
     </style>
 </head>
 <body>
@@ -206,18 +201,33 @@
                     <div class="section-title">🏆 售前业绩统计</div>
                     <div class="performance-help">
                         <strong>📌 填写说明：</strong><br>
-                        1. 勾选"已签约"<br>
-                        2. 填写签约日期和实际签约金额<br>
-                        3. 如有多人合作，添加合作工程师并分配业绩比例（合计100%）
+                        1. 勾选"已中标"或"已签约"（任选其一即可）<br>
+                        2. 填写对应的日期和实际签约金额<br>
+                        3. 如有多人合作，在下方分配各自的业绩比例（合计应为100%）<br>
+                        <span style="color:#059669">勾选后该项目将自动计入售前业绩统计</span>
                     </div>
                     
-                    <label class="milestone-single" id="milestone-contract-signed">
-                        <input type="checkbox" id="tag-contract-signed" onchange="togglePresalesFields()">
-                        <span class="milestone-title">📝 已签约 - 勾选后自动计入售前业绩</span>
-                    </label>
+                    <div class="milestone-options">
+                        <label class="milestone-item" id="milestone-bid-won">
+                            <input type="checkbox" id="tag-bid-won" onchange="togglePresalesFields()">
+                            <span class="milestone-title">🎉 已中标</span>
+                        </label>
+                        <label class="milestone-item" id="milestone-contract-signed">
+                            <input type="checkbox" id="tag-contract-signed" onchange="togglePresalesFields()">
+                            <span class="milestone-title">📝 已签约</span>
+                        </label>
+                    </div>
+                    
+                    <div class="credit-notice" id="presales-credit-notice">
+                        ✅ 此项目已标记为中标/签约，将自动计入售前业绩统计
+                    </div>
                     
                     <div class="conditional-fields" id="presales-details">
                         <div class="form-row triple">
+                            <div class="form-group">
+                                <label class="form-label">中标日期</label>
+                                <input type="date" id="bid-won-date" class="form-input">
+                            </div>
                             <div class="form-group">
                                 <label class="form-label">签约日期</label>
                                 <input type="date" id="contract-signed-date" class="form-input">
@@ -234,19 +244,18 @@
                         </div>
                         
                         <div class="allocation-section">
-                            <div class="allocation-title">👥 业绩分配</div>
-                            <div class="allocation-subtitle">多人合作时，填写各工程师的业绩占比和主要贡献</div>
+                            <div class="allocation-title">👥 业绩分配（多人合作时按比例分配）</div>
                             <table class="allocation-table">
-                                <thead><tr><th style="width:35%">工程师</th><th style="width:40%">主要贡献</th><th style="width:15%">比例(%)</th><th style="width:10%">操作</th></tr></thead>
+                                <thead><tr><th>工程师</th><th>角色</th><th>比例(%)</th><th>操作</th></tr></thead>
                                 <tbody id="presales-allocation-body"></tbody>
                             </table>
-                            <button type="button" class="add-allocation-btn" onclick="addPresalesAllocation()">+ 添加合作工程师</button>
+                            <button type="button" class="add-allocation-btn" onclick="addPresalesAllocation()">+ 添加合作人员</button>
                             <div class="percentage-total" id="presales-percentage-total">业绩比例合计：0%</div>
                         </div>
                         
-                        <div class="convert-section" id="convert-to-postsales">
+                        <div class="convert-section" id="convert-to-postsales" style="display: none;">
                             <h3>🔄 转换为售后项目</h3>
-                            <p>售前签约完成后，可转换为售后实施项目继续交付</p>
+                            <p>售前签约完成后，可转换为售后实施项目，由本人或其他工程师继续交付</p>
                             <button type="button" class="btn-convert" onclick="convertToPostsales()">转换为售后项目</button>
                         </div>
                     </div>
@@ -257,18 +266,33 @@
                     <div class="section-title">📦 售后业绩统计</div>
                     <div class="performance-help">
                         <strong>📌 填写说明：</strong><br>
-                        1. 勾选"已报竣"<br>
-                        2. 填写报竣日期和实际结算金额<br>
-                        3. 如有多人合作，添加合作工程师并分配业绩比例（合计100%）
+                        1. 勾选"已验收"或"已报竣"（任选其一即可）<br>
+                        2. 填写对应的日期和实际结算金额<br>
+                        3. 如有多人合作，在下方分配各自的业绩比例（合计应为100%）<br>
+                        <span style="color:#059669">勾选后该项目将自动计入售后业绩统计</span>
                     </div>
                     
-                    <label class="milestone-single" id="milestone-reported">
-                        <input type="checkbox" id="tag-reported" onchange="togglePostsalesFields()">
-                        <span class="milestone-title">📋 已报竣 - 勾选后自动计入售后业绩</span>
-                    </label>
+                    <div class="milestone-options">
+                        <label class="milestone-item" id="milestone-accepted">
+                            <input type="checkbox" id="tag-accepted" onchange="togglePostsalesFields()">
+                            <span class="milestone-title">✅ 已验收</span>
+                        </label>
+                        <label class="milestone-item" id="milestone-reported">
+                            <input type="checkbox" id="tag-reported" onchange="togglePostsalesFields()">
+                            <span class="milestone-title">📋 已报竣</span>
+                        </label>
+                    </div>
+                    
+                    <div class="credit-notice" id="postsales-credit-notice">
+                        ✅ 此项目已标记为验收/报竣，将自动计入售后业绩统计
+                    </div>
                     
                     <div class="conditional-fields" id="postsales-details">
                         <div class="form-row triple">
+                            <div class="form-group">
+                                <label class="form-label">验收日期</label>
+                                <input type="date" id="acceptance-date" class="form-input">
+                            </div>
                             <div class="form-group">
                                 <label class="form-label">报竣日期</label>
                                 <input type="date" id="completion-report-date" class="form-input">
@@ -285,13 +309,12 @@
                         </div>
                         
                         <div class="allocation-section">
-                            <div class="allocation-title">👥 业绩分配</div>
-                            <div class="allocation-subtitle">多人合作时，填写各工程师的业绩占比和主要贡献</div>
+                            <div class="allocation-title">👥 业绩分配（多人合作时按比例分配）</div>
                             <table class="allocation-table">
-                                <thead><tr><th style="width:35%">工程师</th><th style="width:40%">主要贡献</th><th style="width:15%">比例(%)</th><th style="width:10%">操作</th></tr></thead>
+                                <thead><tr><th>工程师</th><th>角色</th><th>比例(%)</th><th>操作</th></tr></thead>
                                 <tbody id="postsales-allocation-body"></tbody>
                             </table>
-                            <button type="button" class="add-allocation-btn" onclick="addPostsalesAllocation()">+ 添加合作工程师</button>
+                            <button type="button" class="add-allocation-btn" onclick="addPostsalesAllocation()">+ 添加合作人员</button>
                             <div class="percentage-total" id="postsales-percentage-total">业绩比例合计：0%</div>
                         </div>
                     </div>
@@ -348,15 +371,7 @@
             try {
                 const snapshot = await db.collection('users').where('status', '==', 'approved').get();
                 allEngineers = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    allEngineers.push({ 
-                        id: doc.id, 
-                        name: data.displayName || data.fullName || data.email,
-                        ...data 
-                    });
-                });
-                console.log('加载工程师:', allEngineers.length, allEngineers);
+                snapshot.forEach(doc => allEngineers.push({ id: doc.id, ...doc.data() }));
             } catch (e) { console.error('加载工程师失败:', e); }
         }
 
@@ -392,33 +407,24 @@
         function fillPerformanceData() {
             const perf = projectData.performanceData || {};
             if (projectData.projectType === '售前项目') {
+                if (document.getElementById('tag-bid-won')) document.getElementById('tag-bid-won').checked = perf.bidWon || false;
                 if (document.getElementById('tag-contract-signed')) document.getElementById('tag-contract-signed').checked = perf.contractSigned || false;
+                if (document.getElementById('bid-won-date')) document.getElementById('bid-won-date').value = perf.bidWonDate || '';
                 if (document.getElementById('contract-signed-date')) document.getElementById('contract-signed-date').value = perf.contractSignedDate || '';
                 if (document.getElementById('actual-contract-amount')) document.getElementById('actual-contract-amount').value = perf.actualContractAmount || '';
                 if (document.getElementById('actual-contract-currency')) document.getElementById('actual-contract-currency').value = perf.actualContractCurrency || 'GBP';
-                
-                const allocations = perf.presalesAllocation || [];
-                if (allocations.length > 0) {
-                    allocations.forEach(a => addPresalesAllocation(a.engineerId, a.engineerName, a.contribution, a.percentage));
-                } else {
-                    // 默认添加当前用户
-                    const currentEngineer = allEngineers.find(e => e.id === currentUser.uid);
-                    addPresalesAllocation(currentUser.uid, currentEngineer?.name || currentUser.email, '', 100);
-                }
+                (perf.presalesAllocation || []).forEach(a => addPresalesAllocation(a.engineerId, a.role, a.percentage));
+                if (!perf.presalesAllocation?.length) addPresalesAllocation(currentUser.uid, '售前工程师', 100);
                 togglePresalesFields();
             } else if (projectData.projectType === '售后项目') {
+                if (document.getElementById('tag-accepted')) document.getElementById('tag-accepted').checked = perf.accepted || false;
                 if (document.getElementById('tag-reported')) document.getElementById('tag-reported').checked = perf.reported || false;
+                if (document.getElementById('acceptance-date')) document.getElementById('acceptance-date').value = perf.acceptanceDate || '';
                 if (document.getElementById('completion-report-date')) document.getElementById('completion-report-date').value = perf.completionReportDate || '';
                 if (document.getElementById('actual-settlement-amount')) document.getElementById('actual-settlement-amount').value = perf.actualSettlementAmount || '';
                 if (document.getElementById('actual-settlement-currency')) document.getElementById('actual-settlement-currency').value = perf.actualSettlementCurrency || 'GBP';
-                
-                const allocations = perf.postsalesAllocation || [];
-                if (allocations.length > 0) {
-                    allocations.forEach(a => addPostsalesAllocation(a.engineerId, a.engineerName, a.contribution, a.percentage));
-                } else {
-                    const currentEngineer = allEngineers.find(e => e.id === currentUser.uid);
-                    addPostsalesAllocation(currentUser.uid, currentEngineer?.name || currentUser.email, '', 100);
-                }
+                (perf.postsalesAllocation || []).forEach(a => addPostsalesAllocation(a.engineerId, a.role, a.percentage));
+                if (!perf.postsalesAllocation?.length) addPostsalesAllocation(currentUser.uid, '实施工程师', 100);
                 togglePostsalesFields();
             }
         }
@@ -459,14 +465,27 @@
         }
 
         function togglePresalesFields() {
+            const bidWon = document.getElementById('tag-bid-won')?.checked;
             const contractSigned = document.getElementById('tag-contract-signed')?.checked;
-            document.getElementById('presales-details')?.classList.toggle('show', contractSigned);
+            const shouldCredit = bidWon || contractSigned;
+            
+            document.getElementById('presales-details')?.classList.toggle('show', shouldCredit);
+            document.getElementById('presales-credit-notice')?.classList.toggle('show', shouldCredit);
+            document.getElementById('milestone-bid-won')?.classList.toggle('checked', bidWon);
             document.getElementById('milestone-contract-signed')?.classList.toggle('checked', contractSigned);
+            
+            const convertEl = document.getElementById('convert-to-postsales');
+            if (convertEl) convertEl.style.display = contractSigned ? 'block' : 'none';
         }
 
         function togglePostsalesFields() {
+            const accepted = document.getElementById('tag-accepted')?.checked;
             const reported = document.getElementById('tag-reported')?.checked;
-            document.getElementById('postsales-details')?.classList.toggle('show', reported);
+            const shouldCredit = accepted || reported;
+            
+            document.getElementById('postsales-details')?.classList.toggle('show', shouldCredit);
+            document.getElementById('postsales-credit-notice')?.classList.toggle('show', shouldCredit);
+            document.getElementById('milestone-accepted')?.classList.toggle('checked', accepted);
             document.getElementById('milestone-reported')?.classList.toggle('checked', reported);
         }
 
@@ -480,143 +499,64 @@
             }
         }
 
-        // 创建工程师选择器（支持下拉选择或手动输入）
-        function createEngineerSelector(engineerId, engineerName, rowId) {
-            const div = document.createElement('div');
-            div.className = 'engineer-selector';
-            div.innerHTML = `
-                <input type="text" class="engineer-input" placeholder="选择或输入工程师姓名" 
-                       value="${engineerName || ''}" data-engineer-id="${engineerId || ''}"
-                       onfocus="showEngineerDropdown('${rowId}')" 
-                       oninput="filterEngineers('${rowId}', this.value)">
-                <div class="engineer-dropdown" id="dropdown-${rowId}">
-                    ${allEngineers.map(e => `<div class="engineer-option" data-id="${e.id}" data-name="${e.name}" onclick="selectEngineer('${rowId}', '${e.id}', '${e.name}')">${e.name}</div>`).join('')}
-                </div>
-            `;
-            return div;
-        }
-
-        function showEngineerDropdown(rowId) {
-            // 先关闭所有其他下拉
-            document.querySelectorAll('.engineer-dropdown').forEach(d => d.classList.remove('show'));
-            const dropdown = document.getElementById('dropdown-' + rowId);
-            if (dropdown) {
-                dropdown.classList.add('show');
-                // 重置显示所有选项
-                dropdown.querySelectorAll('.engineer-option').forEach(opt => opt.style.display = 'block');
-            }
-        }
-
-        function filterEngineers(rowId, value) {
-            const dropdown = document.getElementById('dropdown-' + rowId);
-            if (!dropdown) return;
-            const lowerValue = value.toLowerCase();
-            dropdown.querySelectorAll('.engineer-option').forEach(opt => {
-                const name = opt.dataset.name.toLowerCase();
-                opt.style.display = name.includes(lowerValue) ? 'block' : 'none';
-            });
-            dropdown.classList.add('show');
-        }
-
-        function selectEngineer(rowId, id, name) {
-            const row = document.getElementById(rowId);
-            if (row) {
-                const input = row.querySelector('.engineer-input');
-                if (input) {
-                    input.value = name;
-                    input.dataset.engineerId = id;
-                }
-            }
-            document.querySelectorAll('.engineer-dropdown').forEach(d => d.classList.remove('show'));
-        }
-
-        // 点击其他地方关闭下拉
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.engineer-selector')) {
-                document.querySelectorAll('.engineer-dropdown').forEach(d => d.classList.remove('show'));
-            }
-        });
-
-        function addPresalesAllocation(engineerId = '', engineerName = '', contribution = '', pct = 0) {
-            const rowId = 'presales-row-' + Date.now() + Math.random().toString(36).substr(2, 5);
+        function addPresalesAllocation(eid = '', role = '售前工程师', pct = 0) {
+            const opts = allEngineers.map(e => '<option value="' + e.id + '" ' + (e.id === eid ? 'selected' : '') + '>' + (e.displayName || e.fullName || e.email) + '</option>').join('');
             const row = document.createElement('tr');
-            row.id = rowId;
-            
-            const selectorCell = document.createElement('td');
-            selectorCell.appendChild(createEngineerSelector(engineerId, engineerName, rowId));
-            
-            row.appendChild(selectorCell);
-            row.innerHTML += `
-                <td><input type="text" class="contribution-input" value="${contribution}" placeholder="如：方案设计、技术支持"></td>
-                <td><input type="number" class="percentage-input" value="${pct}" min="0" max="100" onchange="updatePercentageTotal('presales')"></td>
-                <td><button type="button" class="remove-btn" onclick="document.getElementById('${rowId}').remove();updatePercentageTotal('presales')">删除</button></td>
-            `;
+            row.innerHTML = '<td><select class="form-select engineer-select" style="width:100%"><option value="">选择</option>' + opts + '</select></td>' +
+                '<td><select class="form-select role-select" style="width:100%"><option value="售前工程师"' + (role==='售前工程师'?' selected':'') + '>售前工程师</option><option value="技术顾问"' + (role==='技术顾问'?' selected':'') + '>技术顾问</option><option value="方案经理"' + (role==='方案经理'?' selected':'') + '>方案经理</option><option value="协助人员"' + (role==='协助人员'?' selected':'') + '>协助人员</option></select></td>' +
+                '<td><input type="number" class="percentage-input" value="' + pct + '" min="0" max="100" onchange="updatePercentageTotal(\'presales\')"></td>' +
+                '<td><button type="button" class="remove-btn" onclick="this.closest(\'tr\').remove();updatePercentageTotal(\'presales\')">删除</button></td>';
             document.getElementById('presales-allocation-body').appendChild(row);
             updatePercentageTotal('presales');
         }
 
-        function addPostsalesAllocation(engineerId = '', engineerName = '', contribution = '', pct = 0) {
-            const rowId = 'postsales-row-' + Date.now() + Math.random().toString(36).substr(2, 5);
+        function addPostsalesAllocation(eid = '', role = '实施工程师', pct = 0) {
+            const opts = allEngineers.map(e => '<option value="' + e.id + '" ' + (e.id === eid ? 'selected' : '') + '>' + (e.displayName || e.fullName || e.email) + '</option>').join('');
             const row = document.createElement('tr');
-            row.id = rowId;
-            
-            const selectorCell = document.createElement('td');
-            selectorCell.appendChild(createEngineerSelector(engineerId, engineerName, rowId));
-            
-            row.appendChild(selectorCell);
-            row.innerHTML += `
-                <td><input type="text" class="contribution-input" value="${contribution}" placeholder="如：现场实施、远程调试"></td>
-                <td><input type="number" class="percentage-input" value="${pct}" min="0" max="100" onchange="updatePercentageTotal('postsales')"></td>
-                <td><button type="button" class="remove-btn" onclick="document.getElementById('${rowId}').remove();updatePercentageTotal('postsales')">删除</button></td>
-            `;
+            row.innerHTML = '<td><select class="form-select engineer-select" style="width:100%"><option value="">选择</option>' + opts + '</select></td>' +
+                '<td><select class="form-select role-select" style="width:100%"><option value="实施工程师"' + (role==='实施工程师'?' selected':'') + '>实施工程师</option><option value="项目经理"' + (role==='项目经理'?' selected':'') + '>项目经理</option><option value="技术支持"' + (role==='技术支持'?' selected':'') + '>技术支持</option><option value="协助人员"' + (role==='协助人员'?' selected':'') + '>协助人员</option></select></td>' +
+                '<td><input type="number" class="percentage-input" value="' + pct + '" min="0" max="100" onchange="updatePercentageTotal(\'postsales\')"></td>' +
+                '<td><button type="button" class="remove-btn" onclick="this.closest(\'tr\').remove();updatePercentageTotal(\'postsales\')">删除</button></td>';
             document.getElementById('postsales-allocation-body').appendChild(row);
             updatePercentageTotal('postsales');
         }
 
         function convertToPostsales() {
-            if (!confirm('确定转换为售后项目？\n\n• 项目类型将变为"售后项目"\n• 售前业绩数据将被保留')) return;
+            if (!confirm('确定转换为售后项目？\n\n• 项目类型将变为"售后项目"\n• 售前业绩数据将被保留\n• 可由本人或其他工程师继续交付实施')) return;
             document.getElementById('project-type').value = '售后项目';
             onProjectTypeChange();
-            alert('已转换为售后项目，请设置报竣信息后保存。');
+            alert('已转换为售后项目，请设置售后信息后保存。');
         }
 
         function collectPerformanceData() {
             const t = document.getElementById('project-type').value, data = {};
             if (t === '售前项目') {
+                data.bidWon = document.getElementById('tag-bid-won')?.checked || false;
                 data.contractSigned = document.getElementById('tag-contract-signed')?.checked || false;
+                data.bidWonDate = document.getElementById('bid-won-date')?.value || '';
                 data.contractSignedDate = document.getElementById('contract-signed-date')?.value || '';
                 data.actualContractAmount = parseFloat(document.getElementById('actual-contract-amount')?.value) || 0;
                 data.actualContractCurrency = document.getElementById('actual-contract-currency')?.value || 'GBP';
                 data.presalesAllocation = [];
                 document.querySelectorAll('#presales-allocation-body tr').forEach(r => {
-                    const input = r.querySelector('.engineer-input');
-                    const engineerId = input?.dataset?.engineerId || '';
-                    const engineerName = input?.value || '';
-                    const contribution = r.querySelector('.contribution-input')?.value || '';
-                    const pct = parseFloat(r.querySelector('.percentage-input')?.value) || 0;
-                    if (engineerName && pct > 0) {
-                        data.presalesAllocation.push({ engineerId, engineerName, contribution, percentage: pct });
-                    }
+                    const eid = r.querySelector('.engineer-select')?.value, role = r.querySelector('.role-select')?.value, pct = parseFloat(r.querySelector('.percentage-input')?.value) || 0;
+                    if (eid && pct > 0) data.presalesAllocation.push({engineerId: eid, role, percentage: pct});
                 });
             } else if (t === '售后项目') {
+                data.accepted = document.getElementById('tag-accepted')?.checked || false;
                 data.reported = document.getElementById('tag-reported')?.checked || false;
+                data.acceptanceDate = document.getElementById('acceptance-date')?.value || '';
                 data.completionReportDate = document.getElementById('completion-report-date')?.value || '';
                 data.actualSettlementAmount = parseFloat(document.getElementById('actual-settlement-amount')?.value) || 0;
                 data.actualSettlementCurrency = document.getElementById('actual-settlement-currency')?.value || 'GBP';
                 data.postsalesAllocation = [];
                 document.querySelectorAll('#postsales-allocation-body tr').forEach(r => {
-                    const input = r.querySelector('.engineer-input');
-                    const engineerId = input?.dataset?.engineerId || '';
-                    const engineerName = input?.value || '';
-                    const contribution = r.querySelector('.contribution-input')?.value || '';
-                    const pct = parseFloat(r.querySelector('.percentage-input')?.value) || 0;
-                    if (engineerName && pct > 0) {
-                        data.postsalesAllocation.push({ engineerId, engineerName, contribution, percentage: pct });
-                    }
+                    const eid = r.querySelector('.engineer-select')?.value, role = r.querySelector('.role-select')?.value, pct = parseFloat(r.querySelector('.percentage-input')?.value) || 0;
+                    if (eid && pct > 0) data.postsalesAllocation.push({engineerId: eid, role, percentage: pct});
                 });
                 // 保留原售前数据
                 if (projectData.performanceData) {
-                    ['contractSigned','contractSignedDate','actualContractAmount','actualContractCurrency','presalesAllocation'].forEach(k => {
+                    ['bidWon','contractSigned','bidWonDate','contractSignedDate','actualContractAmount','actualContractCurrency','presalesAllocation'].forEach(k => {
                         if (projectData.performanceData[k] !== undefined) data[k] = projectData.performanceData[k];
                     });
                 }
