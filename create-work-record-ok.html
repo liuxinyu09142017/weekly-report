@@ -1082,167 +1082,6 @@
             }
         }
         
-        // ========== 客户名称别名映射 ==========
-        const customerAliases = {
-            // ===== 中国银行 (Bank of China) =====
-            '中行': '中国银行',
-            '中银': '中国银行',
-            'boc': '中国银行',
-            'bankofchina': '中国银行',
-            'bank of china': '中国银行',
-            
-            // ===== 中国工商银行 (ICBC) =====
-            '工行': '中国工商银行',
-            '工商银行': '中国工商银行',
-            'icbc': '中国工商银行',
-            
-            // ===== 中国农业银行 (ABC) =====
-            '农行': '中国农业银行',
-            '农业银行': '中国农业银行',
-            'abc': '中国农业银行',
-            
-            // ===== 中国建设银行 (CCB) =====
-            '建行': '中国建设银行',
-            '建设银行': '中国建设银行',
-            'ccb': '中国建设银行',
-            
-            // ===== 交通银行 (BOCOM) =====
-            '交行': '交通银行',
-            '交银': '交通银行',
-            'bocom': '交通银行',
-            
-            // ===== 招商银行 (CMB) =====
-            '招行': '招商银行',
-            'cmb': '招商银行',
-            
-            // ===== 中信银行 (CITIC) =====
-            '中信': '中信银行',
-            'citic': '中信银行',
-            
-            // ===== 光大银行 (CEB) =====
-            '光大': '光大银行',
-            '中国光大银行': '光大银行',
-            'ceb': '光大银行',
-            
-            // ===== 浦发银行 (SPDB) =====
-            '浦发': '浦发银行',
-            '上海浦东发展银行': '浦发银行',
-            'spdb': '浦发银行',
-            
-            // ===== 兴业银行 (CIB) =====
-            '兴业': '兴业银行',
-            'cib': '兴业银行',
-            
-            // ===== 民生银行 (CMBC) =====
-            '民生': '民生银行',
-            '中国民生银行': '民生银行',
-            'cmbc': '民生银行',
-            
-            // ===== 华夏银行 =====
-            '华夏': '华夏银行',
-            'hxb': '华夏银行',
-            
-            // ===== 平安银行 =====
-            '平安': '平安银行',
-            'pab': '平安银行',
-            
-            // ===== 邮储银行 =====
-            '邮储': '邮储银行',
-            '邮政储蓄': '邮储银行',
-            'psbc': '邮储银行',
-            
-            // ===== 外资银行 =====
-            '渣打': '渣打银行',
-            'scb': '渣打银行',
-            '汇丰': '汇丰银行',
-            'hsbc': '汇丰银行',
-            '花旗': '花旗银行',
-            'citi': '花旗银行',
-            
-            // ===== 运营商 =====
-            '移动': '中国移动',
-            'chinamobile': '中国移动',
-            '联通': '中国联通',
-            'chinaunicom': '中国联通',
-            '电信': '中国电信',
-            'chinatelecom': '中国电信',
-        };
-
-        // 项目名称关键词映射
-        const projectKeywords = {
-            '电话': ['ip电话', '电话系统', 'voip', '语音', '话机', 'cucm', 'avaya', 'ipc', '交易电话', 'turret'],
-            '网络': ['网络升级', '网络改造', '交换机', '路由器', 'lan', 'wan', 'switch', 'router'],
-            '视频': ['视频会议', 'vc', '会议系统', 'webex', 'zoom', 'teams', 'polycom'],
-            '安全': ['防火墙', '安全', 'firewall', 'ips', 'ids', 'waf', 'vpn', 'ise'],
-            '数据中心': ['机房', '数据中心', 'dc', 'idc', '机柜'],
-            '无线': ['wifi', 'wlan', '无线', 'ap', 'wireless'],
-            '服务器': ['服务器', 'server', '虚拟化', 'vmware', 'esxi'],
-        };
-
-        // 获取客户的标准名称
-        function getCanonicalCustomerName(name) {
-            if (!name) return '';
-            const normalized = normalizeText(name);
-            
-            for (const [alias, canonical] of Object.entries(customerAliases)) {
-                if (normalized === normalizeText(alias) || normalized.includes(normalizeText(alias))) {
-                    return canonical;
-                }
-            }
-            
-            return name;
-        }
-
-        // 检查两个客户名是否匹配
-        function isCustomerMatch(name1, name2) {
-            if (!name1 || !name2) return false;
-            
-            const canonical1 = getCanonicalCustomerName(name1);
-            const canonical2 = getCanonicalCustomerName(name2);
-            
-            const norm1 = normalizeText(canonical1);
-            const norm2 = normalizeText(canonical2);
-            
-            // 完全匹配
-            if (norm1 === norm2) return true;
-            
-            // 包含匹配
-            if (norm1.includes(norm2) || norm2.includes(norm1)) return true;
-            
-            // 核心名称匹配（去除分行后缀）
-            const core1 = norm1.replace(/(分行|支行|总行|分公司|子公司|办事处|代表处).*$/, '');
-            const core2 = norm2.replace(/(分行|支行|总行|分公司|子公司|办事处|代表处).*$/, '');
-            
-            if (core1 && core2 && (core1 === core2 || core1.includes(core2) || core2.includes(core1))) {
-                return true;
-            }
-            
-            return false;
-        }
-
-        // 检查两个项目名是否相似
-        function isProjectSimilar(name1, name2) {
-            if (!name1 || !name2) return false;
-            
-            const norm1 = normalizeText(name1);
-            const norm2 = normalizeText(name2);
-            
-            // 完全匹配
-            if (norm1 === norm2) return true;
-            
-            // 包含匹配
-            if (norm1.includes(norm2) || norm2.includes(norm1)) return true;
-            
-            // 关键词匹配
-            for (const [category, keywords] of Object.entries(projectKeywords)) {
-                const match1 = keywords.some(kw => norm1.includes(normalizeText(kw)));
-                const match2 = keywords.some(kw => norm2.includes(normalizeText(kw)));
-                if (match1 && match2) return true;
-            }
-            
-            return false;
-        }
-        
         // 文本标准化（用于模糊匹配）
         function normalizeText(text) {
             if (!text) return '';
@@ -1284,31 +1123,21 @@
         // 执行项目搜索
         function performProjectSearch(query) {
             const normalizedQuery = normalizeText(query);
-            const canonicalQuery = getCanonicalCustomerName(query);  // 也尝试客户名别名匹配
             const resultsDiv = document.getElementById('search-results');
             
             // 显示加载中
             resultsDiv.innerHTML = '<div class="search-loading">搜索中...</div>';
             resultsDiv.classList.add('show');
             
-            // 模糊匹配 - 使用智能匹配
+            // 模糊匹配
             const results = allUserProjects.filter(project => {
                 const normalizedName = normalizeText(project.projectName);
                 const normalizedCustomer = normalizeText(project.customerName);
                 
-                // 项目名称匹配
-                if (normalizedName.includes(normalizedQuery)) return true;
-                if (project.projectName && project.projectName.toLowerCase().includes(query.toLowerCase())) return true;
-                
-                // 客户名称匹配（包括别名）
-                if (normalizedCustomer.includes(normalizedQuery)) return true;
-                if (isCustomerMatch(project.customerName, query)) return true;
-                if (isCustomerMatch(project.customerName, canonicalQuery)) return true;
-                
-                // 项目名称相似匹配
-                if (isProjectSimilar(project.projectName, query)) return true;
-                
-                return false;
+                return normalizedName.includes(normalizedQuery) || 
+                       normalizedCustomer.includes(normalizedQuery) ||
+                       (project.projectName && project.projectName.toLowerCase().includes(query.toLowerCase())) ||
+                       (project.customerName && project.customerName.toLowerCase().includes(query.toLowerCase()));
             });
             
             // 按最近更新排序，限制结果数量
@@ -1510,15 +1339,30 @@
         
         // 查找相似项目（用于保存前检测）
         function findSimilarProject(projectName, customerName) {
+            const normalizedName = normalizeText(projectName);
+            const normalizedCustomer = normalizeText(customerName);
+            
             for (const project of allUserProjects) {
-                // 使用智能客户匹配
-                if (!isCustomerMatch(project.customerName, customerName)) {
-                    continue;
+                const pName = normalizeText(project.projectName);
+                const pCustomer = normalizeText(project.customerName);
+                
+                // 项目名称完全匹配（标准化后）
+                if (pName === normalizedName) {
+                    // 客户名称也匹配或其中一个为空
+                    if (pCustomer === normalizedCustomer || 
+                        (!pCustomer && !normalizedCustomer) ||
+                        (pCustomer && normalizedCustomer && pCustomer === normalizedCustomer)) {
+                        return project;
+                    }
                 }
                 
-                // 使用智能项目匹配
-                if (isProjectSimilar(project.projectName, projectName)) {
-                    return project;
+                // 项目名称高度相似（包含关系）
+                if (normalizedName.length > 5 && pName.length > 5) {
+                    if (pName.includes(normalizedName) || normalizedName.includes(pName)) {
+                        if (pCustomer === normalizedCustomer) {
+                            return project;
+                        }
+                    }
                 }
             }
             
