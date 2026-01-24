@@ -55,11 +55,11 @@
         .welcome-card p { color: #666; font-size: 14px; }
         .week-info { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; margin-top: 12px; }
         
-        /* 统计卡片 - 优化版 4卡片布局 */
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        /* 统计卡片 - 优化版 */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: white; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s; overflow: hidden; }
         .stat-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .stat-card-header { padding: 20px 20px 15px; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f0f0f0; }
+        .stat-card-header { padding: 20px 20px 15px; display: flex; justify-content: space-between; align-items: flex-start; }
         .stat-main { display: flex; align-items: center; gap: 15px; }
         .stat-icon { font-size: 36px; }
         .stat-value { font-size: 32px; font-weight: bold; color: #667eea; }
@@ -67,50 +67,27 @@
         .stat-badge { background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         
         /* 卡片详情区域 */
-        .stat-details { padding: 15px 20px 20px; }
-        .detail-title { font-size: 12px; color: #999; margin-bottom: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        /* 横向条形图样式 */
-        .bar-chart { display: flex; flex-direction: column; gap: 10px; }
-        .bar-item { display: flex; align-items: center; gap: 10px; }
-        .bar-label { width: 120px; font-size: 12px; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; }
-        .bar-container { flex: 1; height: 20px; background: #f3f4f6; border-radius: 10px; overflow: hidden; position: relative; }
-        .bar-fill { height: 100%; border-radius: 10px; transition: width 0.8s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; min-width: 40px; }
-        .bar-fill.purple { background: linear-gradient(90deg, #667eea, #764ba2); }
-        .bar-fill.green { background: linear-gradient(90deg, #10b981, #34d399); }
-        .bar-fill.orange { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-        .bar-fill.blue { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-        .bar-fill.pink { background: linear-gradient(90deg, #ec4899, #f472b6); }
-        .bar-value { font-size: 11px; color: white; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        
-        /* 环形图样式 */
-        .donut-chart-container { display: flex; align-items: center; gap: 20px; }
-        .donut-chart { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
-        .donut-chart svg { transform: rotate(-90deg); }
-        .donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-        .donut-center-value { font-size: 24px; font-weight: bold; color: #333; }
-        .donut-center-label { font-size: 11px; color: #666; }
-        .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-        .legend-color { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-        .legend-text { flex: 1; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .legend-value { color: #667eea; font-weight: 600; white-space: nowrap; }
-        
-        /* 客户标签云 */
-        .customer-cloud { display: flex; flex-wrap: wrap; gap: 8px; max-height: 180px; overflow-y: auto; }
-        .customer-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; transition: all 0.2s; }
-        .customer-tag:nth-child(6n+1) { background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #6d28d9; }
-        .customer-tag:nth-child(6n+2) { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #1d4ed8; }
-        .customer-tag:nth-child(6n+3) { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #047857; }
-        .customer-tag:nth-child(6n+4) { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #b45309; }
-        .customer-tag:nth-child(6n+5) { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #be185d; }
-        .customer-tag:nth-child(6n+6) { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #4338ca; }
-        .customer-tag:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .customer-tag .tag-hours { font-weight: 700; }
+        .stat-details { padding: 0 20px 20px; }
+        .detail-title { font-size: 12px; color: #999; margin-bottom: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-list { max-height: 150px; overflow-y: auto; }
+        .detail-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .detail-item:last-child { border-bottom: none; }
+        .detail-name { font-size: 13px; color: #333; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px; }
+        .detail-value { font-size: 13px; font-weight: 600; color: #667eea; white-space: nowrap; }
+        .detail-bar { flex: 0 0 80px; height: 6px; background: #e5e7eb; border-radius: 3px; margin-left: 10px; overflow: hidden; }
+        .detail-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+        .detail-bar-fill.purple { background: linear-gradient(90deg, #667eea, #764ba2); }
+        .detail-bar-fill.green { background: linear-gradient(90deg, #10b981, #059669); }
+        .detail-bar-fill.orange { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .detail-bar-fill.blue { background: linear-gradient(90deg, #3b82f6, #2563eb); }
         
         /* 空状态 */
-        .empty-detail { text-align: center; padding: 30px 0; color: #999; font-size: 13px; }
-        .empty-detail .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+        .empty-detail { text-align: center; padding: 20px 0; color: #999; font-size: 13px; }
+        
+        /* 客户列表特殊样式 */
+        .customer-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .customer-tag { background: #f3f4f6; color: #374151; padding: 5px 12px; border-radius: 15px; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+        .customer-tag .hours { color: #667eea; font-weight: 600; }
         
         /* 快速操作 */
         .actions-section { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
@@ -379,8 +356,7 @@
                 let overtimeHours = 0;
                 const customerHours = {};
                 const projectHours = {};
-                const projectNormalHours = {};
-                const projectOvertimeHours = {};
+                const engineerHours = {};
                 let weekRecordCount = 0;
                 
                 recordsSnapshot.docs.forEach(doc => {
@@ -391,12 +367,9 @@
                     
                     weekRecordCount++;
                     const hours = data.totalWorkingHours || data.workHours || 0;
-                    const normal = data.normalWorkingHours || 0;
-                    const overtime = data.overtimeHours || 0;
-                    
                     totalHours += hours;
-                    normalHours += normal;
-                    overtimeHours += overtime;
+                    normalHours += data.normalWorkingHours || 0;
+                    overtimeHours += data.overtimeHours || 0;
                     
                     // 按客户统计
                     const customer = data.customerName || '未知客户';
@@ -405,22 +378,24 @@
                     // 按项目统计
                     const project = data.projectName || '未知项目';
                     projectHours[project] = (projectHours[project] || 0) + hours;
-                    projectNormalHours[project] = (projectNormalHours[project] || 0) + normal;
-                    projectOvertimeHours[project] = (projectOvertimeHours[project] || 0) + overtime;
+                    
+                    // 按工程师统计
+                    const engineer = data.userName || '未知';
+                    engineerHours[engineer] = (engineerHours[engineer] || 0) + hours;
                 });
                 
-                // 排序
+                // 排序并取前5
                 const sortedCustomers = Object.entries(customerHours).sort((a, b) => b[1] - a[1]);
                 const sortedProjects = Object.entries(projectHours).sort((a, b) => b[1] - a[1]);
-                const sortedNormalProjects = Object.entries(projectNormalHours).filter(([,h]) => h > 0).sort((a, b) => b[1] - a[1]);
-                const sortedOvertimeProjects = Object.entries(projectOvertimeHours).filter(([,h]) => h > 0).sort((a, b) => b[1] - a[1]);
+                const sortedEngineers = Object.entries(engineerHours).sort((a, b) => b[1] - a[1]);
                 
                 const statsGrid = document.getElementById('stats-grid');
                 statsGrid.innerHTML = `
-                    ${createRecordsCard(weekRecordCount, sortedProjects, totalHours)}
+                    ${createStatCard('📋', weekRecordCount, '本周工作记录', 'purple', sortedProjects, totalHours, '项目工时分布')}
+                    ${createStatCard('⏰', totalHours.toFixed(1), '本周总工时', 'blue', sortedEngineers, totalHours, '工程师工时排名')}
+                    ${createStatCard('☀️', normalHours.toFixed(1), '正常工时', 'green', null, null, null)}
+                    ${createStatCard('🌙', overtimeHours.toFixed(1), '加班工时', 'orange', null, null, null)}
                     ${createCustomerCard(sortedCustomers, totalHours)}
-                    ${createHoursDonutCard('☀️', normalHours.toFixed(1), '正常工时', sortedNormalProjects, normalHours, 'normal')}
-                    ${createHoursDonutCard('🌙', overtimeHours.toFixed(1), '加班工时', sortedOvertimeProjects, overtimeHours, 'overtime')}
                 `;
             } catch (error) {
                 console.error('加载管理员统计失败:', error);
@@ -452,8 +427,6 @@
                 let overtimeHours = 0;
                 const customerHours = {};
                 const projectHours = {};
-                const projectNormalHours = {};
-                const projectOvertimeHours = {};
                 let weekRecordCount = 0;
                 
                 allRecords.forEach(doc => {
@@ -464,33 +437,26 @@
                     
                     weekRecordCount++;
                     const hours = data.totalWorkingHours || data.workHours || 0;
-                    const normal = data.normalWorkingHours || 0;
-                    const overtime = data.overtimeHours || 0;
-                    
                     totalHours += hours;
-                    normalHours += normal;
-                    overtimeHours += overtime;
+                    normalHours += data.normalWorkingHours || 0;
+                    overtimeHours += data.overtimeHours || 0;
                     
                     const customer = data.customerName || '未知客户';
                     customerHours[customer] = (customerHours[customer] || 0) + hours;
                     
                     const project = data.projectName || '未知项目';
                     projectHours[project] = (projectHours[project] || 0) + hours;
-                    projectNormalHours[project] = (projectNormalHours[project] || 0) + normal;
-                    projectOvertimeHours[project] = (projectOvertimeHours[project] || 0) + overtime;
                 });
                 
                 const sortedCustomers = Object.entries(customerHours).sort((a, b) => b[1] - a[1]);
                 const sortedProjects = Object.entries(projectHours).sort((a, b) => b[1] - a[1]);
-                const sortedNormalProjects = Object.entries(projectNormalHours).filter(([,h]) => h > 0).sort((a, b) => b[1] - a[1]);
-                const sortedOvertimeProjects = Object.entries(projectOvertimeHours).filter(([,h]) => h > 0).sort((a, b) => b[1] - a[1]);
                 
                 const statsGrid = document.getElementById('stats-grid');
                 statsGrid.innerHTML = `
-                    ${createRecordsCard(weekRecordCount, sortedProjects, totalHours)}
+                    ${createStatCard('👥', teamMembers.size, '团队成员', 'purple', null, null, null)}
+                    ${createStatCard('📋', weekRecordCount, '本周工作记录', 'blue', sortedProjects, totalHours, '项目工时分布')}
+                    ${createStatCard('⏰', totalHours.toFixed(1), '团队总工时', 'green', null, null, null)}
                     ${createCustomerCard(sortedCustomers, totalHours)}
-                    ${createHoursDonutCard('☀️', normalHours.toFixed(1), '正常工时', sortedNormalProjects, normalHours, 'normal')}
-                    ${createHoursDonutCard('🌙', overtimeHours.toFixed(1), '加班工时', sortedOvertimeProjects, overtimeHours, 'overtime')}
                 `;
             } catch (error) {
                 console.error('加载团队统计失败:', error);
@@ -536,8 +502,6 @@
                 let overtimeHours = 0;
                 const customerHours = {};
                 const projectHours = {};
-                const projectNormalHours = {};
-                const projectOvertimeHours = {};
                 let weekRecordCount = 0;
                 
                 recordsSnapshot.docs.forEach(doc => {
@@ -548,93 +512,86 @@
                     
                     weekRecordCount++;
                     const hours = data.totalWorkingHours || data.workHours || 0;
-                    const normal = data.normalWorkingHours || 0;
-                    const overtime = data.overtimeHours || 0;
-                    
                     totalHours += hours;
-                    normalHours += normal;
-                    overtimeHours += overtime;
+                    normalHours += data.normalWorkingHours || 0;
+                    overtimeHours += data.overtimeHours || 0;
                     
                     const customer = data.customerName || '未知客户';
                     customerHours[customer] = (customerHours[customer] || 0) + hours;
                     
                     const project = data.projectName || '未知项目';
                     projectHours[project] = (projectHours[project] || 0) + hours;
-                    projectNormalHours[project] = (projectNormalHours[project] || 0) + normal;
-                    projectOvertimeHours[project] = (projectOvertimeHours[project] || 0) + overtime;
                 });
                 
                 const sortedCustomers = Object.entries(customerHours).sort((a, b) => b[1] - a[1]);
                 const sortedProjects = Object.entries(projectHours).sort((a, b) => b[1] - a[1]);
-                const sortedNormalProjects = Object.entries(projectNormalHours).filter(([,h]) => h > 0).sort((a, b) => b[1] - a[1]);
-                const sortedOvertimeProjects = Object.entries(projectOvertimeHours).filter(([,h]) => h > 0).sort((a, b) => b[1] - a[1]);
                 
                 const statsGrid = document.getElementById('stats-grid');
                 statsGrid.innerHTML = `
-                    ${createRecordsCard(weekRecordCount, sortedProjects, totalHours)}
+                    ${createStatCard('📋', weekRecordCount, '本周工作记录', 'purple', sortedProjects, totalHours, '项目工时分布')}
+                    ${createStatCard('⏰', totalHours.toFixed(1), '本周总工时', 'blue', null, null, null)}
+                    ${createStatCard('☀️', normalHours.toFixed(1), '正常工时', 'green', null, null, null)}
+                    ${createStatCard('🌙', overtimeHours.toFixed(1), '加班工时', 'orange', null, null, null)}
                     ${createCustomerCard(sortedCustomers, totalHours)}
-                    ${createHoursDonutCard('☀️', normalHours.toFixed(1), '正常工时', sortedNormalProjects, normalHours, 'normal')}
-                    ${createHoursDonutCard('🌙', overtimeHours.toFixed(1), '加班工时', sortedOvertimeProjects, overtimeHours, 'overtime')}
                 `;
             } catch (error) {
                 console.error('加载个人统计失败:', error);
             }
         }
 
-        // 创建工作记录卡片（带横向条形图）
-        function createRecordsCard(count, projects, total) {
-            let chartHtml = '';
-            if (projects.length > 0 && total > 0) {
-                const items = projects.slice(0, 5).map(([name, hours], idx) => {
+        // 创建统计卡片（带详情）
+        function createStatCard(icon, value, label, color, details, total, detailTitle) {
+            let detailsHtml = '';
+            if (details && details.length > 0 && total > 0) {
+                const items = details.slice(0, 5).map(([name, hours]) => {
                     const percent = ((hours / total) * 100).toFixed(0);
-                    const colors = ['purple', 'blue', 'green', 'orange', 'pink'];
                     return `
-                        <div class="bar-item">
-                            <span class="bar-label" title="${name}">${name}</span>
-                            <div class="bar-container">
-                                <div class="bar-fill ${colors[idx % 5]}" style="width: ${Math.max(percent, 15)}%">
-                                    <span class="bar-value">${hours.toFixed(1)}h</span>
-                                </div>
+                        <div class="detail-item">
+                            <span class="detail-name" title="${name}">${name}</span>
+                            <span class="detail-value">${hours.toFixed(1)}h</span>
+                            <div class="detail-bar">
+                                <div class="detail-bar-fill ${color}" style="width: ${percent}%"></div>
                             </div>
                         </div>
                     `;
                 }).join('');
-                chartHtml = `<div class="bar-chart">${items}</div>`;
-            } else {
-                chartHtml = '<div class="empty-detail"><div class="empty-icon">📋</div>本周暂无工作记录</div>';
+                
+                detailsHtml = `
+                    <div class="stat-details">
+                        <div class="detail-title">${detailTitle}</div>
+                        <div class="detail-list">${items}</div>
+                    </div>
+                `;
             }
             
             return `
                 <div class="stat-card">
                     <div class="stat-card-header">
                         <div class="stat-main">
-                            <div class="stat-icon">📋</div>
+                            <div class="stat-icon">${icon}</div>
                             <div>
-                                <div class="stat-value">${count}</div>
-                                <div class="stat-label">本周工作记录</div>
+                                <div class="stat-value">${value}</div>
+                                <div class="stat-label">${label}</div>
                             </div>
                         </div>
-                        <span class="stat-badge">本周</span>
+                        ${details ? `<span class="stat-badge">本周</span>` : ''}
                     </div>
-                    <div class="stat-details">
-                        <div class="detail-title">项目工时分布</div>
-                        ${chartHtml}
-                    </div>
+                    ${detailsHtml}
                 </div>
             `;
         }
 
-        // 创建客户卡片（标签云）
+        // 创建客户卡片（特殊样式）
         function createCustomerCard(customers, totalHours) {
             let content = '';
             if (customers.length === 0) {
-                content = '<div class="empty-detail"><div class="empty-icon">🏢</div>本周暂无客户记录</div>';
+                content = '<div class="empty-detail">本周暂无工作记录</div>';
             } else {
                 const tags = customers.map(([name, hours]) => {
                     const percent = totalHours > 0 ? ((hours / totalHours) * 100).toFixed(0) : 0;
-                    return `<span class="customer-tag">${name} <span class="tag-hours">${hours.toFixed(1)}h (${percent}%)</span></span>`;
+                    return `<span class="customer-tag">${name} <span class="hours">${hours.toFixed(1)}h (${percent}%)</span></span>`;
                 }).join('');
-                content = `<div class="customer-cloud">${tags}</div>`;
+                content = `<div class="customer-list">${tags}</div>`;
             }
             
             return `
@@ -652,79 +609,6 @@
                     <div class="stat-details">
                         <div class="detail-title">客户及工时明细</div>
                         ${content}
-                    </div>
-                </div>
-            `;
-        }
-
-        // 创建工时环形图卡片（正常/加班工时）
-        function createHoursDonutCard(icon, value, label, projects, total, colorType) {
-            const colors = colorType === 'normal' 
-                ? ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5']
-                : ['#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7'];
-            
-            let chartHtml = '';
-            if (projects.length > 0 && total > 0) {
-                // 生成环形图SVG
-                const radius = 45;
-                const circumference = 2 * Math.PI * radius;
-                let currentOffset = 0;
-                
-                const segments = projects.slice(0, 5).map(([name, hours], idx) => {
-                    const percent = (hours / total) * 100;
-                    const dashLength = (percent / 100) * circumference;
-                    const dashOffset = currentOffset;
-                    currentOffset += dashLength;
-                    
-                    return `<circle cx="60" cy="60" r="${radius}" fill="none" stroke="${colors[idx]}" 
-                            stroke-width="12" stroke-dasharray="${dashLength} ${circumference}" 
-                            stroke-dashoffset="-${dashOffset}" />`;
-                }).join('');
-                
-                const legendItems = projects.slice(0, 5).map(([name, hours], idx) => {
-                    const percent = ((hours / total) * 100).toFixed(0);
-                    return `
-                        <div class="legend-item">
-                            <span class="legend-color" style="background: ${colors[idx]}"></span>
-                            <span class="legend-text" title="${name}">${name}</span>
-                            <span class="legend-value">${hours.toFixed(1)}h</span>
-                        </div>
-                    `;
-                }).join('');
-                
-                chartHtml = `
-                    <div class="donut-chart-container">
-                        <div class="donut-chart">
-                            <svg width="120" height="120" viewBox="0 0 120 120">
-                                <circle cx="60" cy="60" r="${radius}" fill="none" stroke="#f3f4f6" stroke-width="12" />
-                                ${segments}
-                            </svg>
-                            <div class="donut-center">
-                                <div class="donut-center-value">${value}</div>
-                                <div class="donut-center-label">小时</div>
-                            </div>
-                        </div>
-                        <div class="donut-legend">${legendItems}</div>
-                    </div>
-                `;
-            } else {
-                chartHtml = `<div class="empty-detail"><div class="empty-icon">${icon}</div>本周暂无${label}记录</div>`;
-            }
-            
-            return `
-                <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-main">
-                            <div class="stat-icon">${icon}</div>
-                            <div>
-                                <div class="stat-value">${value}</div>
-                                <div class="stat-label">${label}</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="stat-details">
-                        <div class="detail-title">项目${label}分布</div>
-                        ${chartHtml}
                     </div>
                 </div>
             `;
