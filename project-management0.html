@@ -548,9 +548,29 @@
                     if (!hasEngineer && !assigned.includes(engineerFilter) && !isCreator) return false;
                 }
                 
-                // 按项目自身的技术方向过滤
                 if (techDirectionFilter) {
-                    if (project.techDirection !== techDirectionFilter) return false;
+                    // 收集所有与项目相关的工程师ID
+                    const relatedEngineerIds = new Set();
+                    
+                    // 1. 业绩分配中的工程师
+                    const presalesAlloc = perf.presalesAllocation || [];
+                    const postsalesAlloc = perf.postsalesAllocation || [];
+                    [...presalesAlloc, ...postsalesAlloc].forEach(a => {
+                        if (a.engineerId) relatedEngineerIds.add(a.engineerId);
+                    });
+                    
+                    // 2. 指派的工程师
+                    (project.assignedEngineers || []).forEach(id => relatedEngineerIds.add(id));
+                    
+                    // 3. 项目创建者
+                    if (project.createdBy) relatedEngineerIds.add(project.createdBy);
+                    
+                    // 检查是否有任一相关工程师属于选定的技术方向
+                    const hasMatchingDirection = allEngineers.some(e => 
+                        relatedEngineerIds.has(e.id) && e.techDirection === techDirectionFilter
+                    );
+                    
+                    if (!hasMatchingDirection) return false;
                 }
                 
                 return true;

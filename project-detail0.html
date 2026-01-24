@@ -489,11 +489,6 @@
                         <span class="info-value" id="project-stage">-</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-icon">🔧</span>
-                        <span class="info-label">技术方向</span>
-                        <span class="info-value" id="project-tech-direction">-</span>
-                    </div>
-                    <div class="info-item">
                         <span class="info-icon">👤</span>
                         <span class="info-label">销售</span>
                         <span class="info-value" id="project-sales">-</span>
@@ -678,7 +673,6 @@
             document.getElementById('project-country').textContent = projectData.customerCountry || '-';
             document.getElementById('project-type').textContent = projectData.projectType;
             document.getElementById('project-stage').textContent = projectData.projectStage;
-            document.getElementById('project-tech-direction').textContent = projectData.techDirection || '-';
             document.getElementById('project-sales').textContent = projectData.salesPerson || '-';
             document.getElementById('project-amount').textContent = projectData.projectAmount 
                 ? `${projectData.projectAmount}K ${projectData.projectCurrency}`

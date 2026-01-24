@@ -840,18 +840,6 @@
                                    placeholder="负责的销售人员">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">技术方向</label>
-                            <select id="tech-direction" class="form-select">
-                                <option value="">请选择</option>
-                                <option value="网络">🌐 网络</option>
-                                <option value="系统">🖥️ 系统</option>
-                                <option value="能基">🏢 能基</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
                             <label class="form-label">项目金额（可选）</label>
                             <div style="display: flex; gap: 10px;">
                                 <input type="number" id="project-amount" class="form-input" 
@@ -863,9 +851,6 @@
                                     <option value="CNY">CNY</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <!-- 占位 -->
                         </div>
                     </div>
                 </div>
@@ -1541,7 +1526,6 @@
                 document.getElementById('project-stage').value = project.projectStage || '';
             }, 100);
             
-            document.getElementById('tech-direction').value = project.techDirection || '';
             document.getElementById('sales-person').value = project.salesPerson || '';
             document.getElementById('project-amount').value = project.projectAmount || '';
             document.getElementById('project-currency').value = project.projectCurrency || 'GBP';
@@ -1557,7 +1541,7 @@
             const fields = [
                 'customer-name', 'customer-industry', 'customer-country',
                 'project-name', 'project-type', 'project-stage',
-                'tech-direction', 'sales-person', 'project-amount', 'project-currency'
+                'sales-person', 'project-amount', 'project-currency'
             ];
             
             fields.forEach(id => {
@@ -1673,7 +1657,6 @@
                         document.getElementById('project-stage').value = project.projectStage || '';
                     }, 150);
                     
-                    document.getElementById('tech-direction').value = project.techDirection || '';
                     document.getElementById('sales-person').value = project.salesPerson || '';
                     document.getElementById('project-amount').value = project.projectAmount || '';
                     document.getElementById('project-currency').value = project.projectCurrency || 'GBP';
@@ -1835,7 +1818,6 @@
             updateProjectStages();
             document.getElementById('project-stage').value = matchedProject.projectStage;
             
-            document.getElementById('tech-direction').value = matchedProject.techDirection || '';
             document.getElementById('sales-person').value = matchedProject.salesPerson || '';
             document.getElementById('project-amount').value = matchedProject.projectAmount || '';
             document.getElementById('project-currency').value = matchedProject.projectCurrency || 'GBP';
@@ -1847,7 +1829,6 @@
             document.getElementById('project-name').disabled = true;
             document.getElementById('project-type').disabled = true;
             document.getElementById('project-stage').disabled = true;
-            document.getElementById('tech-direction').disabled = true;
             document.getElementById('sales-person').disabled = true;
             document.getElementById('project-amount').disabled = true;
             document.getElementById('project-currency').disabled = true;
@@ -1868,7 +1849,6 @@
             document.getElementById('project-name').disabled = false;
             document.getElementById('project-type').disabled = false;
             document.getElementById('project-stage').disabled = false;
-            document.getElementById('tech-direction').disabled = false;
             document.getElementById('sales-person').disabled = false;
             document.getElementById('project-amount').disabled = false;
             document.getElementById('project-currency').disabled = false;
@@ -2025,7 +2005,6 @@
                         projectType: document.getElementById('project-type').value,
                         projectStage: document.getElementById('project-stage').value,
                         status: '进行中',
-                        techDirection: document.getElementById('tech-direction').value,
                         salesPerson: document.getElementById('sales-person').value.trim(),
                         projectAmount: document.getElementById('project-amount').value ? 
                             parseFloat(document.getElementById('project-amount').value) : null,
