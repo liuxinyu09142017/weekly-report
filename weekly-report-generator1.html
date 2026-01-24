@@ -597,7 +597,7 @@
             let report = `${reportTitle}${userName}\n\n`;
             
             if (greeting) {
-                report += `${greeting}\n\n`;
+                report += `${greeting}\n`;
             }
             
             // 按项目分组
@@ -619,45 +619,41 @@
             projectsMap.forEach((project) => {
                 const { customerName, projectName, records } = project;
                 
-                // 项目标题
                 report += `${index}、${customerName}${projectName}\n`;
                 
-                // 合并工作内容 - 统一格式化
-                const allContents = [];
-                records.forEach(r => {
-                    if (r.workDescription && r.workDescription.trim()) {
-                        // 将每条记录的工作内容按换行拆分
-                        const lines = r.workDescription.trim().split('\n')
-                            .map(line => line.trim())
-                            .filter(line => line.length > 0);
-                        allContents.push(...lines);
-                    }
-                });
+                // 合并工作内容 - 优化格式
+                const contents = records
+                    .map(r => r.workDescription)
+                    .filter(c => c && c.trim());
                 
-                // 输出工作内容
-                if (allContents.length > 0) {
-                    report += `内容：${allContents.join('；')}\n`;
-                } else {
-                    report += `内容：NA\n`;
+                if (contents.length > 0) {
+                    report += `内容：`;
+                    if (contents.length === 1) {
+                        // 单条内容，直接显示
+                        report += `${formatContent(contents[0])}\n`;
+                    } else {
+                        // 多条内容，检查是否需要换行显示
+                        const totalLength = contents.join('').length;
+                        if (totalLength > 50 || contents.some(c => c.length > 30)) {
+                            // 内容较长，每条换行并加序号
+                            report += `\n`;
+                            contents.forEach((content, i) => {
+                                report += `  ${i + 1}. ${formatContent(content)}\n`;
+                            });
+                        } else {
+                            // 内容较短，用顿号连接
+                            report += `${contents.map(c => formatContent(c)).join('；')}\n`;
+                        }
+                    }
                 }
                 
                 // 项目规模（取第一条记录）
                 const firstRecord = records[0];
-                // 直接使用数据库中的金额值，不做任何计算
-                // 数据库存储的应该是以K为单位的数值，如 150 表示 150K
+                // 金额已经是K为单位存储，不需要再除以1000
+                // 金额为0、null、undefined都统一显示NA
                 const amount = firstRecord.projectAmount;
-                
-                // 检查金额是否有效（大于0且不是异常大的数值）
                 if (amount && amount > 0) {
-                    // 如果金额超过10000，可能是存储的原始值（如150000表示150K）
-                    // 需要除以1000转换
-                    let displayAmount = amount;
-                    if (amount >= 10000) {
-                        displayAmount = Math.round(amount / 1000);
-                    }
-                    
-                    const currency = firstRecord.projectCurrency || 'GBP';
-                    report += `规模：${displayAmount}K ${currency}`;
+                    report += `规模：${amount}K ${firstRecord.projectCurrency || 'GBP'}`;
                     
                     // 只有售后项目才显示技术方向
                     if (firstRecord.projectType === '售后项目' && firstRecord.technicalDirection) {
@@ -668,30 +664,36 @@
                     report += `规模：NA\n`;
                 }
                 
-                // 下一步工作计划
-                // 收集所有非空的计划，取最新的一条
+                // 下一步工作计划（优先使用最新的）- 优化格式
                 const plans = records
                     .map(r => r.nextWeekPlan)
                     .filter(p => p && p.trim());
                 
                 if (plans.length > 0) {
-                    // 使用最新的计划（最后一条）
-                    const latestPlan = plans[plans.length - 1].trim()
-                        .split('\n')
-                        .map(line => line.trim())
-                        .filter(line => line.length > 0)
-                        .join('；');
-                    report += `下一步工作计划：${latestPlan}\n`;
+                    const latestPlan = plans[plans.length - 1];
+                    report += `下一步工作计划：${formatContent(latestPlan)}\n`;
                 } else {
-                    // 没有填写下一步计划，显示NA
-                    report += `下一步工作计划：NA\n`;
+                    // 根据项目阶段生成默认计划
+                    report += `下一步工作计划：继续推进${firstRecord.projectStage || '项目'}\n`;
                 }
                 
                 report += `\n`;
                 index++;
             });
             
-            return report.trim();
+            return report;
+        }
+        
+        // 格式化内容文本，处理换行和标点
+        function formatContent(text) {
+            if (!text) return '';
+            // 去除首尾空白
+            text = text.trim();
+            // 将多个换行替换为单个换行
+            text = text.replace(/\n{2,}/g, '\n');
+            // 将换行替换为逗号（用于短内容合并时）
+            // 但保留原始换行用于多行显示
+            return text;
         }
 
         // 复制到剪贴板
