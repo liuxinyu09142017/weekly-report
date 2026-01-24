@@ -675,9 +675,9 @@
                 const perf = project.performanceData || {};
                 const showSigned = project.projectType === '售前项目' && perf.contractSigned;
                 const showReported = project.projectType === '售后项目' && perf.reported;
-                // 修复金额显示：金额已经是K为单位存储
+                // 修复金额显示：只有当金额字段不存在时才显示 -
                 const hasAmount = project.projectAmount !== undefined && project.projectAmount !== null && project.projectAmount !== '';
-                const amountDisplay = hasAmount ? project.projectAmount + 'K ' + (project.projectCurrency || 'GBP') : '-';
+                const amountDisplay = hasAmount ? (project.projectAmount/1000).toFixed(0) + 'K ' + (project.projectCurrency || 'GBP') : '-';
                 return `
                     <div class="project-card" onclick="viewProject('${project.id}')">
                         <div class="performance-badges">
@@ -716,9 +716,9 @@
             const listBody = document.getElementById('list-body');
             listBody.innerHTML = filteredProjects.map(project => {
                 const statusClass = { '规划中': 'status-planning', '进行中': 'status-active', '已完成': 'status-completed', '已暂停': 'status-paused' }[project.status] || 'status-planning';
-                // 修复金额显示：金额已经是K为单位存储
+                // 修复金额显示：只有当金额字段不存在时才显示 -
                 const hasAmount = project.projectAmount !== undefined && project.projectAmount !== null && project.projectAmount !== '';
-                const amount = hasAmount ? project.projectAmount + 'K ' + (project.projectCurrency || 'GBP') : '-';
+                const amount = hasAmount ? (project.projectAmount/1000).toFixed(0) + 'K ' + (project.projectCurrency || 'GBP') : '-';
                 const perf = project.performanceData || {};
                 const showSigned = project.projectType === '售前项目' && perf.contractSigned;
                 const showReported = project.projectType === '售后项目' && perf.reported;
