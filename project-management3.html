@@ -323,6 +323,8 @@
                                 <option value="网络">网络</option>
                                 <option value="系统">系统</option>
                                 <option value="能基">能基</option>
+                                <option value="安全">安全</option>
+                                <option value="应用">应用</option>
                             </select>
                         </div>
                     </div>
@@ -544,33 +546,15 @@
                     const allAlloc = [...presalesAlloc, ...postsalesAlloc];
                     const hasEngineer = allAlloc.some(a => a.engineerId === engineerFilter);
                     const assigned = project.assignedEngineers || [];
-                    const isCreator = project.createdBy === engineerFilter;
-                    if (!hasEngineer && !assigned.includes(engineerFilter) && !isCreator) return false;
+                    if (!hasEngineer && !assigned.includes(engineerFilter)) return false;
                 }
                 
                 if (techDirectionFilter) {
-                    // 收集所有与项目相关的工程师ID
-                    const relatedEngineerIds = new Set();
-                    
-                    // 1. 业绩分配中的工程师
                     const presalesAlloc = perf.presalesAllocation || [];
                     const postsalesAlloc = perf.postsalesAllocation || [];
-                    [...presalesAlloc, ...postsalesAlloc].forEach(a => {
-                        if (a.engineerId) relatedEngineerIds.add(a.engineerId);
-                    });
-                    
-                    // 2. 指派的工程师
-                    (project.assignedEngineers || []).forEach(id => relatedEngineerIds.add(id));
-                    
-                    // 3. 项目创建者
-                    if (project.createdBy) relatedEngineerIds.add(project.createdBy);
-                    
-                    // 检查是否有任一相关工程师属于选定的技术方向
-                    const hasMatchingDirection = allEngineers.some(e => 
-                        relatedEngineerIds.has(e.id) && e.techDirection === techDirectionFilter
-                    );
-                    
-                    if (!hasMatchingDirection) return false;
+                    const engineerIds = [...presalesAlloc, ...postsalesAlloc].map(a => a.engineerId).filter(Boolean);
+                    const projectEngineers = allEngineers.filter(e => engineerIds.includes(e.id));
+                    if (!projectEngineers.some(e => e.techDirection === techDirectionFilter)) return false;
                 }
                 
                 return true;
