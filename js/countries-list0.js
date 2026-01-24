@@ -98,8 +98,7 @@ const COUNTRIES_LIST = {
         { value: '尼日利亚', label: '尼日利亚 (Nigeria)', en: 'Nigeria' },
         { value: '肯尼亚', label: '肯尼亚 (Kenya)', en: 'Kenya' },
         { value: '加纳', label: '加纳 (Ghana)', en: 'Ghana' },
-        { value: '埃塞俄比亚', label: '埃塞俄比亚 (Ethiopia)', en: 'Ethiopia' },
-        { value: '毛里求斯', label: '毛里求斯 (Mauritius)', en: 'Mauritius' }
+        { value: '埃塞俄比亚', label: '埃塞俄比亚 (Ethiopia)', en: 'Ethiopia' }
     ],
     
     // 亚洲（中国电信业务相关）

@@ -4,1152 +4,775 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>业绩统计 - 工程师工时系统</title>
-    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
-    <!-- Firebase初始化模块 -->
     <script src="js/firebase-init.js"></script>
-    
-    <!-- 货币转换模块 -->
+    <!-- 工具模块 -->
     <script src="js/currency-converter.js"></script>
-    
-    <!-- 金额格式化模块 -->
     <script src="js/amount-formatter.js"></script>
-    
+    <script src="js/countries-list.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%); min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3); position: sticky; top: 0; z-index: 1000; }
+        .header-content { max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .header h1 { font-size: 24px; font-weight: 600; }
+        .header-info { font-size: 12px; opacity: 0.9; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; text-decoration: none; }
+        .btn-back { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; }
+        .btn-back:hover { background: rgba(255,255,255,0.3); }
+        .container { max-width: 1600px; margin: 20px auto; padding: 0 20px; }
         
-        body {
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: #f5f7fa;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-back {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid white;
-            color: white;
-        }
-        
-        .btn-back:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
+        /* 视图切换 */
+        .view-switcher { background: white; border-radius: 16px; padding: 20px 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .view-switcher-label { font-weight: 600; color: #333; font-size: 15px; }
+        .view-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .view-tab { padding: 10px 20px; border: 2px solid #e5e7eb; background: white; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 500; color: #666; transition: all 0.3s; }
+        .view-tab:hover { border-color: #10b981; color: #10b981; }
+        .view-tab.active { background: linear-gradient(135deg, #10b981, #059669); color: white; border-color: transparent; }
         
         /* 筛选面板 */
-        .filter-panel {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+        .filter-panel { background: white; border-radius: 16px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .filter-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .filter-item label { display: block; font-size: 12px; color: #666; margin-bottom: 6px; font-weight: 500; }
+        .filter-item select, .filter-item input { width: 100%; padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: all 0.3s; }
+        .filter-item select:focus, .filter-item input:focus { outline: none; border-color: #10b981; }
+        .filter-actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-primary { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 12px 24px; border-radius: 10px; font-weight: 600; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(16,185,129,0.4); }
+        .btn-secondary { background: #f3f4f6; color: #666; padding: 12px 24px; border-radius: 10px; }
+        .btn-secondary:hover { background: #e5e7eb; }
         
-        .filter-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        /* 汇率信息 */
+        .rate-info { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 15px; margin-bottom: 20px; font-size: 13px; color: #166534; display: flex; align-items: center; gap: 10px; }
+        .rate-info-icon { font-size: 18px; }
         
-        .filter-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e1e8ed;
-            padding-bottom: 10px;
-        }
+        /* 业绩卡片 */
+        .stats-overview { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+        @media (max-width: 1200px) { .stats-overview { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .stats-overview { grid-template-columns: 1fr; } }
+        .stat-card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
+        .stat-card.presale-signed::before { background: linear-gradient(90deg, #10b981, #34d399); }
+        .stat-card.presale-pipeline::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .stat-card.postsale-completed::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .stat-card.postsale-ongoing::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .stat-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .stat-card.presale-signed .stat-icon { background: #d1fae5; }
+        .stat-card.presale-pipeline .stat-icon { background: #dbeafe; }
+        .stat-card.postsale-completed .stat-icon { background: #ede9fe; }
+        .stat-card.postsale-ongoing .stat-icon { background: #fef3c7; }
+        .stat-title { font-size: 14px; color: #666; font-weight: 500; }
+        .stat-amount { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
+        .stat-amount-detail { font-size: 13px; color: #999; margin-bottom: 10px; }
+        .stat-card.presale-signed .stat-amount { color: #059669; }
+        .stat-card.presale-pipeline .stat-amount { color: #2563eb; }
+        .stat-card.postsale-completed .stat-amount { color: #7c3aed; }
+        .stat-card.postsale-ongoing .stat-amount { color: #d97706; }
+        .stat-details { display: flex; gap: 20px; padding-top: 15px; border-top: 1px solid #f3f4f6; }
+        .stat-detail-item { text-align: center; }
+        .stat-detail-value { font-size: 18px; font-weight: 600; color: #333; }
+        .stat-detail-label { font-size: 12px; color: #999; }
         
-        .tab-btn {
-            padding: 10px 20px;
-            background: transparent;
-            border: none;
-            color: #666;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
+        /* 图表 */
+        .charts-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 25px; }
+        @media (max-width: 1000px) { .charts-section { grid-template-columns: 1fr; } }
+        .chart-card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .chart-card.full-width { grid-column: span 2; }
+        @media (max-width: 1000px) { .chart-card.full-width { grid-column: span 1; } }
+        .chart-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; }
+        .chart-container { position: relative; height: 300px; }
+        .chart-container.tall { height: 400px; }
         
-        .tab-btn.active {
-            color: #10b981;
-            border-bottom-color: #10b981;
-        }
-        
-        .tab-btn:hover {
-            color: #10b981;
-        }
-        
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .filter-item {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .filter-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-        }
-        
-        .filter-select {
-            padding: 10px;
-            border: 2px solid #e1e8ed;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        
-        .filter-select:focus {
-            outline: none;
-            border-color: #10b981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-        }
-        
-        .filter-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn-filter {
-            flex: 1;
-            padding: 12px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-filter:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-        
-        .btn-export {
-            padding: 12px 30px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .btn-export:hover {
-            background: #5568d3;
-        }
-        
-        /* 业绩概览卡片 */
-        .performance-overview {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .perf-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-left: 4px solid;
-        }
-        
-        .perf-card.presale-signed {
-            border-left-color: #10b981;
-            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-        }
-        
-        .perf-card.presale-pipeline {
-            border-left-color: #3b82f6;
-            background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
-        }
-        
-        .perf-card.postsale-completed {
-            border-left-color: #8b5cf6;
-            background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
-        }
-        
-        .perf-card.postsale-ongoing {
-            border-left-color: #f59e0b;
-            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
-        }
-        
-        .perf-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .perf-icon {
-            font-size: 32px;
-        }
-        
-        .perf-title {
-            font-size: 14px;
-            color: #666;
-            font-weight: 600;
-        }
-        
-        .perf-amount {
-            font-size: 36px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .perf-card.presale-signed .perf-amount {
-            color: #10b981;
-        }
-        
-        .perf-card.presale-pipeline .perf-amount {
-            color: #3b82f6;
-        }
-        
-        .perf-card.postsale-completed .perf-amount {
-            color: #8b5cf6;
-        }
-        
-        .perf-card.postsale-ongoing .perf-amount {
-            color: #f59e0b;
-        }
-        
-        .perf-details {
-            display: flex;
-            justify-content: space-between;
-            padding-top: 15px;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .perf-detail-item {
-            text-align: center;
-        }
-        
-        .perf-detail-value {
-            font-weight: 600;
-            font-size: 18px;
-            color: #333;
-        }
-        
-        .perf-detail-label {
-            font-size: 11px;
-            margin-top: 3px;
-        }
-        
-        /* 图表区域 */
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .chart-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .chart-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-        }
+        /* 排行榜 */
+        .ranking-section { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .ranking-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; }
+        .ranking-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .ranking-tab { padding: 8px 16px; border: 1px solid #e5e7eb; background: white; border-radius: 20px; cursor: pointer; font-size: 13px; transition: all 0.3s; }
+        .ranking-tab:hover { border-color: #10b981; }
+        .ranking-tab.active { background: #10b981; color: white; border-color: #10b981; }
+        .ranking-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
+        .ranking-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: #f9fafb; border-radius: 12px; transition: all 0.3s; }
+        .ranking-item:hover { background: #f3f4f6; transform: translateX(5px); }
+        .ranking-position { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .ranking-position.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+        .ranking-position.silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: white; }
+        .ranking-position.bronze { background: linear-gradient(135deg, #d97706, #b45309); color: white; }
+        .ranking-position.normal { background: #e5e7eb; color: #666; }
+        .ranking-info { flex: 1; }
+        .ranking-name { font-weight: 600; color: #333; font-size: 15px; }
+        .ranking-dept { font-size: 12px; color: #999; }
+        .ranking-amount { font-size: 18px; font-weight: 700; color: #10b981; }
         
         /* 项目列表 */
-        .projects-section {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
+        .projects-section { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .projects-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .projects-title { font-size: 16px; font-weight: 600; color: #333; }
+        .projects-count { background: #f3f4f6; padding: 5px 12px; border-radius: 20px; font-size: 13px; color: #666; }
+        .table-wrapper { overflow-x: auto; }
+        .projects-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .projects-table th { text-align: left; padding: 12px 15px; background: #f9fafb; font-size: 13px; font-weight: 600; color: #666; border-bottom: 2px solid #e5e7eb; white-space: nowrap; }
+        .projects-table td { padding: 15px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #333; }
+        .projects-table tr:hover { background: #f9fafb; }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+        .status-badge.signed { background: #d1fae5; color: #059669; }
+        .status-badge.pipeline { background: #dbeafe; color: #2563eb; }
+        .status-badge.completed { background: #ede9fe; color: #7c3aed; }
+        .status-badge.ongoing { background: #fef3c7; color: #d97706; }
+        .tech-badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+        .tech-badge.network { background: #dbeafe; color: #2563eb; }
+        .tech-badge.system { background: #fce7f3; color: #db2777; }
+        .tech-badge.infra { background: #fef3c7; color: #d97706; }
+        .amount-cell { white-space: nowrap; }
+        .amount-original { font-size: 11px; color: #999; }
         
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .project-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        
-        .project-table th {
-            background: #f8f9fa;
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            color: #555;
-            border-bottom: 2px solid #e1e8ed;
-        }
-        
-        .project-table td {
-            padding: 12px;
-            border-bottom: 1px solid #e1e8ed;
-        }
-        
-        .project-table tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        .status-signed {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .status-pipeline {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-        
-        .status-completed {
-            background: #ede9fe;
-            color: #5b21b6;
-        }
-        
-        .status-ongoing {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-        }
-        
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 15px;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #10b981;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* 状态 */
+        .loading { text-align: center; padding: 60px; color: #666; }
+        .loading .spinner { width: 50px; height: 50px; border: 4px solid #e5e7eb; border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 60px; color: #999; }
+        .empty-state-icon { font-size: 64px; margin-bottom: 20px; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <!-- 顶部导航 -->
     <div class="header">
         <div class="header-content">
-            <h2>💰 工程师业绩统计</h2>
-            <a href="dashboard.html" class="btn btn-back">← 返回主页</a>
+            <div>
+                <h1>📊 业绩统计分析</h1>
+                <div class="header-info" id="rate-header-info"></div>
+            </div>
+            <a href="index.html" class="btn btn-back">← 返回首页</a>
         </div>
     </div>
     
     <div class="container">
+        <!-- 视图切换 -->
+        <div class="view-switcher" id="view-switcher">
+            <span class="view-switcher-label">📌 统计视角：</span>
+            <div class="view-tabs">
+                <button class="view-tab active" data-view="personal" onclick="switchView('personal')">👤 我的业绩</button>
+                <button class="view-tab" data-view="team" onclick="switchView('team')">👥 团队业绩</button>
+                <button class="view-tab" data-view="tech" onclick="switchView('tech')">🔧 技术方向</button>
+                <button class="view-tab" data-view="region" onclick="switchView('region')">🌍 区域分布</button>
+            </div>
+        </div>
+        
+        <!-- 汇率信息 -->
+        <div class="rate-info" id="rate-info">
+            <span class="rate-info-icon">💱</span>
+            <span id="rate-info-text">正在获取汇率信息...</span>
+        </div>
+        
         <!-- 筛选面板 -->
         <div class="filter-panel">
-            <div class="filter-title">📊 统计维度选择</div>
-            
-            <!-- 时间维度标签 -->
-            <div class="filter-tabs">
-                <button class="tab-btn active" onclick="selectTimePeriod('month')" data-period="month">本月</button>
-                <button class="tab-btn" onclick="selectTimePeriod('quarter')" data-period="quarter">本季度</button>
-                <button class="tab-btn" onclick="selectTimePeriod('half')" data-period="half">上半年</button>
-                <button class="tab-btn" onclick="selectTimePeriod('year')" data-period="year">本年度</button>
-                <button class="tab-btn" onclick="selectTimePeriod('custom')" data-period="custom">自定义</button>
-            </div>
-            
+            <div class="filter-title">🔍 筛选条件</div>
             <div class="filter-grid">
-                <!-- 自定义时间范围 -->
-                <div class="filter-item" id="custom-dates" style="display: none;">
-                    <label class="filter-label">起始月份</label>
-                    <input type="month" id="start-month" class="filter-select">
-                </div>
-                <div class="filter-item" id="custom-dates-end" style="display: none;">
-                    <label class="filter-label">结束月份</label>
-                    <input type="month" id="end-month" class="filter-select">
-                </div>
-                
-                <!-- 分类维度 -->
                 <div class="filter-item">
-                    <label class="filter-label">按行业统计</label>
-                    <select id="industry-filter" class="filter-select">
-                        <option value="">全部行业</option>
-                        <option value="银行">银行</option>
-                        <option value="保险">保险</option>
-                        <option value="证券">证券</option>
-                        <option value="基金">基金</option>
-                        <option value="信托">信托</option>
-                        <option value="制造业">制造业</option>
-                        <option value="能源">能源</option>
-                        <option value="零售">零售</option>
-                        <option value="物流">物流</option>
-                        <option value="电信">电信</option>
-                        <option value="互联网">互联网</option>
-                        <option value="教育">教育</option>
-                        <option value="医疗">医疗</option>
-                        <option value="政府">政府</option>
-                        <option value="其他">其他</option>
+                    <label>统计周期</label>
+                    <select id="period-filter" onchange="toggleCustomDate()">
+                        <option value="year">本年度</option>
+                        <option value="quarter">本季度</option>
+                        <option value="month">本月</option>
+                        <option value="custom">自定义</option>
                     </select>
                 </div>
-                
-                <div class="filter-item">
-                    <label class="filter-label">按客户统计</label>
-                    <select id="customer-filter" class="filter-select">
-                        <option value="">全部客户</option>
-                        <!-- 动态填充 -->
-                    </select>
+                <div class="filter-item" id="start-date-item" style="display:none;">
+                    <label>开始日期</label>
+                    <input type="date" id="start-date">
                 </div>
-                
-                <div class="filter-item">
-                    <label class="filter-label">按销售人员统计</label>
-                    <select id="sales-filter" class="filter-select">
-                        <option value="">全部销售</option>
-                        <!-- 动态填充 -->
-                    </select>
+                <div class="filter-item" id="end-date-item" style="display:none;">
+                    <label>结束日期</label>
+                    <input type="date" id="end-date">
                 </div>
-                
+                <div class="filter-item" id="engineer-filter-item">
+                    <label>工程师</label>
+                    <select id="engineer-filter"><option value="">全部工程师</option></select>
+                </div>
                 <div class="filter-item">
-                    <label class="filter-label">按技术方向统计</label>
-                    <select id="tech-direction-filter" class="filter-select">
+                    <label>技术方向</label>
+                    <select id="tech-direction-filter">
                         <option value="">全部方向</option>
                         <option value="网络">🌐 网络</option>
                         <option value="系统">🖥️ 系统</option>
                         <option value="能基">🏢 能基</option>
                     </select>
                 </div>
+                <div class="filter-item">
+                    <label>行业</label>
+                    <select id="industry-filter">
+                        <option value="">全部行业</option>
+                        <option value="银行">🏦 银行</option>
+                        <option value="金融">💰 金融</option>
+                        <option value="能源">⚡ 能源</option>
+                        <option value="制造">🏭 制造</option>
+                        <option value="零售">🛒 零售</option>
+                        <option value="电信">📡 电信</option>
+                        <option value="其他">📋 其他</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>国家/区域</label>
+                    <select id="country-filter"></select>
+                </div>
             </div>
-            
             <div class="filter-actions">
-                <button class="btn-filter" onclick="loadPerformanceData()">📊 统计业绩</button>
-                <button class="btn-export" onclick="exportPerformance()">📥 导出报表</button>
+                <button class="btn btn-primary" onclick="loadStats()">📊 统计分析</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">🔄 重置</button>
+                <button class="btn btn-secondary" onclick="exportStats()">📥 导出报表</button>
             </div>
         </div>
         
         <!-- 加载状态 -->
-        <div id="loading" class="loading" style="display: none;">
-            <div class="spinner"></div>
-            <div>正在统计业绩数据...</div>
-        </div>
+        <div class="loading hidden" id="loading"><div class="spinner"></div><div>正在加载统计数据...</div></div>
+        <div class="empty-state hidden" id="empty-state"><div class="empty-state-icon">📊</div><div>请选择筛选条件后点击"统计分析"</div></div>
         
-        <!-- 业绩概览 -->
-        <div id="performance-overview" class="performance-overview" style="display: none;">
-            <!-- 售前（已签单） -->
-            <div class="perf-card presale-signed">
-                <div class="perf-header">
-                    <div class="perf-icon">✅</div>
-                    <div class="perf-title">售前（已签单/已中标）</div>
-                </div>
-                <div class="perf-amount" id="presale-signed-amount">0K</div>
-                <div class="perf-details">
-                    <div class="perf-detail-item">
-                        <div class="perf-detail-value" id="presale-signed-count">0</div>
-                        <div class="perf-detail-label">项目数</div>
+        <!-- 统计内容 -->
+        <div id="stats-content" class="hidden">
+            <div class="stats-overview">
+                <div class="stat-card presale-signed">
+                    <div class="stat-card-header"><div class="stat-icon">✅</div><div class="stat-title">售前已签单</div></div>
+                    <div class="stat-amount" id="presale-signed-amount">£0</div>
+                    <div class="stat-amount-detail" id="presale-signed-detail"></div>
+                    <div class="stat-details">
+                        <div class="stat-detail-item"><div class="stat-detail-value" id="presale-signed-count">0</div><div class="stat-detail-label">项目数</div></div>
+                        <div class="stat-detail-item"><div class="stat-detail-value" id="presale-signed-customers">0</div><div class="stat-detail-label">客户数</div></div>
                     </div>
-                    <div class="perf-detail-item">
-                        <div class="perf-detail-value" id="presale-signed-customers">0</div>
-                        <div class="perf-detail-label">客户数</div>
+                </div>
+                <div class="stat-card presale-pipeline">
+                    <div class="stat-card-header"><div class="stat-icon">📋</div><div class="stat-title">售前Pipeline</div></div>
+                    <div class="stat-amount" id="presale-pipeline-amount">£0</div>
+                    <div class="stat-amount-detail" id="presale-pipeline-detail"></div>
+                    <div class="stat-details">
+                        <div class="stat-detail-item"><div class="stat-detail-value" id="presale-pipeline-count">0</div><div class="stat-detail-label">项目数</div></div>
+                        <div class="stat-detail-item"><div class="stat-detail-value" id="presale-pipeline-customers">0</div><div class="stat-detail-label">客户数</div></div>
+                    </div>
+                </div>
+                <div class="stat-card postsale-completed">
+                    <div class="stat-card-header"><div class="stat-icon">🏆</div><div class="stat-title">售后已报竣</div></div>
+                    <div class="stat-amount" id="postsale-completed-amount">£0</div>
+                    <div class="stat-amount-detail" id="postsale-completed-detail"></div>
+                    <div class="stat-details">
+                        <div class="stat-detail-item"><div class="stat-detail-value" id="postsale-completed-count">0</div><div class="stat-detail-label">项目数</div></div>
+                        <div class="stat-detail-item"><div class="stat-detail-value" id="postsale-completed-customers">0</div><div class="stat-detail-label">客户数</div></div>
+                    </div>
+                </div>
+                <div class="stat-card postsale-ongoing">
+                    <div class="stat-card-header"><div class="stat-icon">🚀</div><div class="stat-title">售后进行中</div></div>
+                    <div class="stat-amount" id="postsale-ongoing-amount">£0</div>
+                    <div class="stat-amount-detail" id="postsale-ongoing-detail"></div>
+                    <div class="stat-details">
+                        <div class="stat-detail-item"><div class="stat-detail-value" id="postsale-ongoing-count">0</div><div class="stat-detail-label">项目数</div></div>
+                        <div class="stat-detail-item"><div class="stat-detail-value" id="postsale-ongoing-customers">0</div><div class="stat-detail-label">客户数</div></div>
                     </div>
                 </div>
             </div>
             
-            <!-- 售前（Pipeline） -->
-            <div class="perf-card presale-pipeline">
-                <div class="perf-header">
-                    <div class="perf-icon">🔄</div>
-                    <div class="perf-title">售前（Pipeline）</div>
-                </div>
-                <div class="perf-amount" id="presale-pipeline-amount">0K</div>
-                <div class="perf-details">
-                    <div class="perf-detail-item">
-                        <div class="perf-detail-value" id="presale-pipeline-count">0</div>
-                        <div class="perf-detail-label">项目数</div>
-                    </div>
-                    <div class="perf-detail-item">
-                        <div class="perf-detail-value" id="presale-pipeline-customers">0</div>
-                        <div class="perf-detail-label">客户数</div>
-                    </div>
-                </div>
+            <div class="charts-section">
+                <div class="chart-card"><div class="chart-title">📊 业绩分布对比</div><div class="chart-container"><canvas id="overview-chart"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title">🔧 技术方向业绩</div><div class="chart-container"><canvas id="tech-chart"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title">🌍 区域业绩分布</div><div class="chart-container"><canvas id="region-chart"></canvas></div></div>
+                <div class="chart-card"><div class="chart-title">🏢 行业业绩分布</div><div class="chart-container"><canvas id="industry-chart"></canvas></div></div>
+                <div class="chart-card full-width"><div class="chart-title">📈 月度业绩趋势</div><div class="chart-container tall"><canvas id="trend-chart"></canvas></div></div>
             </div>
             
-            <!-- 售后（已报竣/已完工） -->
-            <div class="perf-card postsale-completed">
-                <div class="perf-header">
-                    <div class="perf-icon">🏆</div>
-                    <div class="perf-title">售后（已报竣/已完工）</div>
+            <div class="ranking-section" id="ranking-section">
+                <div class="ranking-title">🏅 工程师业绩排行</div>
+                <div class="ranking-tabs">
+                    <button class="ranking-tab active" data-type="presale" onclick="switchRanking('presale')">售前签单</button>
+                    <button class="ranking-tab" data-type="pipeline" onclick="switchRanking('pipeline')">售前Pipeline</button>
+                    <button class="ranking-tab" data-type="postsale" onclick="switchRanking('postsale')">售后报竣</button>
+                    <button class="ranking-tab" data-type="total" onclick="switchRanking('total')">综合业绩</button>
                 </div>
-                <div class="perf-amount" id="postsale-completed-amount">0K</div>
-                <div class="perf-details">
-                    <div class="perf-detail-item">
-                        <div class="perf-detail-value" id="postsale-completed-count">0</div>
-                        <div class="perf-detail-label">项目数</div>
-                    </div>
-                    <div class="perf-detail-item">
-                        <div class="perf-detail-value" id="postsale-completed-customers">0</div>
-                        <div class="perf-detail-label">客户数</div>
-                    </div>
-                </div>
+                <div class="ranking-list" id="ranking-list"></div>
             </div>
             
-            <!-- 售后（交付实施中） -->
-            <div class="perf-card postsale-ongoing">
-                <div class="perf-header">
-                    <div class="perf-icon">⚙️</div>
-                    <div class="perf-title">售后（交付实施中）</div>
+            <div class="projects-section">
+                <div class="projects-header">
+                    <div class="projects-title">📋 项目明细</div>
+                    <div class="projects-count">共 <span id="project-count">0</span> 个项目</div>
                 </div>
-                <div class="perf-amount" id="postsale-ongoing-amount">0K</div>
-                <div class="perf-details">
-                    <div class="perf-detail-item">
-                        <div class="perf-detail-value" id="postsale-ongoing-count">0</div>
-                        <div class="perf-detail-label">项目数</div>
-                    </div>
-                    <div class="perf-detail-item">
-                        <div class="perf-detail-value" id="postsale-ongoing-customers">0</div>
-                        <div class="perf-detail-label">客户数</div>
-                    </div>
+                <div class="table-wrapper">
+                    <table class="projects-table">
+                        <thead><tr><th>项目名称</th><th>客户</th><th>技术方向</th><th>类型</th><th>状态</th><th>国家</th><th>原始金额</th><th>折合英镑</th><th>负责人</th></tr></thead>
+                        <tbody id="projects-tbody"></tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-        
-        <!-- 图表区域 -->
-        <div id="charts-section" class="charts-section" style="display: none;">
-            <!-- 业绩分布 -->
-            <div class="chart-card">
-                <div class="chart-title">📊 业绩分布对比</div>
-                <div class="chart-container">
-                    <canvas id="performance-chart"></canvas>
-                </div>
-            </div>
-            
-            <!-- 客户贡献 -->
-            <div class="chart-card">
-                <div class="chart-title">👤 客户业绩贡献</div>
-                <div class="chart-container">
-                    <canvas id="customer-chart"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 项目列表 -->
-        <div id="projects-section" class="projects-section" style="display: none;">
-            <div class="section-header">
-                <div class="section-title">📋 项目明细</div>
-                <div style="color: #666; font-size: 13px;">共 <span id="project-count">0</span> 个项目</div>
-            </div>
-            <table class="project-table">
-                <thead>
-                    <tr>
-                        <th>项目名称</th>
-                        <th>客户</th>
-                        <th>行业</th>
-                        <th>销售</th>
-                        <th>类型</th>
-                        <th>状态</th>
-                        <th>金额</th>
-                        <th>币种</th>
-                    </tr>
-                </thead>
-                <tbody id="projects-table-body">
-                    <!-- 动态填充 -->
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- 空状态 -->
-        <div id="empty-state" class="empty-state">
-            <div class="empty-icon">💼</div>
-            <div style="font-size: 16px; margin-bottom: 10px;">选择统计维度开始查看业绩</div>
-            <div style="font-size: 13px;">点击上方"统计业绩"按钮生成报表</div>
         </div>
     </div>
-
     <script>
-        // Firebase配置
-        // Firebase已由firebase-init.js初始化
-        // auth 和 db 变量已全局可用
-        // 以下代码已注释（保留供参考）
-        /*
-        const firebaseConfig = {
-            apiKey: "AIzaSyBzcAr_OJFdIMnaYXRCE7TJs2qlK_TAy9U",
-            authDomain: "weekly-report-d55e9.firebaseapp.com",
-            projectId: "weekly-report-d55e9",
-            storageBucket: "weekly-report-d55e9.appspot.com",
-            messagingSenderId: "315332641675",
-            appId: "1:315332641675:web:e1b52c3d4c5fcc7b8c0de7"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        */
+        let currentUser = null, userData = null, allProjects = [], allEngineers = [], filteredProjects = [], currentView = 'personal', charts = {};
         
-        let currentUser = null;
-        let userData = null;
-        let currentPeriod = 'month';
-        let allProjects = [];
-        let charts = {};
-
-        // 检查登录
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                await loadUserData();
-                await initializePage();
-            } else {
-                window.location.href = 'index.html';
-            }
+        // 初始化
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            currentUser = user;
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            userData = userDoc.data() || {};
+            
+            // 初始化汇率转换
+            await initCurrencyConverter();
+            
+            setupRoleBasedUI();
+            await loadEngineers();
+            loadCountriesDropdown();
+            loadStats();
         });
-
-        async function loadUserData() {
-            const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            if (userDoc.exists) {
-                userData = userDoc.data();
-            }
-        }
-
-        async function initializePage() {
-            // 加载客户和销售人员列表
-            await loadFilterOptions();
-        }
-
-        // 加载筛选选项
-        async function loadFilterOptions() {
+        
+        // 初始化货币转换器
+        async function initCurrencyConverter() {
             try {
-                let query = db.collection('projects');
-                
-                // 根据角色限制
-                if (userData.role === 'engineer') {
-                    query = query.where('assignedEngineers', 'array-contains', currentUser.uid);
-                }
-                
-                const snapshot = await query.get();
-                const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                // 提取唯一的客户和销售
-                const customers = [...new Set(projects.map(p => p.customerName).filter(Boolean))];
-                const salesPeople = [...new Set(projects.map(p => p.salesPerson).filter(Boolean))];
-                
-                // 填充下拉列表
-                const customerSelect = document.getElementById('customer-filter');
-                customers.forEach(customer => {
-                    const option = document.createElement('option');
-                    option.value = customer;
-                    option.textContent = customer;
-                    customerSelect.appendChild(option);
-                });
-                
-                const salesSelect = document.getElementById('sales-filter');
-                salesPeople.forEach(sales => {
-                    const option = document.createElement('option');
-                    option.value = sales;
-                    option.textContent = sales;
-                    salesSelect.appendChild(option);
-                });
-                
+                await currencyConverter.init();
+                const info = currencyConverter.getInfo();
+                document.getElementById('rate-info-text').textContent = 
+                    `汇率来源: ${info.source} | 更新日期: ${info.date} | 基准货币: GBP`;
+                document.getElementById('rate-header-info').textContent = 
+                    `汇率: ${info.date}`;
             } catch (error) {
-                console.error('加载筛选选项失败:', error);
+                document.getElementById('rate-info-text').textContent = '使用默认汇率（获取失败）';
             }
         }
-
-        // 选择时间周期
-        function selectTimePeriod(period) {
-            currentPeriod = period;
-            
-            // 更新标签样式
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
+        
+        function setupRoleBasedUI() {
+            const isAdmin = userData.role === 'admin';
+            const isManager = userData.role === 'manager';
+            if (!isAdmin && !isManager) {
+                document.getElementById('view-switcher').classList.add('hidden');
+                document.getElementById('engineer-filter-item').classList.add('hidden');
+                document.getElementById('ranking-section').classList.add('hidden');
+            }
+        }
+        
+        async function loadEngineers() {
+            const snapshot = await db.collection('users').get();
+            allEngineers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const select = document.getElementById('engineer-filter');
+            allEngineers.forEach(eng => {
+                const name = eng.chineseName || eng.displayName || eng.email;
+                select.innerHTML += `<option value="${eng.id}">${name}</option>`;
             });
-            event.target.classList.add('active');
-            
-            // 显示/隐藏自定义日期
-            if (period === 'custom') {
-                document.getElementById('custom-dates').style.display = 'block';
-                document.getElementById('custom-dates-end').style.display = 'block';
-            } else {
-                document.getElementById('custom-dates').style.display = 'none';
-                document.getElementById('custom-dates-end').style.display = 'none';
+        }
+        
+        // 使用countries-list.js填充国家下拉框
+        function loadCountriesDropdown() {
+            if (typeof populateCountrySelect === 'function') {
+                populateCountrySelect('country-filter', {
+                    addEmptyOption: true,
+                    emptyOptionText: '全部国家'
+                });
             }
         }
-
-        // 获取时间范围
+        
+        function switchView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.view-tab[data-view="${view}"]`).classList.add('active');
+            if (view === 'personal') document.getElementById('engineer-filter-item').classList.add('hidden');
+            else document.getElementById('engineer-filter-item').classList.remove('hidden');
+            loadStats();
+        }
+        
+        function toggleCustomDate() {
+            const period = document.getElementById('period-filter').value;
+            const show = period === 'custom';
+            document.getElementById('start-date-item').style.display = show ? 'block' : 'none';
+            document.getElementById('end-date-item').style.display = show ? 'block' : 'none';
+        }
+        
         function getTimeRange() {
+            const period = document.getElementById('period-filter').value;
             const now = new Date();
             let startDate, endDate;
-            
-            switch (currentPeriod) {
-                case 'month':
-                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                    break;
-                    
-                case 'quarter':
-                    const quarter = Math.floor(now.getMonth() / 3);
-                    startDate = new Date(now.getFullYear(), quarter * 3, 1);
-                    endDate = new Date(now.getFullYear(), quarter * 3 + 3, 0);
-                    break;
-                    
-                case 'half':
-                    const half = Math.floor(now.getMonth() / 6);
-                    startDate = new Date(now.getFullYear(), half * 6, 1);
-                    endDate = new Date(now.getFullYear(), half * 6 + 6, 0);
-                    break;
-                    
-                case 'year':
-                    startDate = new Date(now.getFullYear(), 0, 1);
-                    endDate = new Date(now.getFullYear(), 11, 31);
-                    break;
-                    
-                case 'custom':
-                    const startMonth = document.getElementById('start-month').value;
-                    const endMonth = document.getElementById('end-month').value;
-                    
-                    if (!startMonth || !endMonth) {
-                        alert('请选择起止月份');
-                        return null;
-                    }
-                    
-                    const [startYear, startMon] = startMonth.split('-');
-                    const [endYear, endMon] = endMonth.split('-');
-                    
-                    startDate = new Date(parseInt(startYear), parseInt(startMon) - 1, 1);
-                    endDate = new Date(parseInt(endYear), parseInt(endMon), 0);
-                    break;
+            switch (period) {
+                case 'year': startDate = new Date(now.getFullYear(), 0, 1); endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59); break;
+                case 'quarter': const q = Math.floor(now.getMonth() / 3); startDate = new Date(now.getFullYear(), q * 3, 1); endDate = new Date(now.getFullYear(), q * 3 + 3, 0, 23, 59, 59); break;
+                case 'month': startDate = new Date(now.getFullYear(), now.getMonth(), 1); endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59); break;
+                case 'custom': startDate = new Date(document.getElementById('start-date').value || now); endDate = new Date(document.getElementById('end-date').value || now); endDate.setHours(23, 59, 59); break;
             }
-            
             return { startDate, endDate };
         }
-
-        // 加载业绩数据
-        async function loadPerformanceData() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('empty-state').style.display = 'none';
-            document.getElementById('performance-overview').style.display = 'none';
-            document.getElementById('charts-section').style.display = 'none';
-            document.getElementById('projects-section').style.display = 'none';
+        
+        // 转换项目金额到GBP
+        function convertProjectAmount(project) {
+            const amount = project.projectAmount || 0;
+            const currency = project.projectCurrency || 'GBP';
+            const country = project.customerCountry || '';
+            
+            // 如果已经是GBP，直接返回
+            if (currency === 'GBP') {
+                return { original: amount, currency: 'GBP', gbp: amount, needsConversion: false };
+            }
+            
+            // 使用货币转换器
+            const result = currencyConverter.convertToGBP(amount, country);
+            return {
+                original: amount,
+                currency: currency,
+                gbp: result.gbp,
+                needsConversion: true,
+                rate: result.rate
+            };
+        }
+        
+        async function loadStats() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('stats-content').classList.add('hidden');
             
             try {
-                const timeRange = getTimeRange();
-                if (!timeRange) return;
-                
-                const { startDate, endDate } = timeRange;
-                
-                // 查询项目
                 let query = db.collection('projects');
-                
-                // 根据角色限制
-                if (userData.role === 'engineer') {
+                if (userData.role === 'engineer' || currentView === 'personal') {
                     query = query.where('assignedEngineers', 'array-contains', currentUser.uid);
                 }
-                
-                // 时间范围过滤（如果项目有创建时间）
                 const snapshot = await query.get();
-                allProjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                // 客户端筛选
-                let filteredProjects = allProjects.filter(project => {
-                    // 时间范围过滤（使用项目创建时间或开始时间）
-                    if (project.createdAt) {
-                        const projectDate = project.createdAt.toDate();
-                        if (projectDate < startDate || projectDate > endDate) {
-                            return false;
-                        }
-                    }
-                    
-                    return true;
+                allProjects = snapshot.docs.map(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    // 预处理：转换金额到GBP
+                    data.amountData = convertProjectAmount(data);
+                    return data;
                 });
                 
-                // 应用其他筛选
-                const industry = document.getElementById('industry-filter').value;
-                const customer = document.getElementById('customer-filter').value;
-                const sales = document.getElementById('sales-filter').value;
-                const techDirection = document.getElementById('tech-direction-filter').value;
-                
-                if (industry) {
-                    filteredProjects = filteredProjects.filter(p => p.customerIndustry === industry);
-                }
-                
-                if (customer) {
-                    filteredProjects = filteredProjects.filter(p => p.customerName === customer);
-                }
-                
-                if (sales) {
-                    filteredProjects = filteredProjects.filter(p => p.salesPerson === sales);
-                }
-                
-                if (techDirection) {
-                    filteredProjects = filteredProjects.filter(p => p.techDirection === techDirection);
-                }
-                
-                // 分类统计
-                const stats = calculatePerformance(filteredProjects);
-                
-                // 显示结果
-                displayPerformanceStats(stats);
+                filteredProjects = applyFilters(allProjects);
+                const stats = calculateStats(filteredProjects);
+                displayOverview(stats);
                 displayCharts(stats);
-                displayProjectsList(filteredProjects);
-                
-                document.getElementById('performance-overview').style.display = 'grid';
-                document.getElementById('charts-section').style.display = 'grid';
-                document.getElementById('projects-section').style.display = 'block';
-                
+                displayRanking(stats);
+                displayProjects(filteredProjects);
+                document.getElementById('stats-content').classList.remove('hidden');
             } catch (error) {
-                console.error('加载业绩数据失败:', error);
+                console.error('加载统计数据失败:', error);
                 alert('加载失败: ' + error.message);
             } finally {
-                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loading').classList.add('hidden');
             }
         }
-
-        // 计算业绩
-        function calculatePerformance(projects) {
+        
+        function applyFilters(projects) {
+            const { startDate, endDate } = getTimeRange();
+            const engineerId = document.getElementById('engineer-filter').value;
+            const techDirection = document.getElementById('tech-direction-filter').value;
+            const industry = document.getElementById('industry-filter').value;
+            const country = document.getElementById('country-filter').value;
+            
+            return projects.filter(p => {
+                if (p.createdAt) { const created = p.createdAt.toDate(); if (created < startDate || created > endDate) return false; }
+                if (engineerId && !(p.assignedEngineers || []).includes(engineerId)) return false;
+                if (techDirection && p.techDirection !== techDirection) return false;
+                if (industry && p.customerIndustry !== industry) return false;
+                if (country && p.customerCountry !== country) return false;
+                return true;
+            });
+        }
+        
+        function calculateStats(projects) {
             const stats = {
                 presaleSigned: { amount: 0, count: 0, customers: new Set(), projects: [] },
                 presalePipeline: { amount: 0, count: 0, customers: new Set(), projects: [] },
                 postsaleCompleted: { amount: 0, count: 0, customers: new Set(), projects: [] },
-                postsaleOngoing: { amount: 0, count: 0, customers: new Set(), projects: [] }
+                postsaleOngoing: { amount: 0, count: 0, customers: new Set(), projects: [] },
+                byTech: {}, byRegion: {}, byIndustry: {}, byEngineer: {}, byMonth: {}
             };
             
-            projects.forEach(project => {
-                const amount = project.projectAmount || 0;
-                const customer = project.customerName;
-                const type = project.projectType;
-                const status = project.status;
+            projects.forEach(p => {
+                // 使用转换后的GBP金额
+                const gbpAmount = p.amountData?.gbp || 0;
+                const tech = p.techDirection || '未设置';
+                const region = p.customerCountry || '未知';
+                const industry = p.customerIndustry || '其他';
                 
-                // 售前（已签单）
-                if (type === '售前项目' && status === '已完成') {
-                    stats.presaleSigned.amount += amount;
-                    stats.presaleSigned.count++;
-                    if (customer) stats.presaleSigned.customers.add(customer);
-                    stats.presaleSigned.projects.push(project);
+                // 分类统计（使用GBP金额）
+                if (p.projectType === '售前项目') {
+                    if (p.performanceData?.contractSigned || p.status === '已完成') {
+                        stats.presaleSigned.amount += gbpAmount;
+                        stats.presaleSigned.count++;
+                        stats.presaleSigned.customers.add(p.customerName);
+                        stats.presaleSigned.projects.push(p);
+                    } else {
+                        stats.presalePipeline.amount += gbpAmount;
+                        stats.presalePipeline.count++;
+                        stats.presalePipeline.customers.add(p.customerName);
+                        stats.presalePipeline.projects.push(p);
+                    }
+                } else if (p.projectType === '售后项目') {
+                    if (p.performanceData?.reported || p.status === '已完成') {
+                        stats.postsaleCompleted.amount += gbpAmount;
+                        stats.postsaleCompleted.count++;
+                        stats.postsaleCompleted.customers.add(p.customerName);
+                        stats.postsaleCompleted.projects.push(p);
+                    } else {
+                        stats.postsaleOngoing.amount += gbpAmount;
+                        stats.postsaleOngoing.count++;
+                        stats.postsaleOngoing.customers.add(p.customerName);
+                        stats.postsaleOngoing.projects.push(p);
+                    }
                 }
-                // 售前（Pipeline）
-                else if (type === '售前项目' && status !== '已完成') {
-                    stats.presalePipeline.amount += amount;
-                    stats.presalePipeline.count++;
-                    if (customer) stats.presalePipeline.customers.add(customer);
-                    stats.presalePipeline.projects.push(project);
-                }
-                // 售后（已报竣/已完工）
-                else if (type === '售后项目' && status === '已完成') {
-                    stats.postsaleCompleted.amount += amount;
-                    stats.postsaleCompleted.count++;
-                    if (customer) stats.postsaleCompleted.customers.add(customer);
-                    stats.postsaleCompleted.projects.push(project);
-                }
-                // 售后（交付实施中）
-                else if (type === '售后项目' && status === '进行中') {
-                    stats.postsaleOngoing.amount += amount;
-                    stats.postsaleOngoing.count++;
-                    if (customer) stats.postsaleOngoing.customers.add(customer);
-                    stats.postsaleOngoing.projects.push(project);
+                
+                // 按维度统计（都使用GBP）
+                if (!stats.byTech[tech]) stats.byTech[tech] = { presale: 0, postsale: 0 };
+                if (p.projectType === '售前项目') stats.byTech[tech].presale += gbpAmount;
+                else stats.byTech[tech].postsale += gbpAmount;
+                
+                if (!stats.byRegion[region]) stats.byRegion[region] = { presale: 0, postsale: 0 };
+                if (p.projectType === '售前项目') stats.byRegion[region].presale += gbpAmount;
+                else stats.byRegion[region].postsale += gbpAmount;
+                
+                if (!stats.byIndustry[industry]) stats.byIndustry[industry] = { presale: 0, postsale: 0 };
+                if (p.projectType === '售前项目') stats.byIndustry[industry].presale += gbpAmount;
+                else stats.byIndustry[industry].postsale += gbpAmount;
+                
+                (p.assignedEngineers || []).forEach(engId => {
+                    if (!stats.byEngineer[engId]) stats.byEngineer[engId] = { presale: 0, pipeline: 0, postsale: 0, total: 0 };
+                    if (p.projectType === '售前项目') {
+                        if (p.performanceData?.contractSigned || p.status === '已完成') stats.byEngineer[engId].presale += gbpAmount;
+                        else stats.byEngineer[engId].pipeline += gbpAmount;
+                    } else if (p.performanceData?.reported || p.status === '已完成') {
+                        stats.byEngineer[engId].postsale += gbpAmount;
+                    }
+                    stats.byEngineer[engId].total += gbpAmount;
+                });
+                
+                if (p.createdAt) {
+                    const month = p.createdAt.toDate().toISOString().slice(0, 7);
+                    if (!stats.byMonth[month]) stats.byMonth[month] = { presale: 0, postsale: 0 };
+                    if (p.projectType === '售前项目') stats.byMonth[month].presale += gbpAmount;
+                    else stats.byMonth[month].postsale += gbpAmount;
                 }
             });
             
             return stats;
         }
-
-        // 显示业绩统计
-        function displayPerformanceStats(stats) {
-            // 售前（已签单）
-            document.getElementById('presale-signed-amount').textContent = 
-                formatAmount(stats.presaleSigned.amount);
-            document.getElementById('presale-signed-count').textContent = stats.presaleSigned.count;
-            document.getElementById('presale-signed-customers').textContent = 
-                stats.presaleSigned.customers.size;
-            
-            // 售前（Pipeline）
-            document.getElementById('presale-pipeline-amount').textContent = 
-                formatAmount(stats.presalePipeline.amount);
-            document.getElementById('presale-pipeline-count').textContent = stats.presalePipeline.count;
-            document.getElementById('presale-pipeline-customers').textContent = 
-                stats.presalePipeline.customers.size;
-            
-            // 售后（已报竣）
-            document.getElementById('postsale-completed-amount').textContent = 
-                formatAmount(stats.postsaleCompleted.amount);
-            document.getElementById('postsale-completed-count').textContent = stats.postsaleCompleted.count;
-            document.getElementById('postsale-completed-customers').textContent = 
-                stats.postsaleCompleted.customers.size;
-            
-            // 售后（实施中）
-            document.getElementById('postsale-ongoing-amount').textContent = 
-                formatAmount(stats.postsaleOngoing.amount);
-            document.getElementById('postsale-ongoing-count').textContent = stats.postsaleOngoing.count;
-            document.getElementById('postsale-ongoing-customers').textContent = 
-                stats.postsaleOngoing.customers.size;
-        }
-
-        // 格式化金额
+        
+        // 使用AmountFormatter格式化
         function formatAmount(amount) {
-            if (amount >= 1000) {
-                return (amount / 1000).toFixed(1) + 'M';
+            if (typeof AmountFormatter !== 'undefined') {
+                return AmountFormatter.formatCompact(amount * 1000, 'GBP'); // 金额存储为K，转换为实际值
             }
-            return amount.toFixed(0) + 'K';
+            // 后备方案
+            if (amount >= 1000) return '£' + (amount / 1000).toFixed(1) + 'M';
+            return '£' + amount.toFixed(0) + 'K';
         }
-
-        // 显示图表
-        function displayCharts(stats) {
-            // 销毁旧图表
-            Object.values(charts).forEach(chart => chart && chart.destroy());
-            charts = {};
+        
+        function displayOverview(stats) {
+            document.getElementById('presale-signed-amount').textContent = formatAmount(stats.presaleSigned.amount);
+            document.getElementById('presale-signed-count').textContent = stats.presaleSigned.count;
+            document.getElementById('presale-signed-customers').textContent = stats.presaleSigned.customers.size;
             
-            // 1. 业绩分布对比
-            charts.performance = new Chart(document.getElementById('performance-chart'), {
-                type: 'bar',
+            document.getElementById('presale-pipeline-amount').textContent = formatAmount(stats.presalePipeline.amount);
+            document.getElementById('presale-pipeline-count').textContent = stats.presalePipeline.count;
+            document.getElementById('presale-pipeline-customers').textContent = stats.presalePipeline.customers.size;
+            
+            document.getElementById('postsale-completed-amount').textContent = formatAmount(stats.postsaleCompleted.amount);
+            document.getElementById('postsale-completed-count').textContent = stats.postsaleCompleted.count;
+            document.getElementById('postsale-completed-customers').textContent = stats.postsaleCompleted.customers.size;
+            
+            document.getElementById('postsale-ongoing-amount').textContent = formatAmount(stats.postsaleOngoing.amount);
+            document.getElementById('postsale-ongoing-count').textContent = stats.postsaleOngoing.count;
+            document.getElementById('postsale-ongoing-customers').textContent = stats.postsaleOngoing.customers.size;
+        }
+        
+        function displayCharts(stats) {
+            Object.values(charts).forEach(c => c?.destroy()); charts = {};
+            
+            // 1. 业绩分布
+            charts.overview = new Chart(document.getElementById('overview-chart'), {
+                type: 'doughnut',
                 data: {
-                    labels: ['售前已签单', '售前Pipeline', '售后已完工', '售后实施中'],
+                    labels: ['售前签单', '售前Pipeline', '售后报竣', '售后进行中'],
                     datasets: [{
-                        label: '业绩金额 (K)',
-                        data: [
-                            stats.presaleSigned.amount,
-                            stats.presalePipeline.amount,
-                            stats.postsaleCompleted.amount,
-                            stats.postsaleOngoing.amount
-                        ],
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(139, 92, 246, 0.8)',
-                            'rgba(245, 158, 11, 0.8)'
-                        ]
+                        data: [stats.presaleSigned.amount, stats.presalePipeline.amount, stats.postsaleCompleted.amount, stats.postsaleOngoing.amount],
+                        backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b'],
+                        borderWidth: 0
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false }
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { label: ctx => ctx.label + ': ' + formatAmount(ctx.raw) } }
                     }
                 }
             });
             
-            // 2. 客户业绩贡献
-            const customerStats = {};
-            [...stats.presaleSigned.projects,
-             ...stats.presalePipeline.projects,
-             ...stats.postsaleCompleted.projects,
-             ...stats.postsaleOngoing.projects].forEach(project => {
-                const customer = project.customerName || '未知客户';
-                if (!customerStats[customer]) {
-                    customerStats[customer] = 0;
+            // 2. 技术方向
+            const techLabels = Object.keys(stats.byTech);
+            charts.tech = new Chart(document.getElementById('tech-chart'), {
+                type: 'bar',
+                data: {
+                    labels: techLabels,
+                    datasets: [
+                        { label: '售前', data: techLabels.map(t => stats.byTech[t].presale), backgroundColor: '#10b981' },
+                        { label: '售后', data: techLabels.map(t => stats.byTech[t].postsale), backgroundColor: '#8b5cf6' }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + formatAmount(ctx.raw) } } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatAmount(v) } } }
                 }
-                customerStats[customer] += project.projectAmount || 0;
             });
             
-            const topCustomers = Object.entries(customerStats)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 8);
-            
-            charts.customer = new Chart(document.getElementById('customer-chart'), {
-                type: 'doughnut',
+            // 3. 区域分布
+            const regionEntries = Object.entries(stats.byRegion).sort((a, b) => (b[1].presale + b[1].postsale) - (a[1].presale + a[1].postsale)).slice(0, 8);
+            const regionLabels = regionEntries.map(e => e[0]);
+            charts.region = new Chart(document.getElementById('region-chart'), {
+                type: 'pie',
                 data: {
-                    labels: topCustomers.map(c => c[0]),
+                    labels: regionLabels,
                     datasets: [{
-                        data: topCustomers.map(c => c[1]),
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.8)',
-                            'rgba(59, 130, 246, 0.8)',
-                            'rgba(139, 92, 246, 0.8)',
-                            'rgba(245, 158, 11, 0.8)',
-                            'rgba(239, 68, 68, 0.8)',
-                            'rgba(236, 72, 153, 0.8)',
-                            'rgba(20, 184, 166, 0.8)',
-                            'rgba(251, 191, 36, 0.8)'
-                        ]
+                        data: regionLabels.map(r => stats.byRegion[r].presale + stats.byRegion[r].postsale),
+                        backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#84cc16', '#f97316']
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' }, tooltip: { callbacks: { label: ctx => ctx.label + ': ' + formatAmount(ctx.raw) } } }
+                }
+            });
+            
+            // 4. 行业分布
+            const industryLabels = Object.keys(stats.byIndustry);
+            charts.industry = new Chart(document.getElementById('industry-chart'), {
+                type: 'polarArea',
+                data: {
+                    labels: industryLabels,
+                    datasets: [{
+                        data: industryLabels.map(i => stats.byIndustry[i].presale + stats.byIndustry[i].postsale),
+                        backgroundColor: ['rgba(16,185,129,0.7)', 'rgba(59,130,246,0.7)', 'rgba(139,92,246,0.7)', 'rgba(245,158,11,0.7)', 'rgba(239,68,68,0.7)', 'rgba(6,182,212,0.7)', 'rgba(132,204,22,0.7)']
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' }, tooltip: { callbacks: { label: ctx => ctx.label + ': ' + formatAmount(ctx.raw) } } }
+                }
+            });
+            
+            // 5. 月度趋势
+            const months = Object.keys(stats.byMonth).sort();
+            charts.trend = new Chart(document.getElementById('trend-chart'), {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        { label: '售前业绩', data: months.map(m => stats.byMonth[m].presale), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4 },
+                        { label: '售后业绩', data: months.map(m => stats.byMonth[m].postsale), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + formatAmount(ctx.raw) } } },
+                    scales: { y: { beginAtZero: true, ticks: { callback: v => formatAmount(v) } } }
                 }
             });
         }
-
-        // 显示项目列表
-        function displayProjectsList(projects) {
-            const tbody = document.getElementById('projects-table-body');
-            tbody.innerHTML = '';
+        
+        let currentRankingType = 'presale';
+        function switchRanking(type) {
+            currentRankingType = type;
+            document.querySelectorAll('.ranking-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.ranking-tab[data-type="${type}"]`).classList.add('active');
+            const stats = calculateStats(filteredProjects);
+            displayRanking(stats);
+        }
+        
+        function displayRanking(stats) {
+            const list = document.getElementById('ranking-list');
+            const rankings = Object.entries(stats.byEngineer).map(([id, data]) => {
+                const eng = allEngineers.find(e => e.id === id);
+                let amount = 0;
+                switch (currentRankingType) {
+                    case 'presale': amount = data.presale; break;
+                    case 'pipeline': amount = data.pipeline; break;
+                    case 'postsale': amount = data.postsale; break;
+                    case 'total': amount = data.total; break;
+                }
+                return { id, name: eng?.chineseName || eng?.displayName || eng?.email || '未知', dept: eng?.department || '', techDirection: eng?.techDirection || '', amount };
+            }).filter(r => r.amount > 0).sort((a, b) => b.amount - a.amount).slice(0, 10);
             
+            list.innerHTML = rankings.map((r, i) => {
+                let posClass = 'normal';
+                if (i === 0) posClass = 'gold';
+                else if (i === 1) posClass = 'silver';
+                else if (i === 2) posClass = 'bronze';
+                return `<div class="ranking-item"><div class="ranking-position ${posClass}">${i + 1}</div><div class="ranking-info"><div class="ranking-name">${r.name}</div><div class="ranking-dept">${r.dept} ${r.techDirection ? '· ' + r.techDirection : ''}</div></div><div class="ranking-amount">${formatAmount(r.amount)}</div></div>`;
+            }).join('');
+            
+            if (rankings.length === 0) list.innerHTML = '<div style="text-align:center;color:#999;padding:30px;">暂无数据</div>';
+        }
+        
+        function displayProjects(projects) {
             document.getElementById('project-count').textContent = projects.length;
+            const tbody = document.getElementById('projects-tbody');
             
-            projects.forEach(project => {
-                const row = document.createElement('tr');
-                
-                let statusBadge = '';
-                let statusClass = '';
-                
-                if (project.projectType === '售前项目' && project.status === '已完成') {
-                    statusBadge = '已签单';
-                    statusClass = 'status-signed';
-                } else if (project.projectType === '售前项目') {
-                    statusBadge = 'Pipeline';
-                    statusClass = 'status-pipeline';
-                } else if (project.projectType === '售后项目' && project.status === '已完成') {
-                    statusBadge = '已完工';
-                    statusClass = 'status-completed';
-                } else if (project.projectType === '售后项目' && project.status === '进行中') {
-                    statusBadge = '实施中';
-                    statusClass = 'status-ongoing';
+            tbody.innerHTML = projects.map(p => {
+                let statusBadge = '', statusClass = '';
+                if (p.projectType === '售前项目') {
+                    if (p.performanceData?.contractSigned || p.status === '已完成') { statusBadge = '已签单'; statusClass = 'signed'; }
+                    else { statusBadge = 'Pipeline'; statusClass = 'pipeline'; }
                 } else {
-                    statusBadge = project.status || '-';
+                    if (p.performanceData?.reported || p.status === '已完成') { statusBadge = '已报竣'; statusClass = 'completed'; }
+                    else { statusBadge = '进行中'; statusClass = 'ongoing'; }
                 }
                 
-                row.innerHTML = `
-                    <td>${project.projectName || '-'}</td>
-                    <td>${project.customerName || '-'}</td>
-                    <td>${project.customerIndustry || '-'}</td>
-                    <td>${project.salesPerson || '-'}</td>
-                    <td>${project.projectType || '-'}</td>
+                let techBadge = '-';
+                if (p.techDirection === '网络') techBadge = '<span class="tech-badge network">网络</span>';
+                else if (p.techDirection === '系统') techBadge = '<span class="tech-badge system">系统</span>';
+                else if (p.techDirection === '能基') techBadge = '<span class="tech-badge infra">能基</span>';
+                
+                const engIds = p.assignedEngineers || [];
+                const engNames = engIds.map(id => { const eng = allEngineers.find(e => e.id === id); return eng?.chineseName || eng?.displayName || ''; }).filter(n => n).join(', ') || '-';
+                
+                // 显示原始金额和转换后金额
+                const amtData = p.amountData || { original: 0, currency: 'GBP', gbp: 0 };
+                const originalDisplay = `${amtData.original}K ${amtData.currency}`;
+                const gbpDisplay = amtData.needsConversion ? `£${amtData.gbp.toFixed(0)}K` : '-';
+                
+                return `<tr>
+                    <td><strong>${p.projectName || '-'}</strong></td>
+                    <td>${p.customerName || '-'}</td>
+                    <td>${techBadge}</td>
+                    <td>${p.projectType || '-'}</td>
                     <td><span class="status-badge ${statusClass}">${statusBadge}</span></td>
-                    <td><strong>${project.projectAmount || 0}K</strong></td>
-                    <td>${project.projectCurrency || 'GBP'}</td>
-                `;
-                tbody.appendChild(row);
-            });
+                    <td>${p.customerCountry || '-'}</td>
+                    <td class="amount-cell">${originalDisplay}</td>
+                    <td class="amount-cell"><strong>${gbpDisplay}</strong></td>
+                    <td>${engNames}</td>
+                </tr>`;
+            }).join('');
         }
-
-        // 导出业绩报表
-        function exportPerformance() {
-            if (allProjects.length === 0) {
-                alert('没有数据可导出，请先统计业绩');
-                return;
-            }
-            
-            // 构建CSV
-            let csv = '\uFEFF'; // UTF-8 BOM
-            csv += '项目名称,客户名称,行业,销售人员,项目类型,状态分类,项目状态,项目金额,币种\n';
-            
-            allProjects.forEach(project => {
-                let statusCategory = '';
-                if (project.projectType === '售前项目' && project.status === '已完成') {
-                    statusCategory = '售前-已签单';
-                } else if (project.projectType === '售前项目') {
-                    statusCategory = '售前-Pipeline';
-                } else if (project.projectType === '售后项目' && project.status === '已完成') {
-                    statusCategory = '售后-已完工';
-                } else if (project.projectType === '售后项目' && project.status === '进行中') {
-                    statusCategory = '售后-实施中';
-                }
-                
-                csv += [
-                    project.projectName || '',
-                    project.customerName || '',
-                    project.customerIndustry || '',
-                    project.salesPerson || '',
-                    project.projectType || '',
-                    statusCategory,
-                    project.status || '',
-                    project.projectAmount || 0,
-                    project.projectCurrency || 'GBP'
-                ].join(',') + '\n';
+        
+        function resetFilters() {
+            document.getElementById('period-filter').value = 'year';
+            document.getElementById('engineer-filter').value = '';
+            document.getElementById('tech-direction-filter').value = '';
+            document.getElementById('industry-filter').value = '';
+            document.getElementById('country-filter').value = '';
+            document.getElementById('start-date-item').style.display = 'none';
+            document.getElementById('end-date-item').style.display = 'none';
+            loadStats();
+        }
+        
+        function exportStats() {
+            if (filteredProjects.length === 0) { alert('没有数据可导出'); return; }
+            let csv = '\uFEFF项目名称,客户名称,技术方向,项目类型,状态,国家,行业,原始金额,原始币种,折合英镑(K),销售人员\n';
+            filteredProjects.forEach(p => {
+                let status = '';
+                if (p.projectType === '售前项目') { status = (p.performanceData?.contractSigned || p.status === '已完成') ? '已签单' : 'Pipeline'; }
+                else { status = (p.performanceData?.reported || p.status === '已完成') ? '已报竣' : '进行中'; }
+                const amtData = p.amountData || { original: 0, currency: 'GBP', gbp: 0 };
+                csv += `"${p.projectName || ''}","${p.customerName || ''}","${p.techDirection || ''}","${p.projectType || ''}","${status}","${p.customerCountry || ''}","${p.customerIndustry || ''}","${amtData.original}","${amtData.currency}","${amtData.gbp.toFixed(2)}","${p.salesPerson || ''}"\n`;
             });
-            
-            // 下载
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `业绩统计_${new Date().toISOString().split('T')[0]}.csv`;
+            link.download = `业绩统计_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
-            
-            alert('✅ 业绩报表已导出！');
         }
     </script>
 </body>
