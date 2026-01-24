@@ -506,16 +506,6 @@
                         <!-- 动态填充 -->
                     </select>
                 </div>
-                
-                <div class="filter-item">
-                    <label class="filter-label">按技术方向统计</label>
-                    <select id="tech-direction-filter" class="filter-select">
-                        <option value="">全部方向</option>
-                        <option value="网络">🌐 网络</option>
-                        <option value="系统">🖥️ 系统</option>
-                        <option value="能基">🏢 能基</option>
-                    </select>
-                </div>
             </div>
             
             <div class="filter-actions">
@@ -860,7 +850,6 @@
                 const industry = document.getElementById('industry-filter').value;
                 const customer = document.getElementById('customer-filter').value;
                 const sales = document.getElementById('sales-filter').value;
-                const techDirection = document.getElementById('tech-direction-filter').value;
                 
                 if (industry) {
                     filteredProjects = filteredProjects.filter(p => p.customerIndustry === industry);
@@ -872,10 +861,6 @@
                 
                 if (sales) {
                     filteredProjects = filteredProjects.filter(p => p.salesPerson === sales);
-                }
-                
-                if (techDirection) {
-                    filteredProjects = filteredProjects.filter(p => p.techDirection === techDirection);
                 }
                 
                 // 分类统计
