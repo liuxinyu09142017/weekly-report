@@ -435,6 +435,10 @@
                 
                 for (const doc of snapshot.docs) {
                     const projectData = doc.data();
+                    
+                    // 过滤已删除的项目（软删除）
+                    if (projectData.deleted) continue;
+                    
                     let totalHours = 0, totalSessions = 0, engineerSet = new Set();
                     try {
                         const recordsSnapshot = await db.collection('workRecords').where('projectId', '==', doc.id).get();

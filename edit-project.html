@@ -89,6 +89,46 @@
         .engineer-option:hover { background: #f0f4ff; }
         
         @media (max-width: 768px) { .form-row, .form-row.triple { grid-template-columns: 1fr; } }
+        
+        /* 删除按钮区域 */
+        .danger-zone { margin-top: 40px; padding-top: 30px; border-top: 2px dashed #fecaca; }
+        .danger-zone-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .danger-zone-title { font-size: 16px; color: #dc2626; font-weight: 600; }
+        .danger-zone-content { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #fecaca; border-radius: 12px; padding: 20px; }
+        .danger-zone-desc { font-size: 13px; color: #991b1b; margin-bottom: 15px; line-height: 1.6; }
+        .danger-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-delete { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s; }
+        .btn-delete:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4); }
+        .btn-delete:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-restore { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-restore:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4); }
+        
+        /* 删除确认对话框 */
+        .delete-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .delete-modal.show { display: flex; }
+        .delete-modal-content { background: white; border-radius: 16px; padding: 30px; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); }
+        .delete-modal-header { text-align: center; margin-bottom: 20px; }
+        .delete-modal-icon { font-size: 50px; margin-bottom: 15px; }
+        .delete-modal-title { font-size: 20px; font-weight: 600; color: #dc2626; margin-bottom: 10px; }
+        .delete-modal-desc { font-size: 14px; color: #666; line-height: 1.6; }
+        .delete-modal-warning { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px 15px; margin: 20px 0; font-size: 13px; color: #92400e; }
+        .delete-modal-input { margin: 20px 0; }
+        .delete-modal-input label { display: block; font-size: 13px; color: #666; margin-bottom: 8px; }
+        .delete-modal-input input { width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .delete-modal-input input:focus { outline: none; border-color: #dc2626; }
+        .delete-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .delete-modal-actions button { padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+        .btn-modal-cancel { background: #f0f0f0; color: #666; }
+        .btn-modal-confirm { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+        .btn-modal-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* 已删除项目提示 */
+        .deleted-banner { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #fecaca; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: none; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .deleted-banner.show { display: flex; }
+        .deleted-banner-icon { font-size: 40px; }
+        .deleted-banner-content { flex: 1; min-width: 200px; }
+        .deleted-banner-title { font-size: 16px; font-weight: 600; color: #dc2626; margin-bottom: 5px; }
+        .deleted-banner-desc { font-size: 13px; color: #991b1b; }
     </style>
 </head>
 <body>
@@ -318,7 +358,57 @@
                     <button type="submit" class="btn-submit" id="submit-btn">✅ 保存修改</button>
                     <button type="button" class="btn-cancel" onclick="window.history.back()">取消</button>
                 </div>
+                
+                <!-- 危险操作区域 -->
+                <div class="danger-zone" id="danger-zone" style="display: none;">
+                    <div class="danger-zone-header">
+                        <span style="font-size: 24px;">⚠️</span>
+                        <span class="danger-zone-title">危险操作</span>
+                    </div>
+                    <div class="danger-zone-content">
+                        <div class="danger-zone-desc">
+                            <strong>删除项目</strong>：项目将被移入回收站，30天内可恢复。超过30天后将被永久删除。<br>
+                            <span style="color: #b91c1c;">⚠️ 注意：关联的工作记录不会被删除，但会失去与此项目的关联。</span>
+                        </div>
+                        <div class="danger-actions">
+                            <button type="button" class="btn-delete" id="btn-delete-project" onclick="showDeleteModal()">
+                                🗑️ 删除项目
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </form>
+            
+            <!-- 已删除项目提示 -->
+            <div class="deleted-banner" id="deleted-banner">
+                <div class="deleted-banner-icon">🗑️</div>
+                <div class="deleted-banner-content">
+                    <div class="deleted-banner-title">此项目已在回收站中</div>
+                    <div class="deleted-banner-desc" id="deleted-banner-desc">删除时间：-</div>
+                </div>
+                <button type="button" class="btn-restore" onclick="restoreProject()">♻️ 恢复项目</button>
+                <button type="button" class="btn-delete" onclick="permanentDeleteProject()">🗑️ 永久删除</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 删除确认对话框 -->
+    <div class="delete-modal" id="delete-modal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <div class="delete-modal-icon">🗑️</div>
+                <div class="delete-modal-title">确认删除项目</div>
+                <div class="delete-modal-desc">您正在删除项目 "<span id="delete-project-name"></span>"</div>
+            </div>
+            <div class="delete-modal-warning">⚠️ 项目将被移入回收站，30天内可以恢复。关联的工作记录将保留但失去项目关联。</div>
+            <div class="delete-modal-input">
+                <label>请输入项目名称以确认删除：</label>
+                <input type="text" id="confirm-delete-input" placeholder="输入项目名称..." oninput="checkDeleteConfirmation()">
+            </div>
+            <div class="delete-modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="hideDeleteModal()">取消</button>
+                <button type="button" class="btn-modal-confirm" id="btn-confirm-delete" disabled onclick="deleteProject()">确认删除</button>
+            </div>
         </div>
     </div>
 
@@ -338,17 +428,25 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        let currentUser = null, projectId = null, projectData = null, allEngineers = [];
+        let currentUser = null, projectId = null, projectData = null, allEngineers = [], userData = null;
 
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
                 projectId = new URLSearchParams(window.location.search).get('id');
                 if (!projectId) { alert('缺少项目ID'); window.location.href = 'project-management.html'; return; }
+                await loadUserData();
                 await loadEngineers();
                 await loadProject();
             } else { window.location.href = 'index.html'; }
         });
+        
+        async function loadUserData() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                userData = userDoc.exists ? userDoc.data() : { role: 'engineer' };
+            } catch (e) { userData = { role: 'engineer' }; }
+        }
 
         async function loadEngineers() {
             try {
@@ -375,6 +473,7 @@
                 if (!doc.exists) { alert('项目不存在'); window.location.href = 'project-management.html'; return; }
                 projectData = doc.data();
                 fillForm();
+                showDeleteZone();
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
             } catch (e) { alert('加载失败: ' + e.message); }
@@ -773,6 +872,125 @@
                 window.location.href = 'project-detail.html?id=' + projectId;
             } catch (e) { alert('更新失败: ' + e.message); btn.disabled = false; btn.textContent = '✅ 保存修改'; }
         });
+
+        // ==================== 删除功能 ====================
+        
+        function checkDeletePermission() {
+            if (!projectData || !userData) return false;
+            if (userData.role === 'admin') return true;
+            if (projectData.createdBy === currentUser.uid) return true;
+            return false;
+        }
+
+        function showDeleteZone() {
+            const dangerZone = document.getElementById('danger-zone');
+            const deletedBanner = document.getElementById('deleted-banner');
+            
+            if (!checkDeletePermission()) {
+                dangerZone.style.display = 'none';
+                deletedBanner.classList.remove('show');
+                return;
+            }
+            
+            if (projectData.deleted) {
+                deletedBanner.classList.add('show');
+                dangerZone.style.display = 'none';
+                
+                const deletedAt = projectData.deletedAt?.toDate ? projectData.deletedAt.toDate() : new Date(projectData.deletedAt);
+                const deleteDate = deletedAt.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const daysRemaining = Math.max(0, 30 - Math.floor((Date.now() - deletedAt.getTime()) / (1000 * 60 * 60 * 24)));
+                document.getElementById('deleted-banner-desc').textContent = `删除时间：${deleteDate} | 剩余恢复时间：${daysRemaining}天`;
+            } else {
+                deletedBanner.classList.remove('show');
+                dangerZone.style.display = 'block';
+            }
+        }
+
+        function showDeleteModal() {
+            document.getElementById('delete-project-name').textContent = projectData.projectName || '未命名项目';
+            document.getElementById('confirm-delete-input').value = '';
+            document.getElementById('btn-confirm-delete').disabled = true;
+            document.getElementById('delete-modal').classList.add('show');
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('show');
+        }
+
+        function checkDeleteConfirmation() {
+            const input = document.getElementById('confirm-delete-input').value.trim();
+            const projectName = projectData.projectName || '未命名项目';
+            document.getElementById('btn-confirm-delete').disabled = (input !== projectName);
+        }
+
+        async function deleteProject() {
+            const btn = document.getElementById('btn-confirm-delete');
+            btn.disabled = true;
+            btn.textContent = '删除中...';
+            
+            try {
+                await db.collection('projects').doc(projectId).update({
+                    deleted: true,
+                    deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    deletedBy: currentUser.uid,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                hideDeleteModal();
+                alert('项目已移入回收站');
+                window.location.href = 'project-management.html';
+            } catch (error) {
+                alert('删除失败: ' + error.message);
+                btn.disabled = false;
+                btn.textContent = '确认删除';
+            }
+        }
+
+        async function restoreProject() {
+            if (!confirm('确定要恢复此项目吗？')) return;
+            
+            try {
+                await db.collection('projects').doc(projectId).update({
+                    deleted: false,
+                    deletedAt: firebase.firestore.FieldValue.delete(),
+                    deletedBy: firebase.firestore.FieldValue.delete(),
+                    restoredAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    restoredBy: currentUser.uid,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert('项目已恢复');
+                location.reload();
+            } catch (error) {
+                alert('恢复失败: ' + error.message);
+            }
+        }
+
+        async function permanentDeleteProject() {
+            if (!confirm('⚠️ 警告：此操作不可撤销！\n\n确定要永久删除此项目吗？')) return;
+            if (!confirm('再次确认：项目将被永久删除，无法恢复。继续吗？')) return;
+            
+            try {
+                const workRecords = await db.collection('workRecords').where('projectId', '==', projectId).get();
+                const batch = db.batch();
+                
+                workRecords.docs.forEach(doc => {
+                    batch.update(doc.ref, {
+                        projectId: null,
+                        projectName: projectData.projectName + ' (已删除)',
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+                
+                batch.delete(db.collection('projects').doc(projectId));
+                await batch.commit();
+                
+                alert('项目已永久删除');
+                window.location.href = 'project-management.html';
+            } catch (error) {
+                alert('删除失败: ' + error.message);
+            }
+        }
     </script>
 </body>
 </html>
