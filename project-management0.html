@@ -98,99 +98,65 @@
             padding: 25px;
             border-radius: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            text-align: center;
         }
         
         .stat-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
+            font-size: 36px;
+            margin-bottom: 12px;
         }
         
         .stat-value {
             font-size: 32px;
             font-weight: bold;
-            color: #333;
+            color: #667eea;
+            margin-bottom: 8px;
         }
         
         .stat-label {
-            font-size: 14px;
             color: #666;
-            margin-top: 5px;
+            font-size: 13px;
         }
         
-        /* 筛选区域 */
         .filters {
             background: white;
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 15px;
             margin-bottom: 25px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
         .filter-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            flex-wrap: wrap;
-            align-items: flex-end;
         }
         
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
-            min-width: 150px;
+            gap: 8px;
         }
         
         .filter-label {
             font-size: 12px;
+            font-weight: 600;
             color: #666;
-            font-weight: 500;
         }
         
-        .filter-select, .filter-input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+        .filter-select,
+        .filter-input {
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
             font-size: 14px;
         }
         
-        .filter-select:focus, .filter-input:focus {
+        .filter-select:focus,
+        .filter-input:focus {
             outline: none;
             border-color: #667eea;
         }
-
-        /* 视图切换按钮 */
-        .view-toggle {
-            display: flex;
-            gap: 5px;
-            margin-left: auto;
-        }
-
-        .view-btn {
-            padding: 8px 16px;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .view-btn:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-
-        .view-btn.active {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-        }
         
-        /* 卡片视图 */
         .projects-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -199,11 +165,12 @@
         
         .project-card {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 25px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            cursor: pointer;
             transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
         }
         
         .project-card:hover {
@@ -214,8 +181,12 @@
         .project-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: start;
             margin-bottom: 15px;
+        }
+        
+        .project-title {
+            flex: 1;
         }
         
         .project-name {
@@ -327,164 +298,181 @@
         }
         
         .btn-view:hover {
-            background: #5a6fd6;
+            background: #5568d3;
         }
         
         .btn-edit {
-            background: #f0f0f0;
-            color: #333;
+            background: #f5f7fa;
+            color: #667eea;
+            border: 2px solid #667eea;
         }
         
         .btn-edit:hover {
-            background: #e0e0e0;
-        }
-
-        /* ========== 列表视图样式 ========== */
-        .projects-list {
-            display: none;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .projects-list.show {
-            display: block;
-        }
-
-        .list-header {
-            display: grid;
-            grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr 120px;
-            padding: 15px 20px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e0e0e0;
-            font-weight: 600;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .list-row {
-            display: grid;
-            grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr 120px;
-            padding: 15px 20px;
-            border-bottom: 1px solid #f0f0f0;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .list-row:hover {
-            background: #f8f9ff;
-        }
-
-        .list-row:last-child {
-            border-bottom: none;
-        }
-
-        .list-project-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 3px;
-        }
-
-        .list-customer-name {
-            font-size: 12px;
-            color: #667eea;
-        }
-
-        .list-cell {
-            font-size: 13px;
-            color: #666;
-        }
-
-        .list-cell.amount {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .list-cell.hours {
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .list-actions {
-            display: flex;
-            gap: 5px;
-        }
-
-        .list-action-btn {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .list-btn-view {
-            background: #667eea;
-            color: white;
-        }
-
-        .list-btn-view:hover {
-            background: #5a6fd6;
-        }
-
-        .list-btn-edit {
-            background: #f0f0f0;
-            color: #333;
-        }
-
-        .list-btn-edit:hover {
-            background: #e0e0e0;
-        }
-
-        /* 响应式列表 */
-        @media (max-width: 1200px) {
-            .list-header, .list-row {
-                grid-template-columns: 2fr 1.5fr 1fr 1fr 100px;
-            }
-            .list-header > *:nth-child(4),
-            .list-row > *:nth-child(4),
-            .list-header > *:nth-child(6),
-            .list-row > *:nth-child(6) {
-                display: none;
-            }
-        }
-
-        @media (max-width: 900px) {
-            .list-header, .list-row {
-                grid-template-columns: 2fr 1fr 1fr 100px;
-            }
-            .list-header > *:nth-child(3),
-            .list-row > *:nth-child(3) {
-                display: none;
-            }
+            background: #e7eaf0;
         }
         
-        /* 空状态 */
+        .loading {
+            text-align: center;
+            padding: 100px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             background: white;
-            border-radius: 12px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
         .empty-icon {
-            font-size: 80px;
+            font-size: 64px;
             margin-bottom: 20px;
+            opacity: 0.3;
         }
         
         .empty-text {
-            font-size: 18px;
             color: #666;
             margin-bottom: 20px;
         }
-
-        /* 隐藏卡片视图时 */
-        .projects-grid.hidden {
-            display: none;
+    
+        /* 视图切换按钮 */
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+            background: white;
+            padding: 5px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
+        
+        .view-btn {
+            padding: 10px 18px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 20px;
+            color: #999;
+        }
+        
+        .view-btn:hover {
+            background: #f5f7fa;
+            color: #667eea;
+        }
+        
+        .view-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* 列表视图样式 */
+        .projects-list-view {
+            display: none; /* 默认隐藏 */
+        }
+        
+        .projects-list-view.active {
+            display: block;
+        }
+        
+        .project-list-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            cursor: pointer;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 120px auto;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .project-list-item:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        
+        .list-item-main {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .list-item-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .list-item-subtitle {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .list-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .list-item-label {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .list-item-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .list-item-stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .list-stat {
+            text-align: center;
+        }
+        
+        .list-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .list-stat-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .project-list-item {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -492,17 +480,25 @@
     <div class="header">
         <div class="header-content">
             <div class="header-title">
-                <h1>📁 项目管理</h1>
+                <h2>📁 项目管理</h2>
             </div>
             <div class="header-actions">
-                <a href="create-project.html" class="btn btn-primary">+ 新建项目</a>
+                <button class="btn btn-primary" onclick="window.location.href='create-project.html'">
+                    ➕ 新建项目
+                </button>
                 <a href="dashboard.html" class="btn btn-secondary">← 返回主页</a>
             </div>
         </div>
     </div>
     
+    <!-- 加载中 -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <div>正在加载项目...</div>
+    </div>
+    
     <!-- 主内容 -->
-    <div class="container">
+    <div id="main-content" class="container" style="display: none;">
         <!-- 统计卡片 -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -559,38 +555,24 @@
                         <option value="">全部销售</option>
                     </select>
                 </div>
-                
-                <!-- 视图切换按钮 -->
-                <div class="view-toggle">
-                    <button class="view-btn active" id="card-view-btn" onclick="switchView('card')">
-                        🗂️ 卡片
-                    </button>
-                    <button class="view-btn" id="list-view-btn" onclick="switchView('list')">
-                        📋 列表
-                    </button>
-                </div>
             </div>
         </div>
         
-        <!-- 卡片视图 -->
+        <!-- 视图切换按钮 -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <div class="view-toggle">
+                <button class="view-btn active" id="grid-view-btn" onclick="switchView('grid')" title="卡片视图">
+                    <span>⊞</span>
+                </button>
+                <button class="view-btn" id="list-view-btn" onclick="switchView('list')" title="列表视图">
+                    <span>☰</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 项目列表 -->
         <div class="projects-grid" id="projects-grid">
             <!-- 动态加载 -->
-        </div>
-
-        <!-- 列表视图 -->
-        <div class="projects-list" id="projects-list">
-            <div class="list-header">
-                <div>项目名称 / 客户</div>
-                <div>阶段</div>
-                <div>类型</div>
-                <div>销售</div>
-                <div>金额</div>
-                <div>工时</div>
-                <div>操作</div>
-            </div>
-            <div id="list-body">
-                <!-- 动态加载 -->
-            </div>
         </div>
         
         <!-- 空状态 -->
@@ -623,7 +605,6 @@
         let userData = null;
         let allProjects = [];
         let filteredProjects = [];
-        let currentView = 'card';  // 'card' 或 'list'
 
         // 检查登录状态
         auth.onAuthStateChanged(async (user) => {
@@ -647,13 +628,24 @@
                 if (userDoc.exists) {
                     userData = userDoc.data();
                     console.log('用户数据加载成功:', userData);
+                    
+                    // 检查用户状态
+                    if (userData.status !== 'approved') {
+                        console.warn('用户未审批，状态:', userData.status);
+                        alert('您的账号尚未审批，无法访问系统');
+                        window.location.href = 'pending-approval.html';
+                        return;
+                    }
                 } else {
-                    console.warn('用户文档不存在，以普通用户身份继续');
-                    userData = { role: 'engineer' };
+                    console.error('用户文档不存在');
+                    alert('用户信息未找到，请联系管理员');
+                    auth.signOut();
+                    window.location.href = 'index.html';
+                    return;
                 }
             } catch (error) {
                 console.error('加载用户数据失败:', error);
-                userData = { role: 'engineer' };
+                alert('加载用户数据失败: ' + error.message);
             }
         }
 
@@ -661,14 +653,21 @@
         async function loadProjects() {
             try {
                 console.log('开始加载项目...');
+                console.log('当前用户:', currentUser ? currentUser.email : 'null');
+                console.log('用户数据:', userData);
                 
                 let query = db.collection('projects');
                 
                 // 根据角色加载数据
-                if (userData && (userData.role === 'admin' || userData.role === 'team_lead')) {
-                    console.log('以管理员/领导身份加载所有项目');
+                if (userData && userData.role === 'admin') {
+                    console.log('以管理员身份加载所有项目');
+                    // 管理员看所有项目
+                } else if (userData && userData.role === 'team_lead') {
+                    console.log('以部门领导身份加载所有项目');
+                    // 部门领导看ICT部门所有项目
                 } else {
                     console.log('以工程师身份加载参与的项目');
+                    // 工程师只看自己参与的项目（包括 userData 为 null 的情况）
                     query = query.where('assignedEngineers', 'array-contains', currentUser.uid);
                 }
                 
@@ -676,86 +675,85 @@
                 const snapshot = await query.get();
                 console.log('查询返回', snapshot.size, '个项目');
                 
-                allProjects = [];
-                
-                for (const doc of snapshot.docs) {
+                allProjects = await Promise.all(snapshot.docs.map(async doc => {
                     const projectData = doc.data();
                     
                     // 获取项目的工作记录统计
+                    const recordsSnapshot = await db.collection('workRecords')
+                        .where('projectId', '==', doc.id)
+                        .get();
+                    
                     let totalHours = 0;
-                    let totalSessions = 0;
-                    let engineerSet = new Set();
+                    let sessionCount = recordsSnapshot.size;
+                    const engineers = new Set();
                     
-                    try {
-                        const recordsSnapshot = await db.collection('workRecords')
-                            .where('projectId', '==', doc.id)
-                            .get();
-                        
-                        recordsSnapshot.forEach(record => {
-                            const recordData = record.data();
-                            totalHours += recordData.workHours || 0;
-                            totalSessions++;
-                            if (recordData.engineerId) {
-                                engineerSet.add(recordData.engineerId);
-                            }
-                        });
-                    } catch (e) {
-                        console.warn('获取工作记录失败:', e);
-                    }
+                    recordsSnapshot.docs.forEach(recordDoc => {
+                        const record = recordDoc.data();
+                        totalHours += record.totalWorkingHours || 0;
+                        engineers.add(record.userId);
+                    });
                     
-                    allProjects.push({
+                    return {
                         id: doc.id,
                         ...projectData,
-                        totalWorkHours: projectData.totalWorkHours || totalHours,
-                        totalSessions: projectData.totalSessions || totalSessions,
-                        engineerCount: engineerSet.size || (projectData.assignedEngineers?.length || 0)
-                    });
-                }
+                        totalWorkHours: totalHours,
+                        totalSessions: sessionCount,
+                        engineerCount: engineers.size
+                    };
+                }));
                 
                 console.log('加载了', allProjects.length, '个项目');
                 
-                filteredProjects = [...allProjects];
+                // 构建销售人员筛选列表
+                buildSalesFilterList();
+                
+                // 应用筛选
+                applyFilters();
+                
+                // 更新统计
                 updateStats();
-                renderProjects();
-                updateSalesFilter();
+                
+                // 显示页面
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
                 
             } catch (error) {
                 console.error('加载项目失败:', error);
-                alert('加载项目失败: ' + error.message);
+                alert('加载失败: ' + error.message);
             }
         }
 
-        // 更新销售人员筛选选项
-        function updateSalesFilter() {
+        // 构建销售人员筛选列表
+        function buildSalesFilterList() {
             const salesSet = new Set();
-            allProjects.forEach(p => {
-                if (p.salesPerson) salesSet.add(p.salesPerson);
+            allProjects.forEach(project => {
+                if (project.salesPerson) {
+                    salesSet.add(project.salesPerson);
+                }
             });
             
             const salesSelect = document.getElementById('sales-filter');
-            if (salesSelect) {
-                salesSelect.innerHTML = '<option value="">全部销售</option>';
-                
-                Array.from(salesSet).sort().forEach(sales => {
-                    const option = document.createElement('option');
-                    option.value = sales;
-                    option.textContent = sales;
-                    salesSelect.appendChild(option);
-                });
-            }
+            salesSelect.innerHTML = '<option value="">全部销售</option>';
+            
+            Array.from(salesSet).sort().forEach(sales => {
+                const option = document.createElement('option');
+                option.value = sales;
+                option.textContent = sales;
+                salesSelect.appendChild(option);
+            });
         }
 
         // 应用筛选
         function applyFilters() {
-            const statusFilter = document.getElementById('status-filter')?.value || '';
-            const typeFilter = document.getElementById('type-filter')?.value || '';
-            const customerFilter = (document.getElementById('customer-filter')?.value || '').toLowerCase().trim();
-            const salesFilter = document.getElementById('sales-filter')?.value || '';
+            const statusFilter = document.getElementById('status-filter').value;
+            const typeFilter = document.getElementById('type-filter').value;
+            const customerFilter = document.getElementById('customer-filter').value.toLowerCase().trim();
+            const salesFilter = document.getElementById('sales-filter').value;
             
             filteredProjects = allProjects.filter(project => {
                 if (statusFilter && project.status !== statusFilter) return false;
                 if (typeFilter && project.projectType !== typeFilter) return false;
-                if (customerFilter && !(project.customerName || '').toLowerCase().includes(customerFilter)) return false;
+                if (customerFilter && !project.customerName.toLowerCase().includes(customerFilter)) return false;
                 if (salesFilter && project.salesPerson !== salesFilter) return false;
                 return true;
             });
@@ -763,71 +761,107 @@
             renderProjects();
         }
 
-        // ========== 视图切换 ==========
+        // 渲染项目列表
+        
+        
+        // 当前视图模式（grid 或 list）
+        let currentView = 'grid';
+        
+        // 切换视图
         function switchView(view) {
             currentView = view;
             
-            const cardViewBtn = document.getElementById('card-view-btn');
-            const listViewBtn = document.getElementById('list-view-btn');
-            const projectsGrid = document.getElementById('projects-grid');
-            const projectsList = document.getElementById('projects-list');
+            // 更新按钮状态
+            document.getElementById('grid-view-btn').classList.toggle('active', view === 'grid');
+            document.getElementById('list-view-btn').classList.toggle('active', view === 'list');
             
-            if (!cardViewBtn || !listViewBtn || !projectsGrid || !projectsList) {
-                console.error('视图切换元素不存在');
-                return;
-            }
+            // 切换显示
+            const gridView = document.getElementById('projects-grid');
+            const listView = document.getElementById('projects-list-view');
             
-            if (view === 'card') {
-                cardViewBtn.classList.add('active');
-                listViewBtn.classList.remove('active');
-                projectsGrid.classList.remove('hidden');
-                projectsList.classList.remove('show');
+            if (view === 'grid') {
+                gridView.style.display = 'grid';
+                listView.classList.remove('active');
             } else {
-                cardViewBtn.classList.remove('active');
-                listViewBtn.classList.add('active');
-                projectsGrid.classList.add('hidden');
-                projectsList.classList.add('show');
+                gridView.style.display = 'none';
+                listView.classList.add('active');
             }
             
+            // 重新渲染
             renderProjects();
         }
-
-        // 渲染项目
-        function renderProjects() {
-            const grid = document.getElementById('projects-grid');
-            const listBody = document.getElementById('list-body');
-            const emptyState = document.getElementById('empty-state');
-            const projectsList = document.getElementById('projects-list');
+        
+        // 渲染列表视图
+        function renderListView() {
+            const listView = document.getElementById('projects-list-view');
             
-            if (!grid || !emptyState || !projectsList) {
-                console.error('渲染元素不存在');
+            if (filteredProjects.length === 0) {
+                listView.innerHTML = '';
                 return;
             }
             
+            listView.innerHTML = filteredProjects.map(project => {
+                const statusClass = {
+                    '规划中': 'status-planning',
+                    '进行中': 'status-active',
+                    '已完成': 'status-completed',
+                    '已暂停': 'status-paused'
+                }[project.status] || 'status-planning';
+                
+                return `
+                    <div class="project-list-item" onclick="viewProject('${project.id}')">
+                        <div class="list-item-main">
+                            <div class="list-item-title">${project.projectName}</div>
+                            <div class="list-item-subtitle">${project.customerName}</div>
+                        </div>
+                        
+                        <div class="list-item-info">
+                            <div class="list-item-label">项目类型</div>
+                            <div class="list-item-value">${project.projectType}</div>
+                        </div>
+                        
+                        <div class="list-item-info">
+                            <div class="list-item-label">行业/国家</div>
+                            <div class="list-item-value">${project.customerIndustry || '-'} / ${project.customerCountry || '-'}</div>
+                        </div>
+                        
+                        <div class="list-item-stats">
+                            <div class="list-stat">
+                                <div class="list-stat-value">${project.totalWorkHours.toFixed(1)}</div>
+                                <div class="list-stat-label">总工时</div>
+                            </div>
+                            <div class="list-stat">
+                                <div class="list-stat-value">${project.totalSessions}</div>
+                                <div class="list-stat-label">记录数</div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-item-info">
+                            <div class="list-item-label">状态</div>
+                            <span class="status-badge ${statusClass}">${project.status}</span>
+                        </div>
+                        
+                        <div class="list-item-info">
+                            <div class="list-item-label">销售</div>
+                            <div class="list-item-value">${project.salesPerson || '-'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderProjects() {
+            const grid = document.getElementById('projects-grid');
+            const emptyState = document.getElementById('empty-state');
+            
             if (filteredProjects.length === 0) {
-                grid.classList.add('hidden');
-                projectsList.classList.remove('show');
+                grid.style.display = 'none';
                 emptyState.style.display = 'block';
                 return;
             }
             
+            grid.style.display = 'grid';
             emptyState.style.display = 'none';
-            
-            if (currentView === 'card') {
-                grid.classList.remove('hidden');
-                projectsList.classList.remove('show');
-                renderCardView();
-            } else {
-                grid.classList.add('hidden');
-                projectsList.classList.add('show');
-                renderListView();
-            }
-        }
-
-        // 渲染卡片视图
-        function renderCardView() {
-            const grid = document.getElementById('projects-grid');
-            if (!grid) return;
             
             grid.innerHTML = filteredProjects.map(project => {
                 const statusClass = {
@@ -841,10 +875,10 @@
                     <div class="project-card" onclick="viewProject('${project.id}')">
                         <div class="project-header">
                             <div class="project-title">
-                                <div class="project-name">${project.projectName || '未命名项目'}</div>
-                                <div class="project-customer">${project.customerName || '-'}</div>
+                                <div class="project-name">${project.projectName}</div>
+                                <div class="project-customer">${project.customerName}</div>
                             </div>
-                            <span class="status-badge ${statusClass}">${project.status || '未知'}</span>
+                            <span class="status-badge ${statusClass}">${project.status}</span>
                         </div>
                         
                         <div class="project-meta">
@@ -858,7 +892,7 @@
                             </div>
                             <div class="meta-item">
                                 <span class="meta-icon">📋</span>
-                                <span>${project.projectType || '-'}</span>
+                                <span>${project.projectType}</span>
                             </div>
                             <div class="meta-item">
                                 <span class="meta-icon">👤</span>
@@ -866,7 +900,7 @@
                             </div>
                             <div class="meta-item">
                                 <span class="meta-icon">💰</span>
-                                <span>${project.projectAmount ? (project.projectAmount/1000).toFixed(0) + 'K ' + (project.projectCurrency || 'GBP') : '-'}</span>
+                                <span>${project.projectAmount ? project.projectAmount + 'K ' + project.projectCurrency : '-'}</span>
                             </div>
                             <div class="meta-item">
                                 <span class="meta-icon">📅</span>
@@ -876,15 +910,15 @@
                         
                         <div class="project-stats">
                             <div class="stat-item">
-                                <div class="stat-item-value">${(project.totalWorkHours || 0).toFixed(1)}</div>
+                                <div class="stat-item-value">${project.totalWorkHours.toFixed(1)}</div>
                                 <div class="stat-item-label">总工时</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-item-value">${project.totalSessions || 0}</div>
+                                <div class="stat-item-value">${project.totalSessions}</div>
                                 <div class="stat-item-label">工作记录</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-item-value">${project.engineerCount || 0}</div>
+                                <div class="stat-item-value">${project.engineerCount}</div>
                                 <div class="stat-item-label">参与人员</div>
                             </div>
                         </div>
@@ -902,50 +936,6 @@
             }).join('');
         }
 
-        // 渲染列表视图
-        function renderListView() {
-            const listBody = document.getElementById('list-body');
-            if (!listBody) return;
-            
-            listBody.innerHTML = filteredProjects.map(project => {
-                const statusClass = {
-                    '规划中': 'status-planning',
-                    '进行中': 'status-active',
-                    '已完成': 'status-completed',
-                    '已暂停': 'status-paused'
-                }[project.status] || 'status-planning';
-                
-                const amount = project.projectAmount ? 
-                    (project.projectAmount/1000).toFixed(0) + 'K ' + (project.projectCurrency || 'GBP') : '-';
-                
-                return `
-                    <div class="list-row" onclick="viewProject('${project.id}')">
-                        <div>
-                            <div class="list-project-name">${project.projectName || '未命名项目'}</div>
-                            <div class="list-customer-name">${project.customerName || '-'}</div>
-                        </div>
-                        <div class="list-cell">
-                            <span class="status-badge ${statusClass}" style="font-size: 11px; padding: 3px 8px;">
-                                ${project.projectStage || project.status || '-'}
-                            </span>
-                        </div>
-                        <div class="list-cell">${project.projectType || '-'}</div>
-                        <div class="list-cell">${project.salesPerson || '-'}</div>
-                        <div class="list-cell amount">${amount}</div>
-                        <div class="list-cell hours">${(project.totalWorkHours || 0).toFixed(1)}h</div>
-                        <div class="list-actions" onclick="event.stopPropagation()">
-                            <button class="list-action-btn list-btn-view" onclick="viewProject('${project.id}')">
-                                查看
-                            </button>
-                            <button class="list-action-btn list-btn-edit" onclick="editProject('${project.id}')">
-                                编辑
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
         // 更新统计
         function updateStats() {
             const totalProjects = allProjects.length;
@@ -953,15 +943,10 @@
             const completedProjects = allProjects.filter(p => p.status === '已完成').length;
             const totalHours = allProjects.reduce((sum, p) => sum + (p.totalWorkHours || 0), 0);
             
-            const totalEl = document.getElementById('total-projects');
-            const activeEl = document.getElementById('active-projects');
-            const completedEl = document.getElementById('completed-projects');
-            const hoursEl = document.getElementById('total-hours');
-            
-            if (totalEl) totalEl.textContent = totalProjects;
-            if (activeEl) activeEl.textContent = activeProjects;
-            if (completedEl) completedEl.textContent = completedProjects;
-            if (hoursEl) hoursEl.textContent = totalHours.toFixed(1) + 'h';
+            document.getElementById('total-projects').textContent = totalProjects;
+            document.getElementById('active-projects').textContent = activeProjects;
+            document.getElementById('completed-projects').textContent = completedProjects;
+            document.getElementById('total-hours').textContent = totalHours.toFixed(1) + 'h';
         }
 
         // 查看项目详情
