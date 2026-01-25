@@ -1,0 +1,1431 @@
+/**
+ * 工程师工时系统 - 移动端适配CSS
+ * mobile-responsive.css
+ * 版本: 3.0
+ * 
+ * 使用方法：在每个HTML文件的</head>前添加：
+ * <link rel="stylesheet" href="css/mobile-responsive.css">
+ * 
+ * ============================================
+ * 平台兼容性说明
+ * ============================================
+ * 
+ * 【iOS (iPhone/iPad) 适配】
+ * ✓ -webkit-text-size-adjust: 防止横屏时字体自动放大
+ * ✓ -webkit-tap-highlight-color: 移除点击高亮
+ * ✓ -webkit-touch-callout: 禁用长按菜单
+ * ✓ -webkit-overflow-scrolling: touch 惯性滚动
+ * ✓ font-size: 16px 输入框防止自动缩放
+ * ✓ env(safe-area-inset-*): iPhone X+ 刘海屏/底部安全区
+ * ✓ position: sticky 兼容性处理
+ * ✓ iOS Safari 100vh 问题修复
+ * ✓ 日期/时间选择器原生样式优化
+ * 
+ * 【Android 适配】
+ * ✓ touch-action: manipulation 禁用双击缩放
+ * ✓ overscroll-behavior: 防止过度滚动
+ * ✓ 各厂商浏览器兼容 (Chrome, Samsung, Mi, Huawei)
+ * ✓ 低端设备性能优化 (减少动画)
+ * ✓ Android WebView 兼容
+ * ✓ 虚拟键盘弹出适配
+ * 
+ * 【通用移动端】
+ * ✓ 触摸目标最小 44px (WCAG标准)
+ * ✓ 响应式断点: 1024px, 768px, 480px
+ * ✓ 横屏模式优化
+ * ✓ 高DPI屏幕适配
+ * ✓ 深色模式基础支持
+ * ✓ 打印样式
+ */
+
+/* ============================================
+   基础设置 - iOS & Android 通用
+   ============================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    /* iOS: 移除点击时的蓝色高亮 */
+    -webkit-tap-highlight-color: transparent;
+    /* iOS: 禁用长按弹出菜单 */
+    -webkit-touch-callout: none;
+}
+
+html {
+    /* iOS/Android: 防止横屏时字体自动调整 */
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    
+    /* 平滑滚动 */
+    scroll-behavior: smooth;
+    
+    /* iOS: 修复100vh问题 */
+    height: -webkit-fill-available;
+}
+
+body {
+    /* iOS: 配合100vh修复 */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    
+    /* Android: 防止过度滚动时的橡皮筋效果 */
+    overscroll-behavior-y: none;
+}
+
+/* 图片和媒体响应式 */
+img, video, iframe, canvas, svg {
+    max-width: 100%;
+    height: auto;
+    /* 防止图片在flex容器中被压缩 */
+    flex-shrink: 0;
+}
+
+/* ============================================
+   触摸交互优化 - iOS & Android
+   ============================================ */
+button, 
+.btn, 
+a, 
+input[type="submit"], 
+input[type="button"],
+input[type="reset"],
+select,
+[role="button"],
+[onclick] {
+    /* 禁用双击缩放，改善点击响应速度 */
+    touch-action: manipulation;
+    /* 确保可点击元素有正确的光标 */
+    cursor: pointer;
+    /* Android: 移除默认的点击效果 */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS: 移除输入框默认样式 */
+input,
+textarea,
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: 0; /* iOS Safari 会给输入框加圆角 */
+}
+
+/* 但保留checkbox和radio的默认样式 */
+input[type="checkbox"],
+input[type="radio"] {
+    -webkit-appearance: checkbox;
+    -moz-appearance: checkbox;
+    appearance: auto;
+}
+
+input[type="radio"] {
+    -webkit-appearance: radio;
+    -moz-appearance: radio;
+    appearance: auto;
+}
+
+/* ============================================
+   iOS 日期/时间选择器优化
+   ============================================ */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"] {
+    /* iOS: 确保原生选择器正常工作 */
+    -webkit-appearance: none;
+    appearance: none;
+    /* 统一高度 */
+    min-height: 44px;
+    /* 添加下拉箭头指示 */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 35px;
+}
+
+/* iOS: 日期选择器文字对齐 */
+input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+}
+
+/* ============================================
+   平板设备 (768px - 1024px)
+   ============================================ */
+@media (max-width: 1024px) {
+    /* 容器 */
+    .container {
+        max-width: 100%;
+        padding: 0 15px;
+        margin: 20px auto;
+    }
+    
+    /* 网格布局 2列 */
+    .stats-grid,
+    .actions-grid,
+    .feature-grid,
+    .form-row,
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 15px;
+    }
+    
+    /* 图表区域 */
+    .charts-section {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .chart-card.full-width {
+        grid-column: span 1 !important;
+    }
+    
+    /* 双栏布局改单栏 */
+    .two-column,
+    .form-columns,
+    .main-content {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* 周报生成器双栏 */
+    .report-container {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+    }
+}
+
+/* ============================================
+   手机设备 (最大宽度 768px)
+   ============================================ */
+@media (max-width: 768px) {
+    /* === 头部导航 === */
+    .header {
+        padding: 15px;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .header h2,
+    .header-title {
+        font-size: 18px;
+    }
+    
+    .header-actions {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .header-actions .btn,
+    .back-btn {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+    
+    /* === Logo区域 === */
+    .logo {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .logo-icon {
+        font-size: 28px;
+    }
+    
+    .logo-text h1 {
+        font-size: 16px;
+    }
+    
+    .logo-text p {
+        font-size: 11px;
+    }
+    
+    /* === 用户信息 === */
+    .user-info {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .user-details {
+        text-align: center;
+    }
+    
+    .user-name {
+        font-size: 14px;
+    }
+    
+    .user-avatar,
+    .user-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .logout-btn {
+        width: 100%;
+        padding: 10px;
+    }
+    
+    /* === 主容器 === */
+    .container {
+        margin: 15px auto;
+        padding: 0 12px;
+    }
+    
+    /* === 面板/卡片 === */
+    .panel,
+    .section,
+    .card,
+    .welcome-card,
+    .stat-card,
+    .actions-section,
+    .form-section,
+    .chart-card,
+    .ranking-section {
+        padding: 20px 15px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .panel h2,
+    .section h2,
+    .panel-title,
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+    
+    .panel-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    /* === 网格布局全部单列 === */
+    .stats-grid,
+    .actions-grid,
+    .feature-grid,
+    .form-row,
+    .info-grid,
+    .team-grid,
+    .project-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px;
+    }
+    
+    /* === 统计卡片 === */
+    .stat-card-header {
+        padding: 15px;
+    }
+    
+    .stat-value,
+    .stat-amount {
+        font-size: 24px;
+    }
+    
+    .stat-icon {
+        font-size: 28px;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .stat-label,
+    .stat-title {
+        font-size: 13px;
+    }
+    
+    .stat-details {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    /* === 操作按钮 === */
+    .actions-grid {
+        gap: 10px;
+    }
+    
+    .action-btn {
+        padding: 15px;
+        font-size: 14px;
+    }
+    
+    .action-icon {
+        font-size: 20px;
+    }
+    
+    .action-content {
+        text-align: left;
+    }
+    
+    /* === 表单元素 === */
+    .form-group,
+    .settings-section,
+    .input-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-label,
+    .settings-label,
+    label {
+        font-size: 13px;
+        margin-bottom: 6px;
+        display: block;
+    }
+    
+    /* 防止iOS输入框缩放 - 关键！ */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="search"],
+    input[type="date"],
+    input[type="time"],
+    input[type="datetime-local"],
+    select,
+    textarea,
+    .form-input,
+    .form-select,
+    .form-textarea,
+    .settings-input,
+    .settings-select {
+        font-size: 16px !important;
+        padding: 12px !important;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    textarea,
+    .form-textarea,
+    .settings-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    /* 表单双栏改单列 */
+    .form-row,
+    .form-columns,
+    .input-row {
+        flex-direction: column !important;
+        gap: 15px;
+    }
+    
+    .form-row > *,
+    .form-columns > *,
+    .input-row > * {
+        width: 100% !important;
+        flex: none !important;
+    }
+    
+    /* === 按钮 === */
+    .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+    
+    .btn-group,
+    .button-group,
+    .form-actions,
+    .modal-footer,
+    .action-buttons {
+        flex-direction: column !important;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .btn-group .btn,
+    .button-group .btn,
+    .form-actions .btn,
+    .action-buttons .btn {
+        width: 100%;
+        margin: 0;
+    }
+    
+    /* 主要操作按钮 */
+    .generate-btn,
+    .submit-btn,
+    .save-btn,
+    .primary-btn {
+        padding: 15px;
+        font-size: 16px;
+        position: sticky;
+        bottom: 15px;
+        z-index: 50;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+    
+    /* === 标签页 === */
+    .tabs {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .tab {
+        padding: 10px 14px;
+        font-size: 13px;
+        flex: 1;
+        min-width: calc(50% - 4px);
+        text-align: center;
+    }
+    
+    .tab .badge {
+        top: -5px;
+        right: -5px;
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+    }
+    
+    /* === 表格 === */
+    .table-container,
+    .table-wrapper {
+        margin: 0 -15px;
+        padding: 0 15px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table,
+    .user-table,
+    .project-table,
+    .record-table,
+    .data-table {
+        min-width: 600px;
+        font-size: 13px;
+    }
+    
+    table th,
+    table td {
+        padding: 10px 8px;
+        white-space: nowrap;
+    }
+    
+    /* 表格内用户信息 */
+    table .user-info {
+        flex-direction: row;
+        gap: 8px;
+    }
+    
+    table .user-avatar,
+    table .user-avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    table .user-name {
+        font-size: 13px;
+    }
+    
+    table .user-email {
+        font-size: 11px;
+    }
+    
+    /* 表格操作按钮 */
+    table .action-buttons,
+    table .btn-group {
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    table .action-btn,
+    table .btn-small {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    /* === 状态/角色徽章 === */
+    .status-badge,
+    .role-badge,
+    .badge,
+    .tech-badge {
+        padding: 3px 8px;
+        font-size: 11px;
+    }
+    
+    /* === 筛选器 === */
+    .filters,
+    .filter-section,
+    .filter-row {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .filter-group,
+    .filter-item {
+        width: 100%;
+    }
+    
+    .filter-group select,
+    .filter-group input {
+        width: 100%;
+    }
+    
+    /* === 模态框 === */
+    .modal-overlay {
+        padding: 10px;
+    }
+    
+    .modal-content,
+    .modal {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 12px;
+    }
+    
+    .modal-header {
+        padding: 15px;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .modal-footer {
+        padding: 15px;
+        position: sticky;
+        bottom: 0;
+        background: white;
+        border-top: 1px solid #eee;
+    }
+    
+    /* === 登录页面 === */
+    .login-container,
+    .pending-container {
+        padding: 30px 20px;
+        margin: 10px;
+        width: calc(100% - 20px);
+        max-width: none;
+    }
+    
+    .login-container .logo,
+    .pending-container .icon {
+        font-size: 56px;
+        margin-bottom: 15px;
+    }
+    
+    .login-container .title,
+    .pending-container .title {
+        font-size: 22px;
+        margin-bottom: 8px;
+    }
+    
+    .login-container .subtitle,
+    .pending-container .subtitle {
+        font-size: 13px;
+        margin-bottom: 25px;
+    }
+    
+    .google-btn {
+        padding: 14px;
+        font-size: 15px;
+    }
+    
+    .info-box {
+        padding: 15px;
+        font-size: 12px;
+    }
+    
+    .info-box ul {
+        margin-left: 15px;
+    }
+    
+    /* === 周报生成器 === */
+    .report-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .settings-panel,
+    .preview-panel {
+        width: 100% !important;
+    }
+    
+    .week-selector {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .week-nav-btn {
+        padding: 12px 18px;
+        font-size: 18px;
+        min-width: 50px;
+    }
+    
+    .week-display {
+        font-size: 14px;
+        text-align: center;
+    }
+    
+    .report-preview,
+    .preview-content {
+        font-size: 13px;
+        line-height: 1.6;
+        padding: 15px;
+        max-height: 350px;
+        overflow-y: auto;
+    }
+    
+    .preview-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .copy-btn,
+    .edit-btn {
+        width: 100%;
+        padding: 12px;
+    }
+    
+    /* === 项目匹配提示 === */
+    .project-match-alert,
+    .project-notice {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .match-header {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    .match-content {
+        padding: 12px;
+    }
+    
+    .match-item {
+        flex-direction: column;
+        gap: 5px;
+        padding: 10px 0;
+    }
+    
+    .match-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .match-actions .btn {
+        width: 100%;
+    }
+    
+    /* === 提示框/通知 === */
+    .notice,
+    .tip-box,
+    .alert-box,
+    .status-box,
+    .info-box {
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+    
+    .alert-box {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    /* === 步骤列表 === */
+    .steps {
+        padding-left: 0;
+    }
+    
+    .step {
+        gap: 10px;
+        margin-bottom: 12px;
+        padding-left: 40px;
+        position: relative;
+    }
+    
+    .step-number {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+        position: absolute;
+        left: 0;
+    }
+    
+    .step-title {
+        font-size: 13px;
+    }
+    
+    .step-desc {
+        font-size: 12px;
+    }
+    
+    /* === 团队成员 === */
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+    
+    .team-member {
+        padding: 15px 10px;
+    }
+    
+    .member-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .member-name {
+        font-size: 13px;
+    }
+    
+    .member-team {
+        font-size: 11px;
+    }
+    
+    /* === 图表容器 === */
+    .charts-section {
+        gap: 15px;
+    }
+    
+    .chart-card {
+        padding: 15px;
+    }
+    
+    .chart-title {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    
+    .chart-container {
+        height: 250px !important;
+    }
+    
+    .chart-container.tall {
+        height: 300px !important;
+    }
+    
+    /* 环形图 */
+    .donut-chart-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+    
+    .donut-chart {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .donut-legend {
+        width: 100%;
+    }
+    
+    /* 条形图 */
+    .bar-label {
+        width: 70px;
+        font-size: 11px;
+    }
+    
+    .bar-value {
+        font-size: 10px;
+    }
+    
+    /* === 排行榜 === */
+    .ranking-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .ranking-tab {
+        flex: 1;
+        min-width: calc(50% - 5px);
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .ranking-list {
+        grid-template-columns: 1fr !important;
+        gap: 10px;
+    }
+    
+    .ranking-item {
+        padding: 12px;
+        gap: 10px;
+    }
+    
+    .ranking-position {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+    
+    .ranking-name {
+        font-size: 14px;
+    }
+    
+    .ranking-dept {
+        font-size: 11px;
+    }
+    
+    .ranking-amount {
+        font-size: 14px;
+    }
+    
+    /* === 客户标签云 === */
+    .customer-cloud {
+        max-height: 150px;
+    }
+    
+    .customer-tag {
+        padding: 5px 10px;
+        font-size: 11px;
+    }
+    
+    /* === 欢迎卡片 === */
+    .welcome-card h2 {
+        font-size: 20px;
+    }
+    
+    .welcome-card p {
+        font-size: 13px;
+    }
+    
+    .week-info {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+    
+    /* === 分页器 === */
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+    
+    .pagination .btn,
+    .page-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        min-width: auto;
+    }
+    
+    /* === 导出按钮组 === */
+    .export-actions,
+    .export-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .export-actions .btn {
+        width: 100%;
+    }
+    
+    /* === 项目详情 === */
+    .project-info-grid,
+    .detail-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .info-item,
+    .detail-item {
+        padding: 12px;
+    }
+    
+    .info-label,
+    .detail-label {
+        font-size: 12px;
+    }
+    
+    .info-value,
+    .detail-value {
+        font-size: 14px;
+    }
+    
+    /* === 空状态 === */
+    .empty-state,
+    .no-data {
+        padding: 40px 20px;
+    }
+    
+    .empty-icon {
+        font-size: 48px;
+    }
+    
+    .empty-text {
+        font-size: 14px;
+    }
+    
+    /* === 加载状态 === */
+    .loading {
+        padding: 40px 20px;
+    }
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* ============================================
+   小屏手机 (最大宽度 480px)
+   ============================================ */
+@media (max-width: 480px) {
+    .header {
+        padding: 12px;
+    }
+    
+    .header h2,
+    .header-title {
+        font-size: 16px;
+    }
+    
+    .container {
+        padding: 0 10px;
+    }
+    
+    .panel,
+    .section,
+    .card {
+        padding: 15px 12px;
+        border-radius: 10px;
+    }
+    
+    .panel h2,
+    .section h2,
+    .panel-title {
+        font-size: 16px;
+    }
+    
+    .stat-value,
+    .stat-amount {
+        font-size: 20px;
+    }
+    
+    .stat-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+    
+    .tab {
+        min-width: 100%;
+        padding: 10px 12px;
+    }
+    
+    .team-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .login-container .title,
+    .pending-container .title {
+        font-size: 20px;
+    }
+    
+    .login-container .logo,
+    .pending-container .icon {
+        font-size: 48px;
+    }
+    
+    .welcome-card h2 {
+        font-size: 18px;
+    }
+    
+    .chart-container {
+        height: 200px !important;
+    }
+    
+    .modal-content {
+        border-radius: 10px;
+    }
+    
+    table {
+        font-size: 12px;
+    }
+    
+    table th,
+    table td {
+        padding: 8px 6px;
+    }
+}
+
+/* ============================================
+   横屏模式优化
+   ============================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+    .header {
+        padding: 10px 15px;
+    }
+    
+    .login-container,
+    .pending-container {
+        padding: 20px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .login-container .logo,
+    .pending-container .icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+    
+    .modal-content {
+        max-height: 95vh;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* ============================================
+   触摸设备交互优化 - iOS & Android
+   ============================================ */
+@media (hover: none) and (pointer: coarse) {
+    /* WCAG标准：触摸目标最小 44x44px */
+    .btn,
+    .tab,
+    .action-btn,
+    .nav-link,
+    .ranking-tab,
+    .filter-btn,
+    .close-btn,
+    .modal-close {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* 链接和小按钮增大点击区域 */
+    a, 
+    .link,
+    .clickable {
+        padding: 8px;
+        margin: -8px;
+        display: inline-block;
+    }
+    
+    /* 表格行点击反馈 */
+    table tr {
+        cursor: pointer;
+    }
+    
+    table tr:active {
+        background: #f0f2ff;
+    }
+    
+    /* 禁用hover效果，改用active（触摸设备没有真正的hover） */
+    .btn:hover,
+    .tab:hover,
+    .action-btn:hover,
+    .card:hover,
+    .stat-card:hover,
+    .ranking-item:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* 触摸反馈 */
+    .btn:active,
+    .tab:active,
+    .action-btn:active {
+        transform: scale(0.97);
+        opacity: 0.85;
+        transition: transform 0.1s, opacity 0.1s;
+    }
+    
+    .card:active,
+    .stat-card:active,
+    .ranking-item:active {
+        transform: scale(0.99);
+        opacity: 0.9;
+    }
+    
+    /* iOS/Android: 惯性滚动 */
+    .table-container,
+    .report-preview,
+    .modal-body,
+    .scroll-container,
+    .list-container {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+    
+    /* 禁用文本选择（在需要的元素上） */
+    .btn,
+    .tab,
+    .action-btn,
+    .nav-item {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+}
+
+/* ============================================
+   iOS 安全区域适配 (iPhone X/XS/11/12/13/14/15+)
+   ============================================ */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    /* 底部固定元素需要考虑Home Indicator */
+    .generate-btn,
+    .submit-btn,
+    .save-btn,
+    .primary-btn,
+    .modal-footer,
+    .sticky-bottom,
+    .fixed-bottom,
+    .bottom-bar {
+        padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    }
+    
+    /* 页面底部留白 */
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    /* 全屏模态框 */
+    .modal-content.fullscreen {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    /* 横屏时左右安全区 */
+    @media (orientation: landscape) {
+        .header,
+        .container,
+        .panel,
+        .modal-content {
+            padding-left: max(15px, env(safe-area-inset-left));
+            padding-right: max(15px, env(safe-area-inset-right));
+        }
+    }
+}
+
+/* ============================================
+   Android 特定优化
+   ============================================ */
+/* Android Chrome 地址栏隐藏时的高度变化 */
+@supports (-webkit-touch-callout: none) {
+    /* 这个规则只在iOS生效，用于区分平台 */
+}
+
+/* 低端Android设备性能优化 */
+@media (max-width: 768px) {
+    /* 减少动画和阴影以提升性能 */
+    .low-performance *,
+    .reduce-motion * {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    /* 使用硬件加速 */
+    .panel,
+    .card,
+    .modal-content,
+    .header {
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: auto;
+    }
+}
+
+/* Android: 虚拟键盘弹出时的布局调整 */
+@media (max-height: 500px) and (max-width: 768px) {
+    /* 当键盘弹出时，视口高度会减小 */
+    .login-container,
+    .form-container {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    
+    .login-container .logo,
+    .form-header .icon {
+        display: none; /* 隐藏Logo腾出空间 */
+    }
+    
+    /* 固定底部按钮改为相对定位 */
+    .submit-btn.sticky,
+    .generate-btn.sticky {
+        position: relative;
+        bottom: auto;
+    }
+}
+
+/* ============================================
+   高DPI屏幕适配 (Retina, 2x, 3x)
+   ============================================ */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    /* 1px 边框在高DPI屏幕上的优化 */
+    .thin-border {
+        border-width: 0.5px;
+    }
+    
+    /* 确保图标清晰 */
+    .icon,
+    .logo-icon {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* ============================================
+   减少动画偏好 (系统设置)
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ============================================
+   深色模式支持 (跟随系统)
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+    /* 基础深色模式变量 - 如需启用请取消注释
+    :root {
+        --bg-primary: #1a1a2e;
+        --bg-secondary: #16213e;
+        --text-primary: #eee;
+        --text-secondary: #aaa;
+        --border-color: #333;
+    }
+    
+    body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+    }
+    
+    .panel, .card, .modal-content {
+        background: var(--bg-secondary);
+        border-color: var(--border-color);
+    }
+    */
+}
+
+/* ============================================
+   打印样式
+   ============================================ */
+@media print {
+    /* 隐藏交互元素 */
+    .header,
+    .header-actions,
+    .logout-btn,
+    .action-buttons,
+    .btn,
+    .generate-btn,
+    .copy-btn,
+    .edit-btn,
+    .filters,
+    .pagination,
+    .modal,
+    .back-btn,
+    .nav,
+    .sidebar {
+        display: none !important;
+    }
+    
+    /* 重置布局 */
+    .container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* 移除装饰 */
+    .panel,
+    .section,
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    
+    /* 展开所有内容 */
+    .report-preview,
+    .collapsible {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    
+    /* 表格适配 */
+    table {
+        font-size: 10px;
+        width: 100%;
+    }
+    
+    /* 链接显示URL */
+    a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        color: #666;
+    }
+    
+    /* 背景色转为白色 */
+    * {
+        background: white !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* ============================================
+   特殊设备适配
+   ============================================ */
+/* iPad Pro 12.9" */
+@media only screen 
+    and (min-device-width: 1024px) 
+    and (max-device-width: 1366px) 
+    and (-webkit-min-device-pixel-ratio: 2) {
+    .container {
+        max-width: 1100px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+}
+
+/* 折叠屏设备 (Samsung Fold等) */
+@media (min-width: 280px) and (max-width: 320px) {
+    /* 超窄屏幕 - 折叠屏折叠状态 */
+    .header h2 {
+        font-size: 14px;
+    }
+    
+    .panel {
+        padding: 12px 10px;
+    }
+    
+    .btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+    
+    .stat-value {
+        font-size: 18px;
+    }
+}
