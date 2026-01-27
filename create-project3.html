@@ -395,7 +395,6 @@
             cursor: pointer;
             border-bottom: 1px solid #f0f0f0;
             transition: background 0.2s;
-            position: relative;
         }
 
         .suggestion-item:hover {
@@ -422,85 +421,6 @@
             font-size: 12px;
             color: #888;
             margin-top: 3px;
-        }
-        
-        /* 项目悬停预览卡片 */
-        .project-preview-tooltip {
-            display: none;
-            position: absolute;
-            left: 105%;
-            top: 0;
-            width: 320px;
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            z-index: 1000;
-            padding: 15px;
-            font-size: 13px;
-        }
-        
-        .suggestion-item:hover .project-preview-tooltip {
-            display: block;
-        }
-        
-        .preview-header {
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-            margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
-        }
-        
-        .preview-row {
-            display: flex;
-            margin-bottom: 8px;
-            align-items: flex-start;
-        }
-        
-        .preview-label {
-            color: #888;
-            width: 70px;
-            flex-shrink: 0;
-        }
-        
-        .preview-value {
-            color: #333;
-            flex: 1;
-            word-break: break-all;
-        }
-        
-        .preview-value.highlight {
-            color: #667eea;
-            font-weight: 600;
-        }
-        
-        .preview-status {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        
-        .preview-status.ongoing {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-        
-        .preview-status.completed {
-            background: #e8f5e9;
-            color: #388e3c;
-        }
-        
-        .preview-tip {
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px dashed #e0e0e0;
-            font-size: 11px;
-            color: #999;
-            text-align: center;
         }
 
         /* 客户名称联想 */
@@ -891,225 +811,6 @@
             '电信': '中国电信',
             'chinatelecom': '中国电信',
             'china telecom': '中国电信',
-            
-            // ===== 互联网企业 =====
-            '阿里': '阿里巴巴',
-            '阿里巴巴集团': '阿里巴巴',
-            'alibaba': '阿里巴巴',
-            'ali': '阿里巴巴',
-            
-            '腾讯': '腾讯',
-            'tencent': '腾讯',
-            'qq': '腾讯',
-            
-            '京东': '京东',
-            'jd': '京东',
-            'jingdong': '京东',
-            
-            '百度': '百度',
-            'baidu': '百度',
-            
-            '字节': '字节跳动',
-            '字节跳动': '字节跳动',
-            '抖音': '字节跳动',
-            'bytedance': '字节跳动',
-            'tiktok': '字节跳动',
-            
-            '华为': '华为',
-            'huawei': '华为',
-            
-            '小米': '小米',
-            'xiaomi': '小米',
-            'mi': '小米',
-            
-            '美团': '美团',
-            'meituan': '美团',
-            
-            '滴滴': '滴滴',
-            'didi': '滴滴',
-            
-            '网易': '网易',
-            'netease': '网易',
-            
-            // ===== 航运/物流 =====
-            '中远': '中远海运',
-            'cosco': '中远海运',
-            '中远海运': '中远海运',
-            
-            '招商局': '招商局',
-            'cmg': '招商局',
-            'china merchants': '招商局',
-            
-            '顺丰': '顺丰速运',
-            'sf': '顺丰速运',
-            'sfexpress': '顺丰速运',
-            
-            '中通': '中通快递',
-            'zto': '中通快递',
-            
-            '圆通': '圆通速递',
-            'yto': '圆通速递',
-            
-            '韵达': '韵达快递',
-            'yunda': '韵达快递',
-            
-            '申通': '申通快递',
-            'sto': '申通快递',
-            
-            '极兔': '极兔速递',
-            'jt': '极兔速递',
-            'jtexpress': '极兔速递',
-            
-            '德邦': '德邦物流',
-            'deppon': '德邦物流',
-            
-            '菜鸟': '菜鸟网络',
-            'cainiao': '菜鸟网络',
-            
-            // ===== 汽车/车企 =====
-            '比亚迪': '比亚迪',
-            'byd': '比亚迪',
-            
-            '蔚来': '蔚来汽车',
-            'nio': '蔚来汽车',
-            
-            '小鹏': '小鹏汽车',
-            'xpeng': '小鹏汽车',
-            
-            '理想': '理想汽车',
-            'li auto': '理想汽车',
-            'lixiang': '理想汽车',
-            
-            '吉利': '吉利汽车',
-            'geely': '吉利汽车',
-            
-            '长城': '长城汽车',
-            'gwm': '长城汽车',
-            'great wall': '长城汽车',
-            
-            '奇瑞': '奇瑞汽车',
-            'chery': '奇瑞汽车',
-            
-            '长安': '长安汽车',
-            'changan': '长安汽车',
-            
-            '上汽': '上汽集团',
-            'saic': '上汽集团',
-            
-            '一汽': '一汽集团',
-            'faw': '一汽集团',
-            
-            '东风': '东风汽车',
-            'dongfeng': '东风汽车',
-            
-            '广汽': '广汽集团',
-            'gac': '广汽集团',
-            
-            '北汽': '北汽集团',
-            'baic': '北汽集团',
-            
-            '宝马': '宝马',
-            'bmw': '宝马',
-            
-            '奔驰': '奔驰',
-            'benz': '奔驰',
-            'mercedes': '奔驰',
-            
-            '奥迪': '奥迪',
-            'audi': '奥迪',
-            
-            '大众': '大众',
-            'vw': '大众',
-            'volkswagen': '大众',
-            
-            '丰田': '丰田',
-            'toyota': '丰田',
-            
-            '本田': '本田',
-            'honda': '本田',
-            
-            '日产': '日产',
-            'nissan': '日产',
-            
-            '特斯拉': '特斯拉',
-            'tesla': '特斯拉',
-            
-            // ===== 制造业 =====
-            '海尔': '海尔',
-            'haier': '海尔',
-            
-            '美的': '美的',
-            'midea': '美的',
-            
-            '格力': '格力',
-            'gree': '格力',
-            
-            '海信': '海信',
-            'hisense': '海信',
-            
-            'tcl': 'TCL',
-            
-            '联想': '联想',
-            'lenovo': '联想',
-            
-            '中兴': '中兴通讯',
-            'zte': '中兴通讯',
-            
-            '三一': '三一重工',
-            'sany': '三一重工',
-            
-            '中联': '中联重科',
-            'zoomlion': '中联重科',
-            
-            '徐工': '徐工集团',
-            'xcmg': '徐工集团',
-            
-            '潍柴': '潍柴动力',
-            'weichai': '潍柴动力',
-            
-            '宁德': '宁德时代',
-            'catl': '宁德时代',
-            
-            '大疆': '大疆',
-            'dji': '大疆',
-            
-            '富士康': '富士康',
-            'foxconn': '富士康',
-            
-            // ===== 能源/央企 =====
-            '中石油': '中国石油',
-            'petrochina': '中国石油',
-            'cnpc': '中国石油',
-            
-            '中石化': '中国石化',
-            'sinopec': '中国石化',
-            
-            '中海油': '中国海油',
-            'cnooc': '中国海油',
-            
-            '国家电网': '国家电网',
-            'state grid': '国家电网',
-            
-            '南方电网': '南方电网',
-            'csg': '南方电网',
-            
-            '中核': '中国核电',
-            'cnnc': '中国核电',
-            
-            '中广核': '中广核',
-            'cgnpc': '中广核',
-            
-            '国航': '中国国航',
-            'air china': '中国国航',
-            
-            '东航': '东方航空',
-            'china eastern': '东方航空',
-            
-            '南航': '南方航空',
-            'china southern': '南方航空',
-            
-            '海航': '海南航空',
-            'hainan airlines': '海南航空',
         };
 
         // 项目名称关键词映射（用于相似项目检测）
@@ -1237,62 +938,13 @@
         }
 
         // 获取客户的标准名称
-        // 注意：只替换核心名称部分，保留分行/分公司等后缀
         function getCanonicalCustomerName(name) {
             if (!name) return '';
             const normalized = normalizeText(name);
             
-            // 分行/分公司后缀列表（表示这是一个分支机构）
-            const branchSuffixes = [
-                '分行', '支行', '总行', '分公司', '子公司', '办事处', '代表处', 
-                'it中心', '数据中心', '研发中心', '运营中心', '客服中心',
-                '欧洲公司', '英国公司', '法国公司', '德国公司', '美国公司',
-                '欧洲区', '亚太区', '北美区', '拉美区',
-                '欧洲总部', '海外总部', '国际部', '海外部'
-            ];
-            
-            // 城市/国家/地区列表（表示这是一个特定地区的分支）
-            const locationNames = [
-                // 欧洲城市
-                '伦敦', '卢森堡', '法兰克福', '巴黎', '米兰', '马德里', '布达佩斯', 
-                '华沙', '布拉格', '维也纳', '阿姆斯特丹', '布鲁塞尔', '苏黎世', 
-                '都柏林', '哥本哈根', '斯德哥尔摩', '赫尔辛基', '奥斯陆', '雅典', 
-                '里斯本', '慕尼黑', '汉堡', '柏林', '科隆', '杜塞尔多夫', '罗马', 
-                '威尼斯', '巴塞罗那', '里昂', '马赛', '鹿特丹', '安特卫普', '日内瓦',
-                '曼彻斯特', '伯明翰', '爱丁堡', '格拉斯哥', '利物浦', '布里斯托',
-                '莫斯科', '华沙', '布加勒斯特', '索菲亚', '贝尔格莱德',
-                // 欧洲国家
-                '英国', '法国', '德国', '意大利', '西班牙', '葡萄牙', '荷兰', 
-                '比利时', '瑞士', '奥地利', '波兰', '捷克', '匈牙利', '希腊',
-                '丹麦', '瑞典', '芬兰', '挪威', '爱尔兰', '俄罗斯', '土耳其',
-                // 美洲城市
-                '纽约', '华盛顿', '旧金山', '洛杉矶', '芝加哥', '波士顿', '西雅图',
-                '多伦多', '温哥华', '蒙特利尔', '圣保罗', '墨西哥城',
-                // 亚太城市
-                '东京', '大阪', '首尔', '新加坡', '香港', '澳门', '台北', '曼谷',
-                '吉隆坡', '雅加达', '马尼拉', '河内', '胡志明', '悉尼', '墨尔本',
-                '奥克兰', '迪拜', '孟买', '新德里',
-                // 中国城市
-                '北京', '上海', '深圳', '广州', '杭州', '成都', '重庆', '武汉', 
-                '南京', '天津', '西安', '苏州', '青岛', '大连', '厦门', '宁波', 
-                '无锡', '长沙', '郑州', '济南', '福州', '合肥', '昆明', '贵阳',
-                '南宁', '海口', '三亚', '珠海', '东莞', '佛山', '中山'
-            ];
-            
-            // 检查是否包含分支机构标识或地区名称
-            const hasBranchSuffix = branchSuffixes.some(s => normalized.includes(s));
-            const hasLocation = locationNames.some(loc => normalized.includes(loc));
-            
-            // 如果包含分支机构信息或地区名称，保持原名不变
-            // 这样"阿里伦敦"和"阿里巴黎"会保持不同
-            if (hasBranchSuffix || hasLocation) {
-                return name;
-            }
-            
-            // 只对不含分支信息的简称进行别名转换
-            // 例如：单独的"阿里"转换为"阿里巴巴"
+            // 检查别名
             for (const [alias, canonical] of Object.entries(customerAliases)) {
-                if (normalized === normalizeText(alias)) {
+                if (normalized === normalizeText(alias) || normalized.includes(normalizeText(alias))) {
                     return canonical;
                 }
             }
@@ -1588,62 +1240,15 @@
                 return;
             }
             
-            let html = '<div style="padding: 8px 15px; background: #f8f9ff; color: #667eea; font-size: 12px; font-weight: 600;">📋 该客户已有 ' + customerProjects.length + ' 个项目（悬停查看详情）：</div>';
-            customerProjects.slice(0, 8).forEach(project => {
-                const amount = project.projectAmount ? 
-                    `${project.projectAmount}K ${project.projectCurrency || 'GBP'}` : '未设置';
-                const status = project.status === '已完成' ? 'completed' : 'ongoing';
-                const statusText = project.status || '进行中';
-                const createdBy = project.createdByName || '未知';
-                const stage = project.projectStage || '未设置';
-                const techDir = project.techDirection || '未设置';
-                const createdDate = project.createdAt?.toDate?.() 
-                    ? project.createdAt.toDate().toLocaleDateString('zh-CN')
-                    : '未知';
-                
+            let html = '<div style="padding: 8px 15px; background: #f8f9ff; color: #667eea; font-size: 12px; font-weight: 600;">该客户已有项目：</div>';
+            customerProjects.slice(0, 5).forEach(project => {
                 html += `
-                    <div class="suggestion-item project-hover-item" onclick="goToProject('${project.id}')" style="background: #fffbeb;">
+                    <div class="suggestion-item" onclick="goToProject('${project.id}')" style="background: #fffbeb;">
                         <div class="suggestion-name">⚠️ ${project.projectName}</div>
-                        <div class="suggestion-meta">${project.projectType || ''} | ${stage}</div>
-                        <div class="project-preview-tooltip">
-                            <div class="preview-header">📁 ${project.projectName}</div>
-                            <div class="preview-row">
-                                <span class="preview-label">项目类型</span>
-                                <span class="preview-value">${project.projectType || '未设置'}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">技术方向</span>
-                                <span class="preview-value">${techDir}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">当前阶段</span>
-                                <span class="preview-value">${stage}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">项目金额</span>
-                                <span class="preview-value highlight">${amount}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">项目状态</span>
-                                <span class="preview-value"><span class="preview-status ${status}">${statusText}</span></span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">创建人</span>
-                                <span class="preview-value">${createdBy}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">创建日期</span>
-                                <span class="preview-value">${createdDate}</span>
-                            </div>
-                            <div class="preview-tip">💡 点击可跳转到项目详情页</div>
-                        </div>
+                        <div class="suggestion-meta">${project.projectType || ''} | 点击查看详情</div>
                     </div>
                 `;
             });
-            
-            if (customerProjects.length > 8) {
-                html += `<div style="padding: 8px 15px; background: #f5f5f5; color: #999; font-size: 11px; text-align: center;">还有 ${customerProjects.length - 8} 个项目未显示...</div>`;
-            }
             
             suggestionsDiv.innerHTML = html;
             suggestionsDiv.classList.add('show');
@@ -1676,59 +1281,12 @@
                 return;
             }
             
-            let html = '<div style="padding: 8px 15px; background: #fff3e0; color: #e65100; font-size: 12px; font-weight: 600;">⚠️ 发现 ' + similarProjects.length + ' 个相似项目（悬停查看详情）：</div>';
+            let html = '<div style="padding: 8px 15px; background: #fff3e0; color: #e65100; font-size: 12px; font-weight: 600;">⚠️ 发现相似项目：</div>';
             similarProjects.slice(0, 5).forEach(project => {
-                const amount = project.projectAmount ? 
-                    `${project.projectAmount}K ${project.projectCurrency || 'GBP'}` : '未设置';
-                const status = project.status === '已完成' ? 'completed' : 'ongoing';
-                const statusText = project.status || '进行中';
-                const createdBy = project.createdByName || '未知';
-                const stage = project.projectStage || '未设置';
-                const techDir = project.techDirection || '未设置';
-                const createdDate = project.createdAt?.toDate?.() 
-                    ? project.createdAt.toDate().toLocaleDateString('zh-CN')
-                    : '未知';
-                
                 html += `
-                    <div class="suggestion-item project-hover-item" onclick="goToProject('${project.id}')" style="background: #fffbeb;">
+                    <div class="suggestion-item" onclick="goToProject('${project.id}')" style="background: #fffbeb;">
                         <div class="suggestion-name">${highlightMatch(project.projectName, projectName)}</div>
-                        <div class="suggestion-meta">${project.customerName} | ${project.projectType || ''}</div>
-                        <div class="project-preview-tooltip">
-                            <div class="preview-header">📁 ${project.projectName}</div>
-                            <div class="preview-row">
-                                <span class="preview-label">客户名称</span>
-                                <span class="preview-value">${project.customerName || '未设置'}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">项目类型</span>
-                                <span class="preview-value">${project.projectType || '未设置'}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">技术方向</span>
-                                <span class="preview-value">${techDir}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">当前阶段</span>
-                                <span class="preview-value">${stage}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">项目金额</span>
-                                <span class="preview-value highlight">${amount}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">项目状态</span>
-                                <span class="preview-value"><span class="preview-status ${status}">${statusText}</span></span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">创建人</span>
-                                <span class="preview-value">${createdBy}</span>
-                            </div>
-                            <div class="preview-row">
-                                <span class="preview-label">创建日期</span>
-                                <span class="preview-value">${createdDate}</span>
-                            </div>
-                            <div class="preview-tip">💡 点击可跳转到项目详情页</div>
-                        </div>
+                        <div class="suggestion-meta">${project.customerName} | ${project.projectType || ''} | 点击查看</div>
                     </div>
                 `;
             });

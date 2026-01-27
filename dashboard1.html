@@ -760,13 +760,11 @@
                 teamSection.style.display = 'block';
                 teamGrid.innerHTML = usersSnapshot.docs.map(doc => {
                     const member = doc.data();
-                    const memberId = doc.id;
                     const initial = (member.fullName || member.displayName || 'U').charAt(0);
-                    const memberName = member.fullName || member.displayName || '未知';
                     return `
-                        <div class="team-member clickable" onclick="viewMemberRecords('${memberId}', '${memberName.replace(/'/g, "\\'")}')">
+                        <div class="team-member">
                             <div class="member-avatar">${initial}</div>
-                            <div class="member-name">${memberName}</div>
+                            <div class="member-name">${member.fullName || member.displayName}</div>
                             <div class="member-team">${member.technicalTeam || '-'}</div>
                         </div>
                     `;
@@ -774,11 +772,6 @@
             } catch (error) {
                 console.error('加载团队成员失败:', error);
             }
-        }
-        
-        // 跳转到成员工作记录页面
-        function viewMemberRecords(memberId, memberName) {
-            window.location.href = `work-records-list.html?userId=${memberId}&userName=${encodeURIComponent(memberName)}`;
         }
 
         // 显示管理员操作按钮
