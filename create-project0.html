@@ -618,21 +618,15 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">项目金额</label>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <div style="position: relative; flex: 1;">
-                                    <input type="number" id="project-amount" class="form-input" 
-                                           style="padding-right: 45px;" placeholder="例如: 150 表示 150K" min="0" step="0.01">
-                                    <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #667eea; font-weight: 600; font-size: 14px;">K</span>
-                                </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="project-amount" class="form-input" 
+                                       style="flex: 1;" placeholder="例如: 100000" min="0" step="0.01">
                                 <select id="project-currency" class="form-select" style="width: 100px;">
                                     <option value="GBP">GBP</option>
                                     <option value="EUR">EUR</option>
                                     <option value="USD">USD</option>
                                     <option value="CNY">CNY</option>
                                 </select>
-                            </div>
-                            <div style="margin-top: 8px; padding: 8px 12px; background: #e3f2fd; border-radius: 6px; font-size: 12px; color: #1565c0;">
-                                💡 <strong>提示：</strong>金额单位为 <strong>K（千）</strong>，例如输入 <strong>150</strong> 表示 <strong>150,000</strong>（15万）
                             </div>
                         </div>
                         <div class="form-group">
@@ -965,33 +959,16 @@
             // 完全匹配
             if (norm1 === norm2) return true;
             
-            // 严格模式：必须包含完整的分行/支行名称
-            // 例如："招行伦敦分行" 和 "招行卢森堡分行" 不应该匹配
-            const branchSuffixes = ['分行', '支行', '总行', '分公司', '子公司', '办事处', '代表处'];
-            const hasBranch1 = branchSuffixes.some(suffix => norm1.includes(suffix));
-            const hasBranch2 = branchSuffixes.some(suffix => norm2.includes(suffix));
-            
-            // 如果两个名称都包含分行/支行等后缀，需要完全匹配
-            if (hasBranch1 && hasBranch2) {
-                return norm1 === norm2;
-            }
-            
-            // 如果只有一方有分行后缀，检查是否是同一个母公司
-            // 例如：输入"招行"可以匹配"招行伦敦分行"
-            if (hasBranch1 && !hasBranch2) {
-                // name2是简短名称，检查name1是否以它开头
-                const core1 = norm1.replace(/(伦敦|卢森堡|法兰克福|巴黎|米兰|马德里|布达佩斯|华沙|布拉格|维也纳|阿姆斯特丹|布鲁塞尔|苏黎世|都柏林|哥本哈根|斯德哥尔摩|赫尔辛基|奥斯陆|雅典|里斯本|华盛顿|纽约|旧金山|洛杉矶|芝加哥|多伦多|悉尼|墨尔本|东京|新加坡|香港|澳门|台北)?(分行|支行|总行|分公司|子公司|办事处|代表处).*$/g, '');
-                return core1 === norm2 || norm2.includes(core1) || core1.includes(norm2);
-            }
-            
-            if (!hasBranch1 && hasBranch2) {
-                // name1是简短名称，检查name2是否以它开头
-                const core2 = norm2.replace(/(伦敦|卢森堡|法兰克福|巴黎|米兰|马德里|布达佩斯|华沙|布拉格|维也纳|阿姆斯特丹|布鲁塞尔|苏黎世|都柏林|哥本哈根|斯德哥尔摩|赫尔辛基|奥斯陆|雅典|里斯本|华盛顿|纽约|旧金山|洛杉矶|芝加哥|多伦多|悉尼|墨尔本|东京|新加坡|香港|澳门|台北)?(分行|支行|总行|分公司|子公司|办事处|代表处).*$/g, '');
-                return core2 === norm1 || norm1.includes(core2) || core2.includes(norm1);
-            }
-            
-            // 都没有分行后缀，使用包含匹配
+            // 包含匹配（处理"中国银行卢森堡分行"包含"中国银行"的情况）
             if (norm1.includes(norm2) || norm2.includes(norm1)) return true;
+            
+            // 提取核心名称匹配（去除分行、支行等后缀）
+            const core1 = norm1.replace(/(分行|支行|总行|分公司|子公司|办事处|代表处).*$/, '');
+            const core2 = norm2.replace(/(分行|支行|总行|分公司|子公司|办事处|代表处).*$/, '');
+            
+            if (core1 && core2 && (core1 === core2 || core1.includes(core2) || core2.includes(core1))) {
+                return true;
+            }
             
             return false;
         }
