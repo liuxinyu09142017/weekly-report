@@ -2,7 +2,14 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="工时系统">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no,email=no,address=no">
+    <link rel="stylesheet" href="css/mobile-responsive.css">
     <title>工作记录列表 - 工程师工时系统</title>
     
     <!-- Firebase SDK -->
@@ -565,43 +572,12 @@
         let allRecords = [];
         let filteredRecords = [];
         let selectedRecords = new Set();
-        let targetUserId = null;  // 从URL参数获取的目标用户ID
-        let targetUserName = null;  // 从URL参数获取的目标用户名
-
-        // 解析URL参数 - 页面加载时立即执行
-        function parseUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            targetUserId = urlParams.get('userId');
-            targetUserName = urlParams.get('userName');
-            
-            console.log('URL参数解析:', { targetUserId, targetUserName });
-            
-            // 如果有用户参数，更新页面标题
-            if (targetUserName) {
-                const decodedName = decodeURIComponent(targetUserName);
-                const headerTitle = document.querySelector('.header h2');
-                const panelTitle = document.querySelector('.panel-title');
-                
-                if (headerTitle) {
-                    headerTitle.textContent = `📋 ${decodedName} 的工作记录`;
-                }
-                if (panelTitle) {
-                    panelTitle.textContent = `📊 ${decodedName} 的工作记录`;
-                }
-                
-                console.log('页面标题已更新为:', decodedName);
-            }
-        }
-        
-        // 页面加载时立即解析URL参数
-        parseUrlParams();
 
         // 检查登录状态
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
                 console.log('用户已登录:', user.email);
-                console.log('目标用户ID:', targetUserId);
                 await loadUserData();
                 await loadRecords();
             } else {
@@ -627,26 +603,14 @@
             try {
                 let query = db.collection('workRecords');
                 
-                console.log('loadRecords - targetUserId:', targetUserId);
-                console.log('loadRecords - userData.role:', userData?.role);
-                
-                // 如果有URL参数指定用户，只查该用户的记录
-                if (targetUserId) {
-                    console.log('筛选指定用户的记录:', targetUserId);
-                    query = query.where('userId', '==', targetUserId);
+                // 根据角色加载不同数据
+                if (userData && userData.role === 'admin') {
+                    // 管理员看所有
+                } else if (userData && userData.role === 'team_lead') {
+                    // 部门领导看所有ICT部门
                 } else {
-                    // 根据角色加载不同数据
-                    if (userData && userData.role === 'admin') {
-                        console.log('管理员模式：加载所有记录');
-                        // 管理员看所有
-                    } else if (userData && userData.role === 'team_lead') {
-                        console.log('部门领导模式：加载所有记录');
-                        // 部门领导看所有ICT部门
-                    } else {
-                        console.log('工程师模式：只加载自己的记录');
-                        // 工程师只看自己的
-                        query = query.where('userId', '==', currentUser.uid);
-                    }
+                    // 工程师只看自己的
+                    query = query.where('userId', '==', currentUser.uid);
                 }
                 
                 query = query.orderBy('startDateTime', 'desc');
