@@ -953,9 +953,7 @@
         }
 
         // 检查两个客户名是否匹配
-        // strict=true时用于已有项目列表（必须精确匹配）
-        // strict=false时用于搜索建议（可以模糊匹配）
-        function isCustomerMatch(name1, name2, strict = false) {
+        function isCustomerMatch(name1, name2) {
             if (!name1 || !name2) return false;
             
             const canonical1 = getCanonicalCustomerName(name1);
@@ -964,15 +962,8 @@
             const norm1 = normalizeText(canonical1);
             const norm2 = normalizeText(canonical2);
             
-            // 完全匹配 - 总是返回true
+            // 完全匹配
             if (norm1 === norm2) return true;
-            
-            // 严格模式：只允许完全匹配
-            if (strict) {
-                return false;
-            }
-            
-            // 以下是非严格模式（用于搜索建议）
             
             // 城市列表（用于检测是否包含地区信息）
             const cityNames = [
@@ -985,53 +976,72 @@
                 '天津', '西安', '苏州', '青岛', '大连', '厦门', '宁波', '无锡',
                 '曼彻斯特', '伯明翰', '爱丁堡', '格拉斯哥', '利物浦', '布里斯托',
                 '慕尼黑', '汉堡', '柏林', '科隆', '杜塞尔多夫', '罗马', '威尼斯',
-                '巴塞罗那', '里昂', '马赛', '鹿特丹', '安特卫普', '日内瓦',
-                '匈牙利', '希腊', '葡萄牙', '西班牙', '意大利', '德国', '法国',
-                '荷兰', '比利时', '瑞士', '奥地利', '波兰', '捷克', '丹麦', 
-                '瑞典', '芬兰', '挪威', '爱尔兰', '俄罗斯', '土耳其', '安卡拉'
+                '巴塞罗那', '里昂', '马赛', '鹿特丹', '安特卫普', '日内瓦'
             ];
             
             // 分行后缀列表
             const branchSuffixes = ['分行', '支行', '总行', '分公司', '子公司', '办事处', '代表处'];
             
-            // 检查是否包含城市名或分行后缀
-            const hasCity1 = cityNames.some(city => norm1.includes(city));
-            const hasCity2 = cityNames.some(city => norm2.includes(city));
+            // 检查是否包含分行后缀
             const hasBranch1 = branchSuffixes.some(suffix => norm1.includes(suffix));
             const hasBranch2 = branchSuffixes.some(suffix => norm2.includes(suffix));
             
-            // 判断是否是"特定分行名称"（包含城市名或分行后缀）
-            const isSpecificBranch1 = hasBranch1 || hasCity1;
-            const isSpecificBranch2 = hasBranch2 || hasCity2;
+            // 检查是否包含城市名（即使没有"分行"后缀，也表示是特定分行）
+            const hasCity1 = cityNames.some(city => norm1.includes(city));
+            const hasCity2 = cityNames.some(city => norm2.includes(city));
             
-            // 如果两个都是特定分行，必须完全匹配（已在上面处理）
-            if (isSpecificBranch1 && isSpecificBranch2) {
-                return false; // 不完全匹配就返回false
+            // 判断是否是"完整的分行名称"（包含城市名或分行后缀）
+            const isFullBranchName1 = hasBranch1 || hasCity1;
+            const isFullBranchName2 = hasBranch2 || hasCity2;
+            
+            // 如果两个名称都是完整的分行名称，需要严格匹配
+            // 例如："建行卢森堡" vs "建行伦敦分行" → 不匹配
+            // 例如："建行伦敦分行" vs "建行伦敦分行" → 匹配
+            if (isFullBranchName1 && isFullBranchName2) {
+                // 提取核心银行名称和城市
+                const getCore = (name) => {
+                    let core = name;
+                    // 移除城市名和分行后缀，得到核心名称
+                    cityNames.forEach(city => { core = core.replace(city, ''); });
+                    branchSuffixes.forEach(suffix => { core = core.replace(suffix, ''); });
+                    return core.trim();
+                };
+                
+                const getCity = (name) => {
+                    for (const city of cityNames) {
+                        if (name.includes(city)) return city;
+                    }
+                    return '';
+                };
+                
+                const core1 = getCore(norm1);
+                const core2 = getCore(norm2);
+                const city1 = getCity(norm1);
+                const city2 = getCity(norm2);
+                
+                // 核心名称必须匹配，且城市必须相同
+                const coreMatch = core1 === core2 || core1.includes(core2) || core2.includes(core1);
+                const cityMatch = city1 === city2;
+                
+                return coreMatch && cityMatch;
             }
             
-            // 提取核心名称（去除城市和分行后缀）
-            const getCoreName = (name) => {
-                let core = name;
-                cityNames.forEach(city => { core = core.replace(city, ''); });
-                branchSuffixes.forEach(suffix => { core = core.replace(suffix, ''); });
-                return core.trim();
-            };
-            
-            // 如果只有一方是特定分行（用于搜索建议）
-            // 例如：输入"中行"显示"中行伦敦分行"、"中行卢森堡分行"的建议
-            if (!isSpecificBranch1 && isSpecificBranch2) {
-                // norm1是简短名称，检查norm2的核心名称是否匹配
-                const core2 = getCoreName(norm2);
-                return norm1.length >= 2 && (core2.includes(norm1) || norm1.includes(core2));
+            // 如果只有一方是完整分行名称，另一方是简短名称
+            // 例如：输入"建行"可以匹配显示"建行伦敦分行"的建议
+            if (isFullBranchName1 && !isFullBranchName2) {
+                // norm2是简短名称，检查norm1是否包含它
+                const core1 = norm1;
+                cityNames.forEach(city => { core1.replace(city, ''); });
+                branchSuffixes.forEach(suffix => { core1.replace(suffix, ''); });
+                return norm1.includes(norm2) || norm2.length >= 2 && norm1.startsWith(norm2);
             }
             
-            if (isSpecificBranch1 && !isSpecificBranch2) {
-                // norm2是简短名称，检查norm1的核心名称是否匹配
-                const core1 = getCoreName(norm1);
-                return norm2.length >= 2 && (core1.includes(norm2) || norm2.includes(core1));
+            if (!isFullBranchName1 && isFullBranchName2) {
+                // norm1是简短名称，检查norm2是否包含它
+                return norm2.includes(norm1) || norm1.length >= 2 && norm2.startsWith(norm1);
             }
             
-            // 都不是特定分行，使用包含匹配
+            // 都不是完整分行名称，使用包含匹配
             if (norm1.includes(norm2) || norm2.includes(norm1)) return true;
             
             return false;
@@ -1143,10 +1153,10 @@
                 return;
             }
             
-            // 查找匹配的项目 - 使用严格匹配（strict=true）
+            // 查找匹配的项目
             const matchedProjects = allUserProjects.filter(project => {
-                // 客户名称必须精确匹配
-                if (!isCustomerMatch(project.customerName, customerName, true)) {
+                // 客户名称匹配
+                if (!isCustomerMatch(project.customerName, customerName)) {
                     return false;
                 }
                 
@@ -1230,9 +1240,8 @@
                 return;
             }
             
-            // 使用严格匹配 - 只显示完全匹配客户的项目
             const customerProjects = allUserProjects.filter(p => 
-                isCustomerMatch(p.customerName, customerName, true)
+                isCustomerMatch(p.customerName, customerName)
             );
             
             if (customerProjects.length === 0) {
@@ -1265,10 +1274,10 @@
                 return;
             }
             
-            // 搜索相似项目（同一客户下的）- 使用严格匹配
+            // 搜索相似项目（同一客户下的）
             const similarProjects = allUserProjects.filter(project => {
-                // 首先检查客户是否精确匹配
-                if (customerName && !isCustomerMatch(project.customerName, customerName, true)) {
+                // 首先检查客户是否匹配
+                if (customerName && !isCustomerMatch(project.customerName, customerName)) {
                     return false;
                 }
                 
@@ -1363,9 +1372,9 @@
                 const projectName = document.getElementById('project-name').value.trim();
                 const customerName = document.getElementById('customer-name').value.trim();
                 
-                // 检测重复项目 - 使用严格匹配
+                // 检测重复项目
                 const duplicateProject = allUserProjects.find(project => {
-                    return isCustomerMatch(project.customerName, customerName, true) && 
+                    return isCustomerMatch(project.customerName, customerName) && 
                            isProjectSimilar(project.projectName, projectName);
                 });
                 
