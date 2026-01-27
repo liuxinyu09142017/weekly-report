@@ -965,83 +965,32 @@
             // 完全匹配
             if (norm1 === norm2) return true;
             
-            // 城市列表（用于检测是否包含地区信息）
-            const cityNames = [
-                '伦敦', '卢森堡', '法兰克福', '巴黎', '米兰', '马德里', '布达佩斯', 
-                '华沙', '布拉格', '维也纳', '阿姆斯特丹', '布鲁塞尔', '苏黎世', 
-                '都柏林', '哥本哈根', '斯德哥尔摩', '赫尔辛基', '奥斯陆', '雅典', 
-                '里斯本', '华盛顿', '纽约', '旧金山', '洛杉矶', '芝加哥', '多伦多', 
-                '悉尼', '墨尔本', '东京', '新加坡', '香港', '澳门', '台北', '北京',
-                '上海', '深圳', '广州', '杭州', '成都', '重庆', '武汉', '南京',
-                '天津', '西安', '苏州', '青岛', '大连', '厦门', '宁波', '无锡',
-                '曼彻斯特', '伯明翰', '爱丁堡', '格拉斯哥', '利物浦', '布里斯托',
-                '慕尼黑', '汉堡', '柏林', '科隆', '杜塞尔多夫', '罗马', '威尼斯',
-                '巴塞罗那', '里昂', '马赛', '鹿特丹', '安特卫普', '日内瓦'
-            ];
-            
-            // 分行后缀列表
+            // 严格模式：必须包含完整的分行/支行名称
+            // 例如："招行伦敦分行" 和 "招行卢森堡分行" 不应该匹配
             const branchSuffixes = ['分行', '支行', '总行', '分公司', '子公司', '办事处', '代表处'];
-            
-            // 检查是否包含分行后缀
             const hasBranch1 = branchSuffixes.some(suffix => norm1.includes(suffix));
             const hasBranch2 = branchSuffixes.some(suffix => norm2.includes(suffix));
             
-            // 检查是否包含城市名（即使没有"分行"后缀，也表示是特定分行）
-            const hasCity1 = cityNames.some(city => norm1.includes(city));
-            const hasCity2 = cityNames.some(city => norm2.includes(city));
-            
-            // 判断是否是"完整的分行名称"（包含城市名或分行后缀）
-            const isFullBranchName1 = hasBranch1 || hasCity1;
-            const isFullBranchName2 = hasBranch2 || hasCity2;
-            
-            // 如果两个名称都是完整的分行名称，需要严格匹配
-            // 例如："建行卢森堡" vs "建行伦敦分行" → 不匹配
-            // 例如："建行伦敦分行" vs "建行伦敦分行" → 匹配
-            if (isFullBranchName1 && isFullBranchName2) {
-                // 提取核心银行名称和城市
-                const getCore = (name) => {
-                    let core = name;
-                    // 移除城市名和分行后缀，得到核心名称
-                    cityNames.forEach(city => { core = core.replace(city, ''); });
-                    branchSuffixes.forEach(suffix => { core = core.replace(suffix, ''); });
-                    return core.trim();
-                };
-                
-                const getCity = (name) => {
-                    for (const city of cityNames) {
-                        if (name.includes(city)) return city;
-                    }
-                    return '';
-                };
-                
-                const core1 = getCore(norm1);
-                const core2 = getCore(norm2);
-                const city1 = getCity(norm1);
-                const city2 = getCity(norm2);
-                
-                // 核心名称必须匹配，且城市必须相同
-                const coreMatch = core1 === core2 || core1.includes(core2) || core2.includes(core1);
-                const cityMatch = city1 === city2;
-                
-                return coreMatch && cityMatch;
+            // 如果两个名称都包含分行/支行等后缀，需要完全匹配
+            if (hasBranch1 && hasBranch2) {
+                return norm1 === norm2;
             }
             
-            // 如果只有一方是完整分行名称，另一方是简短名称
-            // 例如：输入"建行"可以匹配显示"建行伦敦分行"的建议
-            if (isFullBranchName1 && !isFullBranchName2) {
-                // norm2是简短名称，检查norm1是否包含它
-                const core1 = norm1;
-                cityNames.forEach(city => { core1.replace(city, ''); });
-                branchSuffixes.forEach(suffix => { core1.replace(suffix, ''); });
-                return norm1.includes(norm2) || norm2.length >= 2 && norm1.startsWith(norm2);
+            // 如果只有一方有分行后缀，检查是否是同一个母公司
+            // 例如：输入"招行"可以匹配"招行伦敦分行"
+            if (hasBranch1 && !hasBranch2) {
+                // name2是简短名称，检查name1是否以它开头
+                const core1 = norm1.replace(/(伦敦|卢森堡|法兰克福|巴黎|米兰|马德里|布达佩斯|华沙|布拉格|维也纳|阿姆斯特丹|布鲁塞尔|苏黎世|都柏林|哥本哈根|斯德哥尔摩|赫尔辛基|奥斯陆|雅典|里斯本|华盛顿|纽约|旧金山|洛杉矶|芝加哥|多伦多|悉尼|墨尔本|东京|新加坡|香港|澳门|台北)?(分行|支行|总行|分公司|子公司|办事处|代表处).*$/g, '');
+                return core1 === norm2 || norm2.includes(core1) || core1.includes(norm2);
             }
             
-            if (!isFullBranchName1 && isFullBranchName2) {
-                // norm1是简短名称，检查norm2是否包含它
-                return norm2.includes(norm1) || norm1.length >= 2 && norm2.startsWith(norm1);
+            if (!hasBranch1 && hasBranch2) {
+                // name1是简短名称，检查name2是否以它开头
+                const core2 = norm2.replace(/(伦敦|卢森堡|法兰克福|巴黎|米兰|马德里|布达佩斯|华沙|布拉格|维也纳|阿姆斯特丹|布鲁塞尔|苏黎世|都柏林|哥本哈根|斯德哥尔摩|赫尔辛基|奥斯陆|雅典|里斯本|华盛顿|纽约|旧金山|洛杉矶|芝加哥|多伦多|悉尼|墨尔本|东京|新加坡|香港|澳门|台北)?(分行|支行|总行|分公司|子公司|办事处|代表处).*$/g, '');
+                return core2 === norm1 || norm1.includes(core2) || core2.includes(norm1);
             }
             
-            // 都不是完整分行名称，使用包含匹配
+            // 都没有分行后缀，使用包含匹配
             if (norm1.includes(norm2) || norm2.includes(norm1)) return true;
             
             return false;
